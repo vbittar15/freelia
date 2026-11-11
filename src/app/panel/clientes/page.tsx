@@ -42,7 +42,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ a
               <div className="mt-4">
                 {c.client_user_id
                   ? <StatusBadge status="aprobado" label="En su portal" />
-                  : <StatusBadge status="borrador" label="Sin invitar" />}
+                  : <StatusBadge status="borrador" label="Sin conectar" />}
               </div>
             </Link>
           ))}

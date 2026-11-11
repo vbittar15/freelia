@@ -24,6 +24,7 @@ export type Client = {
   color: string | null;
   notes: string | null;
   archived: boolean;
+  invite_token: string;
   created_at: string;
 };
 

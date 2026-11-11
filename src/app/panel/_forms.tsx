@@ -33,10 +33,10 @@ export function ClientForm({ client }: { client?: Client }) {
       {client && <input type="hidden" name="id" value={client.id} />}
       <Field label="Nombre de contacto *"><input name="name" className="input" required defaultValue={client?.name} /></Field>
       <Field label="Marca / empresa"><input name="company" className="input" defaultValue={client?.company ?? ""} /></Field>
-      <Field label="Correo" hint="Con este correo tu cliente podrá entrar a Freelia a aprobar y chatear.">
+      <Field label="Correo" hint="Para enviarle la invitación por correo.">
         <input name="email" type="email" className="input" defaultValue={client?.email ?? ""} />
       </Field>
-      <Field label="Teléfono / WhatsApp"><input name="phone" className="input" defaultValue={client?.phone ?? ""} /></Field>
+      <Field label="WhatsApp" hint="Para enviarle la invitación por WhatsApp."><input name="phone" className="input" defaultValue={client?.phone ?? ""} placeholder="300 123 4567" /></Field>
       <Field label="NIT o cédula"><input name="document_id" className="input" defaultValue={client?.document_id ?? ""} /></Field>
       <div>
         <span className="label">Color</span>

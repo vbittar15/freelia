@@ -59,7 +59,16 @@ export async function saveClient(formData: FormData) {
   const { data, error } = await supabase.from("clients").insert(row).select("id").single();
   if (error || !data) fail("/panel/clientes/nuevo", error?.message ?? "No se pudo crear");
   revalidatePath("/panel", "layout");
-  redirect(`/panel/clientes/${data.id}`);
+  redirect(`/panel/clientes/${data.id}?nuevo=1`);
+}
+
+/** Genera un enlace de invitación nuevo (el anterior deja de funcionar) */
+export async function resetInvite(formData: FormData) {
+  const { supabase } = await requireCreative();
+  const id = s(formData, "id")!;
+  await supabase.from("clients").update({ invite_token: crypto.randomUUID() }).eq("id", id).is("client_user_id", null);
+  revalidatePath(`/panel/clientes/${id}`);
+  redirect(`/panel/clientes/${id}?enlace=nuevo`);
 }
 
 export async function archiveClient(formData: FormData) {
