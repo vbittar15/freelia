@@ -44,9 +44,9 @@ export function ItemsEditor({ initial, catalog = [] }: { initial?: LineItem[]; c
         ))}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           {catalog.length > 0 && (
-            <select className="input h-9 w-auto text-[13px] font-semibold bg-brand-soft text-brand-dark pr-9" value=""
+            <select className="input h-9 w-full sm:w-auto sm:max-w-[320px] text-[13px] font-semibold !bg-brand-soft text-brand-dark pr-9" value=""
               onChange={(e) => { addFromCatalog(e.target.value); e.currentTarget.value = ""; }} aria-label="Agregar desde mi catálogo">
               <option value="" disabled>+ Desde mis servicios</option>
               {(["Paquetes", "Servicios"] as const).map((g) => catalog.some((c) => c.group === g) && (
