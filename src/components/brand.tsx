@@ -105,8 +105,8 @@ export function Trazo({ children, color = "#3D5BF5" }: { children: React.ReactNo
     <span className="relative inline-block whitespace-nowrap">
       {children}
       <svg viewBox="0 0 200 16" preserveAspectRatio="none" aria-hidden
-        className="absolute overflow-visible" style={{ left: "-2%", bottom: "-0.16em", width: "104%", height: "0.24em" }}>
-        <path className="trazo-path" pathLength={1} d="M3 9c22-9 40 7 62 0s42-8 64 0 44 6 68-2" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+        className="absolute overflow-visible trazo-path" style={{ left: "-2%", bottom: "-0.16em", width: "104%", height: "0.24em" }}>
+        <path d="M3 9c22-9 40 7 62 0s42-8 64 0 44 6 68-2" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
       </svg>
     </span>
   );

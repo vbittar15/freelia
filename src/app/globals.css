@@ -118,7 +118,8 @@
 .anim-wiggle:hover { animation: f-wiggle .5s ease-in-out; }
 .anim-ping { animation: f-ping 1.6s cubic-bezier(0,0,.2,1) infinite; }
 .lia-eyes { animation: f-blink 4.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.trazo-path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: f-draw .9s cubic-bezier(.6,.1,.3,1) forwards .35s; }
+@keyframes f-wipe { from { clip-path: inset(-50% 100% -50% 0); } to { clip-path: inset(-50% 0 -50% 0); } }
+.trazo-path { animation: f-wipe .9s cubic-bezier(.6,.1,.3,1) both .35s; }
 
 /* Listas que entran escalonadas */
 .stagger > * { animation: f-fade-up .45s cubic-bezier(.2,.7,.2,1) both; }
@@ -141,5 +142,5 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
-  .trazo-path { stroke-dashoffset: 0; }
+  .trazo-path { clip-path: none; }
 }
