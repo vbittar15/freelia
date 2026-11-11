@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* =========================================================
+   FREELIA · Tokens de marca
+   Cambia aquí los colores y se actualiza toda la app.
+   ========================================================= */
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand: #4b5fe0;        /* azul de marca (el "punto") */
+  --color-brand-dark: #3a4bc4;
+  --color-brand-soft: #eef0fd;
+
+  --color-ink: #1e2240;          /* texto principal */
+  --color-muted: #6b7090;        /* texto secundario */
+  --color-line: #eceef6;         /* bordes */
+  --color-surface: #f8f9fd;      /* fondos suaves */
+
+  /* Pasteles de apoyo */
+  --color-lavanda: #eeebff;
+  --color-menta: #e3f6ee;
+  --color-cielo: #e6f0ff;
+  --color-mantequilla: #fff5d9;
+  --color-rosa: #fde8f1;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+}
+
+@layer base {
+  html { -webkit-font-smoothing: antialiased; }
+  body { @apply bg-white text-ink font-sans text-[14px]; }
+  ::selection { background: var(--color-brand-soft); }
+}
+
+@layer components {
+  .card { @apply bg-white border border-line rounded-2xl; }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 h-10 text-[13px] font-medium
+           transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap cursor-pointer;
+  }
+  .btn-primary { @apply bg-brand text-white hover:bg-brand-dark; }
+  .btn-soft { @apply bg-brand-soft text-brand hover:bg-[#e2e6fc]; }
+  .btn-ghost { @apply text-muted hover:bg-surface hover:text-ink; }
+  .btn-danger { @apply text-[#c2416b] hover:bg-rosa; }
+  .btn-sm { @apply h-8 px-3 text-[12px]; }
+
+  .label { @apply block text-[12px] font-medium text-muted mb-1.5; }
+  .input {
+    @apply w-full rounded-xl border border-line bg-white px-3.5 h-10 text-[14px] text-ink
+           placeholder:text-[#a9adc4] outline-none transition
+           focus:border-brand focus:ring-4 focus:ring-brand-soft;
+  }
+  textarea.input { @apply h-auto py-2.5 leading-relaxed; }
+  select.input { @apply pr-8; }
+
+  .badge { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium whitespace-nowrap; }
+  .dot { @apply inline-block size-1.5 rounded-full bg-current; }
+
+  .table { @apply w-full text-left; }
+  .table th { @apply text-[11px] font-medium uppercase tracking-wide text-muted px-4 py-3 border-b border-line; }
+  .table td { @apply px-4 py-3.5 border-b border-line align-middle; }
+  .table tr:last-child td { @apply border-b-0; }
+  .table tbody tr { @apply hover:bg-surface/60 transition-colors; }
+}
+
+/* Impresión de cotizaciones y cuentas de cobro (Guardar como PDF) */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+  .print-sheet { border: none !important; box-shadow: none !important; padding: 0 !important; }
+  @page { margin: 18mm; }
+}
