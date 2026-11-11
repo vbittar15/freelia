@@ -26,7 +26,7 @@ language plpgsql security definer set search_path = public as $$
 declare c record; v_body text;
 begin
   select owner_id, client_user_id, name, company into c from clients where id = new.client_id;
-  v_body := coalesce(nullif(left(new.body, 140), ''), '' || coalesce(new.attachment_name, 'Archivo'));
+  v_body := coalesce(nullif(left(new.body, 140), ''), 'Archivo: ' || coalesce(new.attachment_name, 'adjunto'));
   if new.sender_id = c.owner_id then
     perform notify(c.client_user_id, 'mensaje', 'Nuevo mensaje', v_body, '/cliente/mensajes/' || new.client_id);
   else
@@ -85,7 +85,7 @@ begin
          count(*) filter (where status = 'cambios'),
          count(*) filter (where status = 'en_revision')
     into v_ok, v_ch, v_pend from posts where review_request_id = p_request;
-  v_title := case when v_pend = 0 and v_ch = 0 then '' || v_name || ' aprobó todo el envío'
+  v_title := case when v_pend = 0 and v_ch = 0 then v_name || ' aprobó todo el envío'
                   when v_pend = 0 then v_name || ' terminó de revisar'
                   else v_name || ' está revisando tu envío' end;
   v_body := v_ok || case when v_ok = 1 then ' aprobada' else ' aprobadas' end
@@ -144,7 +144,7 @@ begin
   if coalesce(current_setting('freelia.bulk', true), '') = '1' then return new; end if;
   if new.delivered_at is not null and new.delivered_at is distinct from old.delivered_at then
     select client_user_id into v_client from clients where id = new.client_id;
-    perform notify(v_client, 'entrega', '' || new.title || ' está lista para descargar', null, '/cliente/aprobaciones/' || new.id);
+    perform notify(v_client, 'entrega', new.title || ' está lista para descargar', null, '/cliente/aprobaciones/' || new.id);
   end if;
   return new;
 end $$;
