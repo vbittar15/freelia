@@ -26,7 +26,7 @@ Hecho con **Next.js 15**, **Supabase** (base de datos, usuarios, archivos y tiem
 
 ### 1. Crea la base de datos en Supabase (gratis)
 1. Entra a [supabase.com](https://supabase.com), crea una cuenta y luego un proyecto nuevo (región: *South America (São Paulo)*).
-2. Ve a **SQL Editor → New query**, pega todo el contenido de `supabase/schema.sql` y presiona **Run**. Debe decir *Success*.
+2. Ve a **SQL Editor → New query**, pega todo el contenido de `supabase/schema.sql` y presiona **Run**. Debe decir *Success*. Repite con `supabase/002_invitaciones.sql`.
 3. Ve a **Project Settings → API** y copia:
    - `Project URL`
    - `anon public` key
@@ -55,7 +55,7 @@ En Supabase, ve a **Authentication → URL Configuration**:
 ### 5. Pruébala
 1. Crea tu cuenta en `/registro`. Esa es la cuenta del creativo.
 2. Crea un cliente con un correo tuyo diferente.
-3. Desde la ficha del cliente copia la **invitación** y ábrela en una ventana de incógnito para registrarte como cliente.
+3. En la ficha del cliente copia su **enlace único** (o envíalo por WhatsApp o correo) y ábrelo en una ventana de incógnito para crear la cuenta del cliente.
 4. Crea una pieza, envíala a aprobación y apruébala desde la cuenta del cliente. 🎉
 
 ---
