@@ -157,7 +157,6 @@ export async function savePost(formData: FormData) {
     asset_url: s(formData, "asset_url"),
     brief_id: s(formData, "brief_id"),
   };
-  if (intent === "review") row.status = "en_revision";
   const back = id ? `/panel/parrilla/${id}` : "/panel/parrilla/nueva";
   if (!row.client_id || !row.title) fail(back, "Elige un cliente y escribe un título");
 
@@ -173,12 +172,12 @@ export async function savePost(formData: FormData) {
     const { error } = await supabase.from("posts").update(row).eq("id", id);
     if (error) fail(back, error.message);
     revalidatePath("/panel/parrilla", "layout");
-    redirect(`/panel/parrilla/${id}?ok=1`);
+    redirect(intent === "review" ? `/panel/enviar?ids=${id}` : `/panel/parrilla/${id}?ok=1`);
   }
   const { data, error } = await supabase.from("posts").insert(row).select("id").single();
   if (error || !data) fail(back, error?.message ?? "No se pudo crear");
   revalidatePath("/panel/parrilla", "layout");
-  redirect(`/panel/parrilla/${data.id}?ok=1`);
+  redirect(intent === "review" ? `/panel/enviar?ids=${data.id}` : `/panel/parrilla/${data.id}?ok=1`);
 }
 
 export async function setPostStatus(formData: FormData) {
@@ -330,14 +329,17 @@ export async function updateProfile(formData: FormData) {
 }
 
 // ---------------------------------------------------------------- Parrilla de un pedido
-export async function sendBriefForReview(formData: FormData) {
+export async function sendForReview(formData: FormData) {
   const { supabase } = await requireCreative();
-  const id = s(formData, "id")!;
-  const { data, error } = await supabase.rpc("send_brief_for_review", { p_brief: id });
-  if (error) redirect(`/panel/briefs/${id}?error=${encodeURIComponent(error.message)}`);
-  revalidatePath(`/panel/briefs/${id}`);
-  revalidatePath("/panel/parrilla", "layout");
-  redirect(`/panel/briefs/${id}?enviada=${data ?? 0}`);
+  const ids = formData.getAll("post_ids").map(String).filter(Boolean);
+  const back = `/panel/enviar?${new URLSearchParams({ cliente: s(formData, "client_id") ?? "", ids: ids.join(",") })}`;
+  if (!ids.length) fail(back, "Elige al menos una pieza para enviar");
+  const { data, error } = await supabase.rpc("send_posts_for_review", {
+    p_posts: ids, p_message: s(formData, "message"), p_resolve: formData.get("resolve") === "on",
+  });
+  if (error || !data) fail(back, error?.message ?? "No se pudo enviar");
+  revalidatePath("/panel", "layout");
+  redirect(`/panel/envios/${data}?nuevo=1`);
 }
 
 export async function linkPosts(formData: FormData) {

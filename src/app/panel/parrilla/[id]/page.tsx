@@ -49,14 +49,44 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         </>}
       />
       <ErrorNote error={error} />
-      {ok && p.status === "en_revision" && (
-        <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">
-          {p.clients?.client_user_id
-            ? "Enviada a aprobación. Tu cliente ya recibió la notificación."
-            : "Guardada en revisión. Tu cliente aún no tiene cuenta: invítalo desde su ficha para que pueda aprobar."}
-        </p>
+      {ok && (
+        <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-3 rounded-[18px] bg-verde-t px-4 py-3 text-[14px]">
+          <span className="flex-1">{p.status === "cambios" ? "Corrección guardada. Cuando tengas listas las demás, reenvíalas juntas." : p.status === "borrador" ? "Pieza guardada en borrador." : "Cambios guardados."}</span>
+          {(p.status === "borrador" || p.status === "cambios") && (
+            <Link href={`/panel/enviar?cliente=${p.client_id}&ids=${p.id}`} className="btn btn-sm btn-primary shrink-0">Enviar a aprobación →</Link>
+          )}
+        </div>
       )}
-      {ok && p.status !== "en_revision" && <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">Cambios guardados.</p>}
+
+      {p.status === "cambios" && (() => {
+        const all = (comments ?? []) as PostComment[];
+        const last = [...all].reverse().find((k) => k.action === "cambios");
+        const pins = all.filter((k) => k.x != null && !k.resolved);
+        return (
+          <section className="mb-6 rounded-[22px] bg-rosa-t p-5 sm:p-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="h2">Lo que pidió el cliente</h2>
+              <span className="badge bg-white text-ink">Ronda {p.round ?? 1}</span>
+            </div>
+            {last?.body && <p className="mt-2 text-[15px] whitespace-pre-wrap">“{last.body}”</p>}
+            {pins.length > 0 && (
+              <ol className="mt-3 space-y-1.5">
+                {pins.map((k) => (
+                  <li key={k.id} className="flex gap-2 text-[14px]">
+                    <span className="size-5 shrink-0 rounded-full bg-rosa text-white text-[11px] font-bold grid place-items-center">📍</span>
+                    <span>{k.body}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {!last?.body && pins.length === 0 && <p className="mt-2 text-[14px] text-muted">No dejó detalles; revisa los comentarios abajo.</p>}
+            <p className="mt-3 text-[13px] text-muted">Corrige la pieza, guarda y luego reenvíala. Al reenviar, las marcas se dan por resueltas.</p>
+          </section>
+        );
+      })()}
+      {p.status === "en_revision" && p.review_request_id && (
+        <p className="mb-5 text-[14px] text-muted">Enviada al cliente{(p.round ?? 1) > 1 ? ` · ronda ${p.round}` : ""}. <Link href={`/panel/envios/${p.review_request_id}`} className="font-semibold text-brand-dark hover:underline">Ver el envío →</Link></p>
+      )}
 
       <PostForm post={p} clients={clients ?? []} userId={user.id} briefs={briefs ?? []} />
 

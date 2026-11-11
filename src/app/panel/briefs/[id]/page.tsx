@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCreative } from "@/lib/auth";
-import { ClientChip, EmptyState, Notice, PageHeader, Section, StatusBadge } from "@/components/ui";
+import { ClientChip, EmptyState, PageHeader, Section, StatusBadge } from "@/components/ui";
 import { BriefPostRows, BriefProgress } from "@/components/brief-posts";
 import { ConfirmSubmit, SubmitButton } from "@/components/client-ui";
 import { BriefView } from "@/components/brief-view";
 import type { Brief, Post } from "@/lib/types";
 import { NETWORKS, clientLabel, fmtDateTime } from "@/lib/utils";
-import { deleteBrief, linkPosts, sendBriefForReview, setBriefStatus, unlinkPost } from "../../actions";
+import { deleteBrief, linkPosts, setBriefStatus, unlinkPost } from "../../actions";
 
 const NEXT: Record<string, { status: string; label: string } | null> = {
   nuevo: { status: "en_proceso", label: "Empezar a trabajar" },
@@ -15,9 +15,8 @@ const NEXT: Record<string, { status: string; label: string } | null> = {
   completado: null,
 };
 
-export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ enviada?: string }> }) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { enviada } = await searchParams;
   const { supabase, user } = await requireCreative();
   const { data } = await supabase.from("briefs").select("*, clients(name, company, color)").eq("id", id).single();
   if (!data) notFound();
@@ -56,8 +55,6 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           <Link href={`/panel/briefs/${b.id}/editar`} className="btn btn-ghost">Editar</Link>
         </>}
       />
-      {enviada && <div className="mb-5"><Notice tone="ok">{Number(enviada) > 0 ? `Listo: enviaste ${enviada} ${enviada === "1" ? "pieza" : "piezas"} a aprobación. Tu cliente recibió una sola notificación con toda la parrilla.` : "No había piezas en borrador o con cambios para enviar."}</Notice></div>}
-
       <Section title="Parrilla del pedido" count={posts.length} className="mb-6"
         action={<Link href={newPiece} className="btn btn-soft btn-sm">+ Pieza</Link>}>
         <div className={posts.length ? "card p-5 sm:p-6" : ""}>
@@ -79,13 +76,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
               </div>
               <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
                 {pending > 0 ? (
-                  <form action={sendBriefForReview}>
-                    <input type="hidden" name="id" value={b.id} />
-                    <SubmitButton className="btn btn-approve" pendingText="Enviando…">Enviar parrilla a aprobación ({pending})</SubmitButton>
-                  </form>
+                  <Link href={`/panel/enviar?brief=${b.id}`} className="btn btn-primary">Revisar y enviar a aprobación ({pending})</Link>
                 ) : null}
                 <p className="text-[13px] text-muted">
-                  {pending > 0 ? "Se envían todas las piezas en borrador o con cambios, con una sola notificación al cliente."
+                  {pending > 0 ? "Verás lo que recibe tu cliente y podrás dejarle un mensaje. Le llega una sola notificación."
                     : inReview > 0 ? `${inReview} ${inReview === 1 ? "pieza espera" : "piezas esperan"} la aprobación del cliente.`
                     : "Todo al día en este pedido ✨"}
                 </p>

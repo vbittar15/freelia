@@ -43,7 +43,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
   return (
     <>
       <PageHeader title="Parrilla de contenido" subtitle="Planea, envía a aprobación y publica."
-        actions={<Link href={`/panel/parrilla/nueva${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-primary">+ Nueva pieza</Link>} />
+        actions={<>
+          <Link href={`/panel/enviar${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-soft">Enviar a aprobación</Link>
+          <Link href={`/panel/parrilla/nueva${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-primary">+ Nueva pieza</Link>
+        </>} />
 
       <div className="flex flex-wrap items-center gap-2 mb-5">
         <form className="flex flex-wrap gap-2" action="/panel/parrilla">

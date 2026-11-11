@@ -6,6 +6,7 @@ const NAV: NavItem[] = [
   { href: "/panel/clientes", label: "Clientes", icon: "users", tab: true },
   { href: "/panel/parrilla", label: "Parrilla", icon: "calendar", tab: true },
   { href: "/panel/cobros", label: "Cobros", icon: "money", tab: true },
+  { href: "/panel/envios", label: "Aprobaciones", icon: "send" },
   { href: "/panel/briefs", label: "Briefs", icon: "brief" },
   { href: "/panel/cotizaciones", label: "Cotizaciones", icon: "quote" },
   { href: "/panel/mensajes", label: "Mensajes", icon: "chat" },

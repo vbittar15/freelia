@@ -126,12 +126,13 @@ export function PostForm({ post, clients, userId, clientId, date, briefs = [], b
           )}
         </div>
         <div className="flex flex-col gap-2">
+          <SubmitButton name="intent" value="save">{post?.status === "cambios" ? "Guardar corrección" : post ? "Guardar cambios" : "Guardar pieza"}</SubmitButton>
           {canSend && (
-            <SubmitButton name="intent" value="review" pendingText="Enviando…">
-              {post?.status === "cambios" ? "Guardar y reenviar a aprobación" : "Guardar y enviar a aprobación"}
+            <SubmitButton className="btn btn-soft" name="intent" value="review" pendingText="Guardando…">
+              {post?.status === "cambios" ? "Guardar y reenviar →" : "Guardar y enviar a aprobación →"}
             </SubmitButton>
           )}
-          <SubmitButton className="btn btn-soft" name="intent" value="save">Guardar</SubmitButton>
+          {canSend && <p className="text-[12px] text-muted text-center px-2">Tip: guarda varias piezas y envíalas juntas. Tu cliente recibe un solo aviso.</p>}
         </div>
       </div>
     </form>

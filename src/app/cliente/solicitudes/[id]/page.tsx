@@ -6,7 +6,7 @@ import { BriefView } from "@/components/brief-view";
 import { BriefPostRows, BriefProgress } from "@/components/brief-posts";
 import { SubmitButton } from "@/components/client-ui";
 import type { Brief, Post } from "@/lib/types";
-import { approveBrief } from "../../actions";
+import { approveAll } from "../../actions";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ ok?: string; aprobada?: string; error?: string }> }) {
   const { id } = await params;
@@ -35,8 +35,9 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             </div>
             {inReview > 0 && (
               <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
-                <form action={approveBrief}>
-                  <input type="hidden" name="id" value={b.id} />
+                <form action={approveAll}>
+                  <input type="hidden" name="back" value={`/cliente/solicitudes/${b.id}`} />
+                  {posts.filter((p) => p.status === "en_revision").map((p) => <input key={p.id} type="hidden" name="post_ids" value={p.id} />)}
                   <SubmitButton className="btn btn-approve" pendingText="Aprobando…">✓ Aprobar toda la parrilla ({inReview})</SubmitButton>
                 </form>
                 <p className="text-[13px] text-muted">¿Algo por ajustar? Abre la pieza y marca los cambios sobre el arte. <Link href="/cliente/aprobaciones" className="font-semibold text-brand-dark hover:underline">Revisar una por una</Link></p>

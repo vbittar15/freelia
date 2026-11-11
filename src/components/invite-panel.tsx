@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Lia } from "./brand";
 
-function waNumber(phone?: string | null) {
+export function waNumber(phone?: string | null) {
   const d = (phone ?? "").replace(/\D/g, "");
   if (!d) return "";
   if (d.length === 10 && d.startsWith("3")) return "57" + d; // celular Colombia

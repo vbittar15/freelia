@@ -34,12 +34,12 @@ export default async function Page() {
   ]);
   const posts = (pending ?? []) as Post[];
   const n = posts.length;
-  const byBrief = new Map<string, number>();
-  posts.forEach((p) => { if (p.brief_id) byBrief.set(p.brief_id, (byBrief.get(p.brief_id) ?? 0) + 1); });
-  const { data: bd } = byBrief.size
-    ? await supabase.from("briefs").select("id, title").in("id", [...byBrief.keys()])
-    : { data: [] as { id: string; title: string }[] };
-  const ready = (bd ?? []) as { id: string; title: string }[];
+  const byReq = new Map<string, Post[]>();
+  posts.forEach((p) => { if (p.review_request_id) byReq.set(p.review_request_id, [...(byReq.get(p.review_request_id) ?? []), p]); });
+  const { data: rd } = byReq.size
+    ? await supabase.from("review_requests").select("id, message, created_at, client_id").in("id", [...byReq.keys()]).order("created_at", { ascending: false })
+    : { data: [] as { id: string; message: string | null; created_at: string; client_id: string }[] };
+  const ready = (rd ?? []) as { id: string; message: string | null; created_at: string; client_id: string }[];
 
   return (
     <div className="space-y-9">
@@ -56,14 +56,28 @@ export default async function Page() {
       <NotifyCard compact />
 
       {ready.length > 0 && (
-        <Section title="Parrillas listas para aprobar" count={ready.length}>
-          <RowList>
-            {ready.map((r) => (
-              <Row key={r.id} href={`/cliente/solicitudes/${r.id}`} status="en_revision" title={r.title}
-                sub={`${byBrief.get(r.id)} ${byBrief.get(r.id) === 1 ? "pieza" : "piezas"} por aprobar`}
-                pill={<span className="badge bg-azul-t text-brand-dark">Ver parrilla →</span>} />
-            ))}
-          </RowList>
+        <Section title="Envíos por revisar" count={ready.length}>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {ready.map((r) => {
+              const ps = byReq.get(r.id) ?? [];
+              const fix = ps.some((p) => (p.round ?? 1) > 1);
+              return (
+                <Link key={r.id} href={`/cliente/revisar/${r.id}`} className="card p-4 flex items-center gap-4 min-w-0 hover:bg-surface-2 transition-colors">
+                  <div className="flex -space-x-3 shrink-0">
+                    {ps.slice(0, 3).map((p) => p.asset_url && !/\.(mp4|mov|webm)$/i.test(p.asset_url)
+                      // eslint-disable-next-line @next/next/no-img-element
+                      ? <img key={p.id} src={p.asset_url} alt="" className="size-12 rounded-[14px] object-cover ring-2 ring-surface bg-lila-t" />
+                      : <span key={p.id} className="size-12 rounded-[14px] ring-2 ring-surface bg-azul-t grid place-items-center"><Lia size={24} mood="right" /></span>)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold">{fix ? "Correcciones listas" : `${ps.length} ${ps.length === 1 ? "pieza nueva" : "piezas nuevas"}`}</div>
+                    <div className="text-[13px] text-muted truncate">{r.message || `${creativeName(workspaces.find((w) => w.id === r.client_id))} · ${fmtDate(r.created_at)}`}</div>
+                  </div>
+                  <span className="btn btn-primary btn-sm shrink-0">Revisar</span>
+                </Link>
+              );
+            })}
+          </div>
         </Section>
       )}
 
@@ -71,7 +85,7 @@ export default async function Page() {
         {n ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {posts.map((p) => (
-              <Link key={p.id} href={`/cliente/aprobaciones/${p.id}`} className="card overflow-hidden hover:bg-surface-2 transition-colors">
+              <Link key={p.id} href={`/cliente/aprobaciones/${p.id}${p.review_request_id ? `?r=${p.review_request_id}` : ""}`} className="card overflow-hidden hover:bg-surface-2 transition-colors">
                 {p.asset_url && !/\.(mp4|mov|webm)$/i.test(p.asset_url)
                   // eslint-disable-next-line @next/next/no-img-element
                   ? <img src={p.asset_url} alt="" className="w-full aspect-[4/3] object-cover bg-lila-t" />

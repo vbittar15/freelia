@@ -185,6 +185,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           <>
             <div className="flex flex-wrap items-center gap-2 mb-5">
               <Link href={`/panel/parrilla/nueva?cliente=${c.id}`} className="btn btn-primary btn-sm">+ Nueva pieza</Link>
+              {(() => { const k = posts.filter((p) => p.status === "borrador" || p.status === "cambios").length; return k > 0 && <Link href={`/panel/enviar?cliente=${c.id}`} className="btn btn-soft btn-sm">Enviar a aprobación ({k})</Link>; })()}
               <div className="ml-auto flex rounded-full bg-surface p-1">
                 <Link href={href({ vista: undefined })} className={cn("btn btn-sm", !list ? "bg-white shadow-sm text-ink" : "text-muted font-medium")}>Calendario</Link>
                 <Link href={href({ vista: "lista" })} className={cn("btn btn-sm", list ? "bg-white shadow-sm text-ink" : "text-muted font-medium")}>Lista</Link>

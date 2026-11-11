@@ -60,6 +60,8 @@ export type Post = {
   copy: string | null;
   asset_url: string | null;
   brief_id?: string | null;
+  round?: number;
+  review_request_id?: string | null;
   status: PostStatus;
   created_at: string;
   updated_at: string;
@@ -142,3 +144,14 @@ export type Notification = {
 };
 
 export type FileRef = { url: string; name: string; type: string };
+
+export type ReviewRequest = {
+  id: string;
+  owner_id: string;
+  client_id: string;
+  brief_id: string | null;
+  message: string | null;
+  post_ids: string[];
+  created_at: string;
+  clients?: Pick<Client, "name" | "company" | "color" | "phone" | "client_user_id"> | null;
+};

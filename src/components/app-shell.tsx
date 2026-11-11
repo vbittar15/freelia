@@ -19,6 +19,7 @@ const ICONS: Record<string, React.ReactNode> = {
   chat: <path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.3A8 8 0 1 1 20 11.5z" />,
   bell: <><path d="M6 9a6 6 0 1 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15.5 6 9" /><path d="M10.3 20.5a1.94 1.94 0 0 0 3.4 0" /></>,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  send: <><path d="M20.5 3.5L10 14" /><path d="M20.5 3.5l-6.5 17-4-6.5-6.5-4z" /></>,
   more: <><circle cx="5.5" cy="12" r="1.3" /><circle cx="12" cy="12" r="1.3" /><circle cx="18.5" cy="12" r="1.3" /></>,
 };
 export type IconName = keyof typeof ICONS & string;

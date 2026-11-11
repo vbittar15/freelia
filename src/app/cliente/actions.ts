@@ -14,15 +14,36 @@ export async function reviewPost(formData: FormData) {
   const id = s(formData, "id")!;
   const action = s(formData, "action");
   const comment = s(formData, "comment");
+  const r = s(formData, "r");
+  const self = `/cliente/aprobaciones/${id}${r ? `?r=${r}&` : "?"}`;
   if (action === "cambios" && !comment) {
     const { count } = await supabase.from("post_comments").select("id", { count: "exact", head: true })
       .eq("post_id", id).not("x", "is", null).eq("resolved", false);
-    if (!count) redirect(`/cliente/aprobaciones/${id}?error=${encodeURIComponent("Cuéntale al equipo qué cambios necesitas o márcalos sobre el arte")}`);
+    if (!count) redirect(`${self}error=${encodeURIComponent("Cuéntale al equipo qué cambios necesitas o márcalos sobre el arte")}`);
   }
   const { error } = await supabase.rpc("review_post", { p_post: id, p_action: action, p_comment: comment ?? (action === "cambios" ? "Marqué los cambios sobre el arte 📍" : null) });
-  if (error) redirect(`/cliente/aprobaciones/${id}?error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`${self}error=${encodeURIComponent(error.message)}`);
   revalidatePath("/cliente", "layout");
+  if (r) {
+    // Revisión en secuencia: pasar a la siguiente pieza pendiente del envío
+    const { data: req } = await supabase.from("review_requests").select("post_ids").eq("id", r).single();
+    const { data: next } = await supabase.from("posts").select("id").in("id", req?.post_ids ?? []).eq("status", "en_revision")
+      .order("scheduled_at", { ascending: true, nullsFirst: false }).limit(1);
+    if (next?.[0]) redirect(`/cliente/aprobaciones/${next[0].id}?r=${r}&prev=${action}`);
+    redirect(`/cliente/revisar/${r}?fin=1`);
+  }
   redirect(`/cliente/aprobaciones/${id}?ok=${action}`);
+}
+
+export async function approveAll(formData: FormData) {
+  const { supabase } = await requireClient();
+  const ids = formData.getAll("post_ids").map(String).filter(Boolean);
+  const back = s(formData, "back") ?? "/cliente";
+  const { data, error } = await supabase.rpc("approve_posts", { p_posts: ids });
+  const sep = back.includes("?") ? "&" : "?";
+  if (error) redirect(`${back}${sep}error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/cliente", "layout");
+  redirect(`${back}${sep}aprobada=${data ?? 0}`);
 }
 
 export async function respondQuote(formData: FormData) {
@@ -67,11 +88,3 @@ export async function updateClientProfile(formData: FormData) {
   redirect("/cliente/perfil?ok=1");
 }
 
-export async function approveBrief(formData: FormData) {
-  const { supabase } = await requireClient();
-  const id = s(formData, "id")!;
-  const { data, error } = await supabase.rpc("approve_brief_posts", { p_brief: id });
-  if (error) redirect(`/cliente/solicitudes/${id}?error=${encodeURIComponent(error.message)}`);
-  revalidatePath("/cliente", "layout");
-  redirect(`/cliente/solicitudes/${id}?aprobada=${data ?? 0}`);
-}
