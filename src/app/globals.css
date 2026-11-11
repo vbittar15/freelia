@@ -7,12 +7,12 @@
 @theme {
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand: #4b5fe0;        /* azul de marca (el "punto") */
-  --color-brand-dark: #3a4bc4;
-  --color-brand-soft: #eef0fd;
+  --color-brand: #3d5bf5;        /* azul de marca (el "punto") */
+  --color-brand-dark: #2c46d8;
+  --color-brand-soft: #dce3ff;
 
-  --color-ink: #1e2240;          /* texto principal */
-  --color-muted: #6b7090;        /* texto secundario */
+  --color-ink: #221a3a;          /* tinta */
+  --color-muted: #5e5678;        /* texto secundario */
   --color-line: #eceef6;         /* bordes */
   --color-surface: #f8f9fd;      /* fondos suaves */
 
@@ -40,7 +40,7 @@
            transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap cursor-pointer;
   }
   .btn-primary { @apply bg-brand text-white hover:bg-brand-dark; }
-  .btn-soft { @apply bg-brand-soft text-brand hover:bg-[#e2e6fc]; }
+  .btn-soft { @apply bg-brand-soft text-brand hover:bg-[#cfd8ff]; }
   .btn-ghost { @apply text-muted hover:bg-surface hover:text-ink; }
   .btn-danger { @apply text-[#c2416b] hover:bg-rosa; }
   .btn-sm { @apply h-8 px-3 text-[12px]; }

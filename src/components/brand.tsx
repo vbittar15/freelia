@@ -1,19 +1,25 @@
 import { cn } from "@/lib/utils";
 
-/** Logo "Punto.": Freelia en Poppins con el punto de la i en azul de marca */
-export function Logo({ className, size = 22 }: { className?: string; size?: number }) {
+/**
+ * Logo "Punto." según el manual de marca:
+ * "freelia" en minúsculas, Poppins 900. El punto de la i crece, sube
+ * y es lo único que lleva color (azul de marca).
+ */
+export function Logo({ className, size = 24, color = "var(--color-ink)", dot = "var(--color-brand)" }:
+  { className?: string; size?: number; color?: string; dot?: string }) {
   return (
     <span
-      className={cn("font-semibold tracking-tight text-ink select-none inline-flex items-baseline", className)}
-      style={{ fontSize: size, lineHeight: 1 }}
+      className={cn("inline-block whitespace-nowrap select-none", className)}
+      style={{ fontSize: size, fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1.1, color }}
+      role="img"
       aria-label="Freelia"
     >
-      Freel
+      freel
       <span className="relative inline-block">
-        ı
+        <span className="inline-block" style={{ clipPath: "inset(0.325em 0 0 0)" }}>i</span>
         <span
-          className="absolute left-1/2 -translate-x-1/2 rounded-full bg-brand"
-          style={{ width: size * 0.24, height: size * 0.24, top: -size * 0.14 }}
+          className="absolute block rounded-full"
+          style={{ left: "calc(50% + 0.0175em)", top: "-0.01em", width: "0.3em", height: "0.3em", transform: "translateX(-50%)", background: dot }}
         />
       </span>
       a
@@ -21,21 +27,16 @@ export function Logo({ className, size = 22 }: { className?: string; size?: numb
   );
 }
 
-/** Lia: la asistente, un punto con ojos */
-export function Lia({ size = 40, mood = "happy", className }: { size?: number; mood?: "happy" | "wink" | "calm"; className?: string }) {
+/** Lia: el mismo punto, con ojos. Sin boca, brazos ni piernas: con la mirada basta. */
+export function Lia({ size = 40, mood = "base", color = "var(--color-brand)", className }:
+  { size?: number; mood?: "base" | "happy" | "wink" | "calm"; color?: string; className?: string }) {
+  const eye = "var(--color-ink)";
+  const oval = (x: number) => <ellipse cx={x} cy={-6} rx={6.5} ry={mood === "calm" ? 5 : 10} fill={eye} />;
+  const arc = (x: number) => <path d={`M${x - 8} -3q8 -13 16 0`} fill="none" stroke={eye} strokeWidth={5.5} strokeLinecap="round" />;
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" className={className} aria-hidden>
-      <circle cx="20" cy="20" r="18" fill="var(--color-brand)" />
-      <circle cx="13" cy="12" r="5" fill="white" opacity=".18" />
-      {mood === "wink" ? (
-        <path d="M12.5 18.5q2.5-2 5 0" stroke="white" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-      ) : (
-        <ellipse cx="15" cy="18" rx="2.2" ry={mood === "calm" ? 1.4 : 2.8} fill="white" />
-      )}
-      <ellipse cx="25" cy="18" rx="2.2" ry={mood === "calm" ? 1.4 : 2.8} fill="white" />
-      <path d="M16.5 24.5q3.5 3 7 0" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <circle cx="11" cy="23" r="2" fill="#ffb8d2" opacity=".55" />
-      <circle cx="29" cy="23" r="2" fill="#ffb8d2" opacity=".55" />
+    <svg width={size} height={size} viewBox="-50 -50 100 100" className={className} aria-hidden>
+      <circle r={50} fill={color} />
+      {mood === "happy" ? <>{arc(-15)}{arc(15)}</> : mood === "wink" ? <>{arc(-15)}{oval(15)}</> : <>{oval(-15)}{oval(15)}</>}
     </svg>
   );
 }

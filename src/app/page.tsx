@@ -17,7 +17,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       <header className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Logo />
+        <Logo size={28} />
         <div className="flex gap-2">
           <Link href="/ingresar" className="btn btn-ghost">Ingresar</Link>
           <Link href="/registro" className="btn btn-primary">Empezar gratis</Link>

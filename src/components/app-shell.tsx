@@ -66,7 +66,7 @@ export function AppShell({
     <div className="min-h-screen flex">
       {/* Barra lateral (escritorio) */}
       <aside className="no-print hidden md:flex w-60 shrink-0 flex-col border-r border-line px-4 py-6 sticky top-0 h-screen">
-        <Link href={nav[0].href} className="px-2 mb-8"><Logo /></Link>
+        <Link href={nav[0].href} className="px-2 mb-8"><Logo size={28} /></Link>
         <nav className="flex flex-col gap-0.5 flex-1">
           {nav.map((i) => (
             <Link key={i.href} href={i.href}
@@ -94,7 +94,7 @@ export function AppShell({
       {/* Barra superior + navegación inferior (móvil) */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="no-print md:hidden flex items-center justify-between px-5 h-14 border-b border-line sticky top-0 bg-white/90 backdrop-blur z-20">
-          <Logo size={20} />
+          <Logo size={24} />
           <div className="flex items-center gap-1">
             <Link href={notificationsHref} className="relative btn-ghost btn btn-sm px-2" aria-label="Notificaciones">
               <Icon name="bell" />
