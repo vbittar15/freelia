@@ -4,6 +4,7 @@ import { EmptyState, PageHeader, Row, RowList, StatusBadge } from "@/components/
 import type { Post } from "@/lib/types";
 import { NETWORKS, FORMATS, clientLabel, cn, fmtDateTime } from "@/lib/utils";
 import { ContentCalendar, monthRange } from "@/components/content-calendar";
+import { pieceWord, usesSocial, workTitle } from "@/lib/rubros";
 
 export const metadata = { title: "Parrilla" };
 
@@ -11,7 +12,8 @@ type SP = { mes?: string; cliente?: string; estado?: string; vista?: string };
 
 export default async function Page({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
-  const { supabase } = await requireCreative();
+  const { supabase, profile } = await requireCreative();
+  const rub = profile.specialties ?? [];
 
   const { start, end } = monthRange(sp.mes);
   const list = sp.vista === "lista";
@@ -42,10 +44,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
 
   return (
     <>
-      <PageHeader title="Parrilla de contenido" subtitle="Planea, envía a aprobación y publica."
+      <PageHeader title={workTitle(rub)} subtitle={usesSocial(rub) ? "Planea, envía a aprobación y publica." : "Organiza tus entregas, envíalas a aprobación y entrégalas."}
         actions={<>
           <Link href={`/panel/enviar${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-soft">Enviar a aprobación</Link>
-          <Link href={`/panel/parrilla/nueva${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-primary">+ Nueva pieza</Link>
+          <Link href={`/panel/parrilla/nueva${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-primary">+ Nueva {pieceWord(rub)}</Link>
         </>} />
 
       <div className="flex flex-wrap items-center gap-2 mb-5">

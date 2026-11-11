@@ -1,6 +1,7 @@
 import { SubmitButton } from "@/components/client-ui";
 import { Field } from "@/components/ui";
 import { ItemsEditor } from "@/components/items-editor";
+import type { CatalogItem } from "@/lib/catalog";
 import { ImageUpload } from "@/components/image-upload";
 import { FilePicker } from "@/components/file-picker";
 import type { Brief, Client, Invoice, Post, Quote } from "@/lib/types";
@@ -84,7 +85,9 @@ export function BriefForm({ brief, clients, clientId, userId }: { brief?: Brief;
 
 type BriefOpt = { id: string; title: string; client_id: string };
 
-export function PostForm({ post, clients, userId, clientId, date, briefs = [], briefId }: { post?: Post; clients: ClientOpt[]; userId: string; clientId?: string; date?: string; briefs?: BriefOpt[]; briefId?: string }) {
+export function PostForm({ post, clients, userId, clientId, date, briefs = [], briefId, networks, formats, word = "pieza" }: { post?: Post; clients: ClientOpt[]; userId: string; clientId?: string; date?: string; briefs?: BriefOpt[]; briefId?: string; networks?: string[]; formats?: string[]; word?: string }) {
+  const netKeys = networks?.length ? [...networks, ...Object.keys(NETWORKS).filter((k) => !networks.includes(k))] : Object.keys(NETWORKS);
+  const fmtKeys = formats?.length ? formats : Object.keys(FORMATS);
   const cid = post?.client_id ?? clientId;
   const briefOpts = briefs.filter((b) => !cid || b.client_id === cid);
   const canSend = !post || post.status === "borrador" || post.status === "cambios";
@@ -92,7 +95,7 @@ export function PostForm({ post, clients, userId, clientId, date, briefs = [], b
     <form action={savePost} className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-5">
       {post && <input type="hidden" name="id" value={post.id} />}
       <div className="card p-6 space-y-4">
-        <Field label="Título de la pieza *"><input name="title" className="input" required defaultValue={post?.title} placeholder="Ej. Lanzamiento sabor maracuyá" /></Field>
+        <Field label={`Título de la ${word} *`}><input name="title" className="input" required defaultValue={post?.title} placeholder="Ej. Lanzamiento sabor maracuyá" /></Field>
         <Field label="Copy"><textarea name="copy" rows={8} className="input" defaultValue={post?.copy ?? ""} placeholder="Texto de la publicación, hashtags, CTA…" /></Field>
         <div>
           <span className="label">Arte</span>
@@ -102,14 +105,14 @@ export function PostForm({ post, clients, userId, clientId, date, briefs = [], b
       <div className="space-y-4">
         <div className="card p-6 space-y-4">
           <ClientSelect clients={clients} value={post?.client_id ?? clientId} disabled={!!post} />
-          <Field label="Red">
-            <select name="network" className="input" defaultValue={post?.network ?? "instagram"}>
-              {Object.entries(NETWORKS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          <Field label="Red o canal">
+            <select name="network" className="input" defaultValue={post?.network ?? netKeys[0]}>
+              {netKeys.map((k) => <option key={k} value={k}>{NETWORKS[k]}</option>)}
             </select>
           </Field>
           <Field label="Formato">
-            <select name="format" className="input" defaultValue={post?.format ?? "post"}>
-              {Object.entries(FORMATS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            <select name="format" className="input" defaultValue={post?.format ?? fmtKeys[0]}>
+              {fmtKeys.map((k) => <option key={k} value={k}>{FORMATS[k]}</option>)}
             </select>
           </Field>
           <Field label="Fecha y hora de publicación">
@@ -126,7 +129,7 @@ export function PostForm({ post, clients, userId, clientId, date, briefs = [], b
           )}
         </div>
         <div className="flex flex-col gap-2">
-          <SubmitButton name="intent" value="save">{post?.status === "cambios" ? "Guardar corrección" : post ? "Guardar cambios" : "Guardar pieza"}</SubmitButton>
+          <SubmitButton name="intent" value="save">{post?.status === "cambios" ? "Guardar corrección" : post ? "Guardar cambios" : `Guardar ${word}`}</SubmitButton>
           {canSend && (
             <SubmitButton className="btn btn-soft" name="intent" value="review" pendingText="Guardando…">
               {post?.status === "cambios" ? "Guardar y reenviar →" : "Guardar y enviar a aprobación →"}
@@ -139,22 +142,22 @@ export function PostForm({ post, clients, userId, clientId, date, briefs = [], b
   );
 }
 
-export function QuoteForm({ quote, clients, clientId }: { quote?: Quote; clients: ClientOpt[]; clientId?: string }) {
+export function QuoteForm({ quote, clients, clientId, catalog, defaults }: { quote?: Quote; clients: ClientOpt[]; clientId?: string; catalog?: CatalogItem[]; defaults?: { valid_until?: string; notes?: string } }) {
   return (
     <form action={saveQuote} className="space-y-5 max-w-4xl">
       {quote && <input type="hidden" name="id" value={quote.id} />}
       <div className="card p-6 grid sm:grid-cols-2 gap-4">
         <ClientSelect clients={clients} value={quote?.client_id ?? clientId} disabled={!!quote} />
         <Field label="Título *"><input name="title" className="input" required defaultValue={quote?.title} placeholder="Ej. Gestión de redes – diciembre" /></Field>
-        <Field label="Válida hasta"><input name="valid_until" type="date" className="input" defaultValue={quote?.valid_until ?? ""} /></Field>
+        <Field label="Válida hasta"><input name="valid_until" type="date" className="input" defaultValue={quote ? quote.valid_until ?? "" : defaults?.valid_until ?? ""} /></Field>
       </div>
       <div className="card p-6">
         <h3 className="font-medium mb-4">Ítems</h3>
-        <ItemsEditor initial={quote?.quote_items} />
+        <ItemsEditor initial={quote?.quote_items} catalog={catalog} />
       </div>
       <div className="card p-6">
         <Field label="Condiciones / notas">
-          <textarea name="notes" rows={4} className="input" defaultValue={quote?.notes ?? "50% de anticipo para iniciar y 50% contra entrega.\nIncluye 2 rondas de ajustes."} />
+          <textarea name="notes" rows={4} className="input" defaultValue={quote ? quote.notes ?? "" : defaults?.notes ?? "50% de anticipo para iniciar y 50% contra entrega.\nIncluye 2 rondas de ajustes."} />
         </Field>
       </div>
       <div className="flex flex-wrap justify-end gap-2">
@@ -165,7 +168,7 @@ export function QuoteForm({ quote, clients, clientId }: { quote?: Quote; clients
   );
 }
 
-export function InvoiceForm({ invoice, clients, clientId }: { invoice?: Invoice; clients: ClientOpt[]; clientId?: string }) {
+export function InvoiceForm({ invoice, clients, clientId, catalog, defaults }: { invoice?: Invoice; clients: ClientOpt[]; clientId?: string; catalog?: CatalogItem[]; defaults?: { due_date?: string; notes?: string } }) {
   const today = new Date().toISOString().slice(0, 10);
   return (
     <form action={saveInvoice} className="space-y-5 max-w-4xl">
@@ -174,15 +177,15 @@ export function InvoiceForm({ invoice, clients, clientId }: { invoice?: Invoice;
         <ClientSelect clients={clients} value={invoice?.client_id ?? clientId} disabled={!!invoice} />
         <Field label="Por concepto de *"><input name="concept" className="input" required defaultValue={invoice?.concept} placeholder="Ej. Servicios de diseño – noviembre" /></Field>
         <Field label="Fecha de emisión"><input name="issue_date" type="date" className="input" defaultValue={invoice?.issue_date ?? today} /></Field>
-        <Field label="Fecha límite de pago"><input name="due_date" type="date" className="input" defaultValue={invoice?.due_date ?? ""} /></Field>
+        <Field label="Fecha límite de pago"><input name="due_date" type="date" className="input" defaultValue={invoice ? invoice.due_date ?? "" : defaults?.due_date ?? ""} /></Field>
       </div>
       <div className="card p-6">
         <h3 className="font-medium mb-4">Ítems</h3>
-        <ItemsEditor initial={invoice?.invoice_items} />
+        <ItemsEditor initial={invoice?.invoice_items} catalog={catalog} />
       </div>
       <div className="card p-6">
         <Field label="Notas" hint="Tus datos bancarios se toman de tu perfil.">
-          <textarea name="notes" rows={3} className="input" defaultValue={invoice?.notes ?? "No soy responsable de IVA."} />
+          <textarea name="notes" rows={3} className="input" defaultValue={invoice ? invoice.notes ?? "" : defaults?.notes ?? "No soy responsable de IVA."} />
         </Field>
       </div>
       <div className="flex flex-wrap justify-end gap-2">

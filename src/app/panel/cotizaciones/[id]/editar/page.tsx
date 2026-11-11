@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireCreative } from "@/lib/auth";
+import { loadCatalog } from "@/lib/catalog";
 import { PageHeader } from "@/components/ui";
 import { ErrorNote, QuoteForm } from "../../../_forms";
 import type { Quote } from "@/lib/types";
@@ -19,7 +20,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     <>
       <PageHeader title={`Editar cotización #${q.number}`} back={{ href: `/panel/cotizaciones/${id}`, label: q.title }} />
       <ErrorNote error={error} />
-      <QuoteForm quote={q} clients={clients ?? []} />
+      <QuoteForm quote={q} clients={clients ?? []} catalog={await loadCatalog(supabase)} />
     </>
   );
 }

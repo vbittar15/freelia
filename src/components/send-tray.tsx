@@ -19,9 +19,9 @@ function Thumb({ p, size = 56 }: { p: Post; size?: number }) {
 }
 
 /** Bandeja para armar un envío a aprobación: elegir piezas, escribir mensaje, ver lo que recibe el cliente */
-export function SendTray({ action, clientId, clientName, hasAccount, posts, preselected, briefTitle }: {
+export function SendTray({ action, clientId, clientName, hasAccount, posts, preselected, briefTitle, roundsIncluded = 2 }: {
   action: (f: FormData) => void; clientId: string; clientName: string; hasAccount: boolean;
-  posts: TrayPost[]; preselected: string[]; briefTitle?: string | null;
+  posts: TrayPost[]; preselected: string[]; briefTitle?: string | null; roundsIncluded?: number;
 }) {
   const [sel, setSel] = useState<Set<string>>(new Set(preselected));
   const [msg, setMsg] = useState("");
@@ -63,6 +63,7 @@ export function SendTray({ action, clientId, clientName, hasAccount, posts, pres
                 <span className="flex items-center gap-2 min-w-0">
                   <span className="font-semibold text-[15px] truncate">{p.title}</span>
                   {p.status === "cambios" && <span className="badge bg-rosa-t text-ink shrink-0">Ronda {(p.round ?? 1) + 1}</span>}
+                  {p.status === "cambios" && (p.round ?? 1) > roundsIncluded && <span className="badge bg-amarillo-t text-ink shrink-0" title={`Tu tarifa incluye ${roundsIncluded} rondas de cambios`}>Ronda extra</span>}
                 </span>
                 <span className="block text-[12px] text-muted truncate">{NETWORKS[p.network] ?? p.network} · {FORMATS[p.format] ?? p.format} · {p.scheduled_at ? fmtDateTime(p.scheduled_at) : "Sin fecha"}</span>
                 {p.status === "cambios" && p.lastChange && (

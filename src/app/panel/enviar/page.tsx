@@ -4,6 +4,7 @@ import { ClientChip, EmptyState, PageHeader, Row, RowList } from "@/components/u
 import { SendTray, type TrayPost } from "@/components/send-tray";
 import type { Post } from "@/lib/types";
 import { clientLabel } from "@/lib/utils";
+import { withDefaults } from "@/lib/rubros";
 import { ErrorNote } from "../_forms";
 import { sendForReview } from "../actions";
 
@@ -13,7 +14,7 @@ type SP = { cliente?: string; brief?: string; ids?: string; error?: string };
 
 export default async function Page({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
-  const { supabase } = await requireCreative();
+  const { supabase, profile } = await requireCreative();
   const pre = (sp.ids ?? "").split(",").filter(Boolean);
 
   // Piezas que se pueden enviar: borradores y correcciones
@@ -82,7 +83,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
           action={<Link href={`/panel/parrilla/nueva?cliente=${clientId}`} className="btn btn-primary">+ Nueva pieza</Link>} />
       ) : (
         <SendTray action={sendForReview} clientId={clientId} clientName={clientLabel(c)} hasAccount={!!c?.client_user_id}
-          posts={tray} preselected={preselected} briefTitle={brief?.title} />
+          posts={tray} preselected={preselected} briefTitle={brief?.title} roundsIncluded={withDefaults(profile.settings).rounds_included} />
       )}
     </>
   );

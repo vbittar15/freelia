@@ -19,6 +19,7 @@ const ICONS: Record<string, React.ReactNode> = {
   chat: <path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.3A8 8 0 1 1 20 11.5z" />,
   bell: <><path d="M6 9a6 6 0 1 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15.5 6 9" /><path d="M10.3 20.5a1.94 1.94 0 0 0 3.4 0" /></>,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>,
   send: <><path d="M20.5 3.5L10 14" /><path d="M20.5 3.5l-6.5 17-4-6.5-6.5-4z" /></>,
   more: <><circle cx="5.5" cy="12" r="1.3" /><circle cx="12" cy="12" r="1.3" /><circle cx="18.5" cy="12" r="1.3" /></>,
 };
@@ -77,7 +78,7 @@ export function AppShell({
         <Link href={nav[0].href} className="px-3 mb-9"><Logo size={28} /></Link>
         <nav className="flex flex-col gap-1 flex-1">
           {nav.map((i) => (
-            <Link key={i.href} href={i.href}
+            <Link key={i.href} href={i.href} data-tour={i.href}
               className={cn("flex items-center gap-3 rounded-full px-4 h-11 text-[14px] transition-colors",
                 isActive(i) ? "bg-brand-soft text-brand-dark font-semibold" : "text-muted font-medium hover:bg-surface hover:text-ink")}>
               <Icon name={i.icon} className="size-[20px]" />{i.label}
@@ -85,7 +86,7 @@ export function AppShell({
           ))}
         </nav>
         <div className="flex flex-col gap-1">
-          <Link href={notificationsHref}
+          <Link href={notificationsHref} data-tour="notificaciones"
             className={cn("flex items-center gap-3 rounded-full px-4 h-11 text-[14px]",
               pathname.startsWith(notificationsHref) ? "bg-brand-soft text-brand-dark font-semibold" : "text-muted font-medium hover:bg-surface hover:text-ink")}>
             <Icon name="bell" className="size-[20px]" />Notificaciones
@@ -106,7 +107,7 @@ export function AppShell({
         <header className="no-print lg:hidden flex items-center justify-between px-4 h-16 sticky top-0 bg-white/90 backdrop-blur z-20">
           <Link href={nav[0].href} className="pl-1"><Logo size={24} /></Link>
           <div className="flex items-center gap-2.5">
-            <Link href={notificationsHref} className="icon-btn relative" aria-label="Notificaciones">
+            <Link href={notificationsHref} data-tour="notificaciones" className="icon-btn relative" aria-label="Notificaciones">
               <Icon name="bell" />
               {count > 0 && <span className="absolute top-2 right-2.5 size-2.5 rounded-full bg-brand ring-2 ring-white" />}
             </Link>
@@ -130,14 +131,14 @@ export function AppShell({
         <nav aria-label="Pestañas"
           className="no-print lg:hidden fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[480px] bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-[62px] rounded-full bg-white/95 backdrop-blur shadow-[0_6px_24px_rgba(34,26,58,.10)] border border-line flex items-center px-[5px] gap-0.5">
           {tabs.map((i) => (
-            <Link key={i.href} href={i.href}
+            <Link key={i.href} href={i.href} data-tour={i.href}
               className={cn("flex-1 min-w-0 h-[52px] rounded-full flex flex-col items-center justify-center gap-px text-[11px]",
                 isActive(i) ? "bg-brand-soft text-brand-dark font-semibold" : "text-muted font-medium")}>
               <Icon name={i.icon} />{i.short ?? i.label}
             </Link>
           ))}
           {rest.length > 0 && (
-            <button type="button" onClick={() => setMore((m) => !m)} aria-expanded={more}
+            <button type="button" data-tour="more" onClick={() => setMore((m) => !m)} aria-expanded={more}
               className={cn("flex-1 min-w-0 h-[52px] rounded-full flex flex-col items-center justify-center gap-px text-[11px] cursor-pointer",
                 restActive || more ? "bg-brand-soft text-brand-dark font-semibold" : "text-muted font-medium")}>
               <Icon name="more" />Más

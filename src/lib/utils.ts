@@ -57,6 +57,7 @@ export const NETWORKS: Record<string, string> = {
   youtube: "YouTube",
   pinterest: "Pinterest",
   web: "Web / Blog",
+  entrega: "Entrega directa (sin red)",
 };
 
 export const FORMATS: Record<string, string> = {
@@ -66,6 +67,13 @@ export const FORMATS: Record<string, string> = {
   historia: "Historia",
   video: "Video",
   articulo: "Artículo",
+  foto: "Fotografía",
+  sesion: "Sesión de fotos",
+  pantalla: "Pantalla / UI",
+  web: "Sitio web / landing",
+  documento: "Documento / PDF",
+  audio: "Audio / episodio",
+  entrega: "Entrega / archivo final",
 };
 
 /** Número a letras en español (para "La suma de ... pesos") */

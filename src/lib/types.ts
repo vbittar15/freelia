@@ -10,6 +10,34 @@ export type Profile = {
   city: string | null;
   phone: string | null;
   bank_info: string | null;
+  specialties?: string[];
+  settings?: import("./rubros").Settings | null;
+  onboarded_at?: string | null;
+};
+
+export type Service = {
+  id: string;
+  owner_id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  unit: string;
+  price: number;
+  active: boolean;
+  position: number;
+};
+
+export type PackageItem = { service_id: string | null; name: string; qty: number };
+export type Package = {
+  id: string;
+  owner_id: string;
+  name: string;
+  description: string | null;
+  period: "unico" | "mensual";
+  price: number;
+  items: PackageItem[];
+  active: boolean;
+  position: number;
 };
 
 export type Client = {

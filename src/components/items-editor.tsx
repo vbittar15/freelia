@@ -3,14 +3,21 @@
 import { useState } from "react";
 import type { LineItem } from "@/lib/types";
 import { money } from "@/lib/utils";
+import type { CatalogItem } from "@/lib/catalog";
 
 /** Editor de ítems para cotizaciones y cuentas de cobro. Envía un input oculto "items" en JSON. */
-export function ItemsEditor({ initial }: { initial?: LineItem[] }) {
+export function ItemsEditor({ initial, catalog = [] }: { initial?: LineItem[]; catalog?: CatalogItem[] }) {
   const [items, setItems] = useState<LineItem[]>(
     initial && initial.length ? initial : [{ description: "", quantity: 1, unit_price: 0 }]
   );
   const update = (i: number, patch: Partial<LineItem>) =>
     setItems((arr) => arr.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
+  const addFromCatalog = (key: string) => {
+    const c = catalog.find((x) => x.key === key);
+    if (!c) return;
+    const line = { description: c.description, quantity: 1, unit_price: c.unit_price };
+    setItems((arr) => (arr.length === 1 && !arr[0].description.trim() && !Number(arr[0].unit_price) ? [line] : [...arr, line]));
+  };
   const sum = items.reduce((s, i) => s + Number(i.quantity || 0) * Number(i.unit_price || 0), 0);
 
   return (
@@ -36,11 +43,24 @@ export function ItemsEditor({ initial }: { initial?: LineItem[] }) {
           </div>
         ))}
       </div>
-      <div className="flex items-center justify-between mt-4">
-        <button type="button" className="btn btn-soft btn-sm"
-          onClick={() => setItems((arr) => [...arr, { description: "", quantity: 1, unit_price: 0 }])}>
-          + Agregar ítem
-        </button>
+      <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
+        <div className="flex flex-wrap gap-2">
+          {catalog.length > 0 && (
+            <select className="input h-9 w-auto text-[13px] font-semibold bg-brand-soft text-brand-dark pr-9" value=""
+              onChange={(e) => { addFromCatalog(e.target.value); e.currentTarget.value = ""; }} aria-label="Agregar desde mi catálogo">
+              <option value="" disabled>+ Desde mis servicios</option>
+              {(["Paquetes", "Servicios"] as const).map((g) => catalog.some((c) => c.group === g) && (
+                <optgroup key={g} label={g}>
+                  {catalog.filter((c) => c.group === g).map((c) => <option key={c.key} value={c.key}>{c.label} — {money(c.unit_price)}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          )}
+          <button type="button" className="btn btn-soft btn-sm"
+            onClick={() => setItems((arr) => [...arr, { description: "", quantity: 1, unit_price: 0 }])}>
+            + Ítem libre
+          </button>
+        </div>
         <div className="text-right">
           <div className="text-[11px] text-muted">Total</div>
           <div className="text-[20px] font-semibold tracking-tight">{money(sum)}</div>

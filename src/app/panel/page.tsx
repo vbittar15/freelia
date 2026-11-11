@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { NotifyCard } from "@/components/pwa";
 import { requireCreative } from "@/lib/auth";
 import { Lia, Trazo } from "@/components/brand";
@@ -10,6 +11,7 @@ export const metadata = { title: "Inicio" };
 
 export default async function Dashboard() {
   const { supabase, profile } = await requireCreative();
+  if (!profile.onboarded_at && profile.onboarded_at !== undefined) redirect("/bienvenida");
   const now = new Date();
   const in14 = new Date(now.getTime() + 14 * 86400000).toISOString();
   const today = isoToBogotaLocal(now.toISOString()).slice(0, 10);

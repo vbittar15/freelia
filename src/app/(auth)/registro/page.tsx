@@ -2,6 +2,7 @@ import Link from "next/link";
 import { signUp } from "../actions";
 import { SubmitButton } from "@/components/client-ui";
 import { Field } from "@/components/ui";
+import { RubroPicker } from "@/components/rubro-picker";
 
 export const metadata = { title: "Crear cuenta" };
 
@@ -32,6 +33,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
         <Field label="Contraseña" hint="Mínimo 8 caracteres.">
           <input className="input" type="password" name="password" required minLength={8} autoComplete="new-password" />
         </Field>
+        {!isClient && (
+          <div>
+            <span className="label">¿A qué te dedicas?</span>
+            <RubroPicker initial={(sp.rubros ?? "").split(",").filter(Boolean)} />
+          </div>
+        )}
         <SubmitButton className="btn btn-primary w-full" pendingText="Creando cuenta…">Crear cuenta</SubmitButton>
       </form>
 

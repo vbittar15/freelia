@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { validRubros } from "@/lib/rubros";
 
 async function siteUrl() {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -28,7 +29,9 @@ export async function signUp(formData: FormData) {
   const full_name = String(formData.get("full_name") || "").trim();
   const invite = String(formData.get("invite") || "").trim();
   const role = invite || formData.get("role") === "client" ? "client" : "creative";
-  const back = invite ? `/invitacion/${invite}?email=${encodeURIComponent(email)}` : `/registro?email=${encodeURIComponent(email)}`;
+  const specialties = role === "creative" ? validRubros(formData.getAll("specialties")) : [];
+  const back = invite ? `/invitacion/${invite}?email=${encodeURIComponent(email)}` : `/registro?email=${encodeURIComponent(email)}&rubros=${specialties.join(",")}`;
+  if (role === "creative" && !specialties.length) redirect(`${back}&error=${encodeURIComponent("Cuéntanos a qué te dedicas: elige al menos un rubro")}`);
 
   if (password.length < 8) redirect(`${back}&error=${encodeURIComponent("La contraseña debe tener al menos 8 caracteres")}`);
 
@@ -45,7 +48,8 @@ export async function signUp(formData: FormData) {
     redirect(`${back}&error=${encodeURIComponent(msg)}`);
   }
   if (!data.session) redirect(`/ingresar?aviso=${encodeURIComponent("Te enviamos un correo para confirmar tu cuenta.")}&email=${encodeURIComponent(email)}`);
-  redirect(role === "client" ? "/cliente" : "/panel");
+  if (role === "creative" && data.user) await supabase.from("profiles").update({ specialties }).eq("id", data.user.id);
+  redirect(role === "client" ? "/cliente" : "/bienvenida");
 }
 
 export async function signOut() {

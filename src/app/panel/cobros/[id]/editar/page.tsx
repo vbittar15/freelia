@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireCreative } from "@/lib/auth";
+import { loadCatalog } from "@/lib/catalog";
 import { PageHeader } from "@/components/ui";
 import { ErrorNote, InvoiceForm } from "../../../_forms";
 import type { Invoice } from "@/lib/types";
@@ -19,7 +20,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     <>
       <PageHeader title={`Editar cuenta de cobro N.º ${inv.number}`} back={{ href: `/panel/cobros/${id}`, label: inv.concept }} />
       <ErrorNote error={error} />
-      <InvoiceForm invoice={inv} clients={clients ?? []} />
+      <InvoiceForm invoice={inv} clients={clients ?? []} catalog={await loadCatalog(supabase)} />
     </>
   );
 }

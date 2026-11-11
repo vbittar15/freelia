@@ -8,12 +8,16 @@ import { PinBoard } from "@/components/pin-board";
 import type { Post, PostComment } from "@/lib/types";
 import { clientLabel } from "@/lib/utils";
 import { ErrorNote, PostForm } from "../../_forms";
+import { FORMATS } from "@/lib/utils";
+import { pieceWord, rankedFormats, usesSocial, withDefaults, workLabel } from "@/lib/rubros";
 import { deletePost, setPostStatus } from "../../actions";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; ok?: string }> }) {
   const { id } = await params;
   const { error, ok } = await searchParams;
-  const { supabase, user } = await requireCreative();
+  const { supabase, user, profile } = await requireCreative();
+  const sp = profile.specialties ?? [];
+  const nets = withDefaults(profile.settings).networks;
   const [{ data }, { data: comments }, { data: clients }] = await Promise.all([
     supabase.from("posts").select("*, clients(name, company, color, client_user_id)").eq("id", id).single(),
     supabase.from("post_comments").select("*, profiles(full_name)").eq("post_id", id).order("created_at"),
@@ -26,7 +30,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   return (
     <>
       <PageHeader
-        back={{ href: "/panel/parrilla", label: "Parrilla" }}
+        back={{ href: "/panel/parrilla", label: workLabel(sp) }}
         title={p.title}
         subtitle={<span className="flex flex-wrap items-center gap-3 mt-1">
           <Link href={`/panel/clientes/${p.client_id}`}><ClientChip name={clientLabel(p.clients)} color={p.clients?.color} /></Link>
@@ -88,7 +92,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <p className="mb-5 text-[14px] text-muted">Enviada al cliente{(p.round ?? 1) > 1 ? ` · ronda ${p.round}` : ""}. <Link href={`/panel/envios/${p.review_request_id}`} className="font-semibold text-brand-dark hover:underline">Ver el envío →</Link></p>
       )}
 
-      <PostForm post={p} clients={clients ?? []} userId={user.id} briefs={briefs ?? []} />
+      <PostForm post={p} clients={clients ?? []} userId={user.id} briefs={briefs ?? []} word={pieceWord(sp)}
+        formats={rankedFormats(sp, FORMATS)} networks={nets.length ? nets : usesSocial(sp) ? undefined : ["entrega"]} />
 
       {p.asset_url && !/\.(mp4|mov|webm)$/i.test(p.asset_url) && (
         <section className="mt-8 card p-4 sm:p-5 max-w-3xl">
