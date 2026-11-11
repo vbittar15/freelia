@@ -6,8 +6,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen grid lg:grid-cols-2">
       <div className="flex flex-col px-6 sm:px-12 py-8">
         <Link href="/"><Logo size={28} /></Link>
+        <div className="lg:hidden relative overflow-hidden rounded-[28px] bg-azul-t mt-6 px-6 py-6">
+          <p className="relative z-10 text-[22px] leading-[1.15] font-semibold tracking-[-0.02em] pr-24">Crea más.<br /><Trazo>Persigue menos.</Trazo></p>
+          <div className="absolute -right-5 -bottom-8"><div className="anim-peek"><div className="anim-bob"><Lia size={110} mood="smile" /></div></div></div>
+        </div>
         <div className="flex-1 flex items-center">
-          <div className="w-full max-w-sm mx-auto py-10 on-white">{children}</div>
+          <div className="w-full max-w-sm mx-auto py-10 on-white anim-page">{children}</div>
         </div>
       </div>
       <div className="hidden lg:block p-4">
@@ -28,7 +32,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <StatusPill status="aprobado" />
             <StatusPill status="pagada" label="Cobrado" />
           </div>
-          <div className="absolute -right-10 -bottom-12"><Lia size={240} mood="smile" /></div>
+          <div className="absolute -right-10 -bottom-12"><div className="anim-peek"><div className="anim-bob"><Lia size={240} mood="smile" /></div></div></div>
         </div>
       </div>
     </div>

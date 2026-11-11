@@ -35,8 +35,8 @@ export type LiaMood = "base" | "right" | "idea" | "happy" | "worry" | "sleep" | 
  * Lia: el punto del logo, despierto. Gestos de la biblioteca de componentes.
  * Por debajo de 60 px va sin boca ni cachetes.
  */
-export function Lia({ size = 40, mood = "base", color = "#3D5BF5", className }:
-  { size?: number; mood?: LiaMood; color?: string; className?: string }) {
+export function Lia({ size = 40, mood = "base", color = "#3D5BF5", className, still }:
+  { size?: number; mood?: LiaMood; color?: string; className?: string; still?: boolean }) {
   const big = size >= 60;
   const eye = (x: number, y: number) => <ellipse cx={x} cy={y} rx={6.5} ry={10} fill={INK} />;
   const line = (d: string, w = 5) => <path d={d} fill="none" stroke={INK} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" />;
@@ -83,7 +83,7 @@ export function Lia({ size = 40, mood = "base", color = "#3D5BF5", className }:
   return (
     <svg viewBox="-50 -50 100 100" width={size} height={size} className={cn("block shrink-0 overflow-visible", className)} aria-hidden>
       <ellipse cx={0} cy={body.dy} rx={body.rx} ry={body.ry} fill={color} />
-      <g transform={`translate(0 ${body.dy})`}>{face}</g>
+      <g transform={`translate(0 ${body.dy})`}><g className={still || mood === "happy" || mood === "sleep" ? undefined : "lia-eyes"} style={{ animationDelay: `${(size * 37) % 4000}ms` }}>{face}</g></g>
       {extra}
     </svg>
   );
@@ -94,7 +94,7 @@ export function Sparkle({ size = 14, color = "#3D5BF5", className, style }:
   { size?: number; color?: string; className?: string; style?: React.CSSProperties }) {
   return (
     <svg viewBox="-1 -1 2 2" width={size} height={size} className={className} style={style} aria-hidden>
-      <path d="M0 -1C.14 -.14 .14 -.14 1 0C.14 .14 .14 .14 0 1C-.14 .14 -.14 .14 -1 0C-.14 -.14 -.14 -.14 0 -1Z" fill={color} />
+      <path className="anim-twinkle" style={{ animationDelay: `${(size * 173) % 2000}ms` }} d="M0 -1C.14 -.14 .14 -.14 1 0C.14 .14 .14 .14 0 1C-.14 .14 -.14 .14 -1 0C-.14 -.14 -.14 -.14 0 -1Z" fill={color} />
     </svg>
   );
 }
@@ -106,7 +106,7 @@ export function Trazo({ children, color = "#3D5BF5" }: { children: React.ReactNo
       {children}
       <svg viewBox="0 0 200 16" preserveAspectRatio="none" aria-hidden
         className="absolute overflow-visible" style={{ left: "-2%", bottom: "-0.16em", width: "104%", height: "0.24em" }}>
-        <path d="M3 9c22-9 40 7 62 0s42-8 64 0 44 6 68-2" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+        <path className="trazo-path" pathLength={1} d="M3 9c22-9 40 7 62 0s42-8 64 0 44 6 68-2" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
       </svg>
     </span>
   );

@@ -16,20 +16,22 @@ export function ItemsEditor({ initial }: { initial?: LineItem[] }) {
   return (
     <div>
       <input type="hidden" name="items" value={JSON.stringify(items)} />
-      <div className="hidden sm:grid grid-cols-[1fr_80px_150px_120px_32px] gap-2 px-1 mb-2 text-[11px] uppercase tracking-wide text-muted">
+      <div className="hidden lg:grid grid-cols-[1fr_80px_150px_120px_32px] gap-2 px-1 mb-2 text-[11px] uppercase tracking-wide text-muted">
         <span>Descripción</span><span>Cant.</span><span>Valor unitario</span><span className="text-right">Subtotal</span><span />
       </div>
       <div className="space-y-2">
         {items.map((it, i) => (
-          <div key={i} className="grid grid-cols-[1fr_80px] sm:grid-cols-[1fr_80px_150px_120px_32px] gap-2 items-center rounded-xl sm:rounded-none bg-surface sm:bg-transparent p-2 sm:p-0">
-            <input className="input col-span-2 sm:col-span-1" placeholder="Ej. Diseño de 12 piezas para Instagram"
+          <div key={i} className="grid grid-cols-[80px_1fr] lg:grid-cols-[1fr_80px_150px_120px_32px] gap-2 items-center rounded-[18px] lg:rounded-none bg-surface-2 lg:bg-transparent p-2.5 lg:p-0 anim-pop">
+            <input className="input col-span-2 lg:col-span-1" placeholder="Ej. Diseño de 12 piezas para Instagram"
               value={it.description} onChange={(e) => update(i, { description: e.target.value })} />
-            <input className="input" type="number" min="0" step="0.5" value={it.quantity}
-              onChange={(e) => update(i, { quantity: Number(e.target.value) })} aria-label="Cantidad" />
-            <input className="input" type="number" min="0" step="1000" value={it.unit_price}
-              onChange={(e) => update(i, { unit_price: Number(e.target.value) })} aria-label="Valor unitario" />
-            <span className="text-right font-medium text-[13px] col-span-1">{money(Number(it.quantity) * Number(it.unit_price))}</span>
-            <button type="button" className="btn btn-ghost btn-sm px-2" aria-label="Quitar"
+            <label className="block"><span className="lg:hidden block text-[11px] text-muted font-medium px-1 mb-1">Cant.</span>
+              <input className="input" type="number" min="0" step="0.5" value={it.quantity}
+                onChange={(e) => update(i, { quantity: Number(e.target.value) })} aria-label="Cantidad" /></label>
+            <label className="block"><span className="lg:hidden block text-[11px] text-muted font-medium px-1 mb-1">Valor unitario</span>
+              <input className="input" type="number" min="0" step="1000" value={it.unit_price}
+                onChange={(e) => update(i, { unit_price: Number(e.target.value) })} aria-label="Valor unitario" /></label>
+            <span className="font-semibold text-[14px] lg:text-right pl-1 lg:pl-0"><span className="lg:hidden text-muted font-medium text-[12px]">Subtotal </span>{money(Number(it.quantity) * Number(it.unit_price))}</span>
+            <button type="button" className="btn btn-ghost btn-sm px-2 justify-self-end" aria-label="Quitar"
               onClick={() => setItems((arr) => (arr.length > 1 ? arr.filter((_, idx) => idx !== i) : arr))}>✕</button>
           </div>
         ))}

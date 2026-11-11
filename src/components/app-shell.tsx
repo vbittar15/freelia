@@ -72,7 +72,7 @@ export function AppShell({
   return (
     <div className="min-h-screen flex">
       {/* Barra lateral (escritorio) */}
-      <aside className="no-print hidden md:flex w-[248px] shrink-0 flex-col px-4 py-7 sticky top-0 h-screen">
+      <aside className="no-print hidden lg:flex w-[248px] shrink-0 flex-col px-4 py-7 sticky top-0 h-screen">
         <Link href={nav[0].href} className="px-3 mb-9"><Logo size={28} /></Link>
         <nav className="flex flex-col gap-1 flex-1">
           {nav.map((i) => (
@@ -102,7 +102,7 @@ export function AppShell({
 
       <div className="flex-1 min-w-0 flex flex-col">
         {/* Barra superior (móvil) */}
-        <header className="no-print md:hidden flex items-center justify-between px-4 h-16 sticky top-0 bg-white/90 backdrop-blur z-20">
+        <header className="no-print lg:hidden flex items-center justify-between px-4 h-16 sticky top-0 bg-white/90 backdrop-blur z-20">
           <Link href={nav[0].href} className="pl-1"><Logo size={24} /></Link>
           <div className="flex items-center gap-2.5">
             <Link href={notificationsHref} className="icon-btn relative" aria-label="Notificaciones">
@@ -113,11 +113,11 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="flex-1 min-w-0 overflow-x-clip px-4 md:px-10 pt-3 md:pt-10 pb-32 md:pb-12 max-w-[1080px] w-full mx-auto">{children}</main>
+        <main className="flex-1 min-w-0 overflow-x-clip px-4 sm:px-8 lg:px-10 pt-3 sm:pt-6 lg:pt-10 pb-32 lg:pb-12 max-w-[1080px] w-full mx-auto">{children}</main>
 
         {/* Pestañas flotantes (móvil) */}
         {more && (
-          <div className="no-print md:hidden fixed inset-x-4 bottom-[98px] z-30 rounded-[24px] bg-white shadow-[0_10px_40px_rgba(34,26,58,.16)] border border-line p-2">
+          <div className="no-print lg:hidden fixed inset-x-4 sm:inset-x-auto sm:right-8 sm:w-72 bottom-[98px] anim-pop z-30 rounded-[24px] bg-white shadow-[0_10px_40px_rgba(34,26,58,.16)] border border-line p-2">
             {rest.map((i) => (
               <Link key={i.href} href={i.href}
                 className={cn("flex items-center gap-3 rounded-full px-4 h-12 text-[15px]", isActive(i) ? "bg-brand-soft text-brand-dark font-semibold" : "font-medium")}>
@@ -127,7 +127,7 @@ export function AppShell({
           </div>
         )}
         <nav aria-label="Pestañas"
-          className="no-print md:hidden fixed left-4 right-4 bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-[62px] rounded-full bg-white/95 backdrop-blur shadow-[0_6px_24px_rgba(34,26,58,.10)] border border-line flex items-center px-[5px] gap-0.5">
+          className="no-print lg:hidden fixed left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-[480px] bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-[62px] rounded-full bg-white/95 backdrop-blur shadow-[0_6px_24px_rgba(34,26,58,.10)] border border-line flex items-center px-[5px] gap-0.5">
           {tabs.map((i) => (
             <Link key={i.href} href={i.href}
               className={cn("flex-1 min-w-0 h-[52px] rounded-full flex flex-col items-center justify-center gap-px text-[11px]",

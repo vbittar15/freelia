@@ -59,7 +59,7 @@ export function ContentCalendar({ posts, undated = [], mes, monthHref, newHref, 
         </div>
         <div className="grid grid-cols-7">
           {cells.map((day, i) => (
-            <div key={i} className={cn("min-h-[92px] sm:min-h-[120px] border-b border-r border-line p-1.5 sm:p-2 group min-w-0",
+            <div key={i} className={cn("min-h-[64px] sm:min-h-[120px] border-b border-r border-line p-1.5 sm:p-2 group min-w-0",
               (i + 1) % 7 === 0 && "border-r-0", !day && "bg-surface/40")}>
               {day && (
                 <>
@@ -68,7 +68,12 @@ export function ContentCalendar({ posts, undated = [], mes, monthHref, newHref, 
                       day === todayLocal ? "bg-brand text-white font-semibold" : "text-muted font-medium")}>{Number(day.slice(8))}</span>
                     <Link href={newHref(day)} className="opacity-0 group-hover:opacity-100 text-brand text-[16px] leading-none px-1" aria-label="Agregar pieza">+</Link>
                   </div>
-                  <div className="mt-1 space-y-1">
+                  <div className="mt-1 flex flex-wrap gap-1 sm:hidden">
+                    {(byDay.get(day) ?? []).map((p) => (
+                      <Link key={p.id} href={`/panel/parrilla/${p.id}`} aria-label={p.title} className="size-2.5 rounded-full" style={{ background: STATUS_DOT[p.status] }} />
+                    ))}
+                  </div>
+                  <div className="mt-1 space-y-1 hidden sm:block">
                     {(byDay.get(day) ?? []).map((p) => (
                       <Link key={p.id} href={`/panel/parrilla/${p.id}`} title={showClient ? `${p.title} · ${clientLabel(p.clients)}` : p.title}
                         className="block rounded-lg px-1.5 py-1 text-[10.5px] sm:text-[11px] font-medium leading-tight truncate hover:ring-1 ring-brand/30"
@@ -90,6 +95,20 @@ export function ContentCalendar({ posts, undated = [], mes, monthHref, newHref, 
             {{ borrador: "Borrador", en_revision: "En revisión", cambios: "Cambios", aprobado: "Aprobado", publicado: "Publicado" }[k]}</span>
         ))}
       </div>
+      {posts.length > 0 && (
+        <div className="sm:hidden mt-6">
+          <h3 className="h2 mb-3">Este mes</h3>
+          <div className="flex flex-col gap-2 stagger">
+            {[...posts].sort((a, b) => (a.scheduled_at ?? "").localeCompare(b.scheduled_at ?? "")).map((p) => (
+              <Link key={p.id} href={`/panel/parrilla/${p.id}`} className="flex items-center gap-3 bg-surface rounded-[18px] px-3.5 py-3">
+                <span className="w-9 text-center shrink-0"><span className="block text-[17px] font-bold leading-none">{Number(isoToBogotaLocal(p.scheduled_at).slice(8, 10))}</span><span className="text-[10px] text-muted">{["dom", "lun", "mar", "mié", "jue", "vie", "sáb"][new Date(isoToBogotaLocal(p.scheduled_at).slice(0, 10) + "T12:00:00").getDay()]}</span></span>
+                <span className="size-2 rounded-full shrink-0" style={{ background: STATUS_DOT[p.status] }} />
+                <span className="min-w-0 flex-1"><span className="block text-[14px] font-semibold truncate">{p.title}</span>{showClient && <span className="block text-[12px] text-muted truncate">{clientLabel(p.clients)}</span>}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
       {undated.length > 0 && (
         <div className="mt-8">
           <h3 className="h2 mb-3">Sin fecha</h3>

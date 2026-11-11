@@ -74,16 +74,18 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       <div className="relative overflow-hidden rounded-[32px] px-6 md:px-8 py-6 md:py-7 mb-6" style={{ background: (c.color ?? "#DCE3FF") + "99" }}>
         <Sparkle size={14} className="absolute right-[120px] top-6 hidden sm:block" />
         <Sparkle size={9} color="#A98BFF" className="absolute right-[142px] top-12 hidden sm:block" />
-        <div className="flex flex-wrap items-center gap-4">
-          <Avatar name={c.company || c.name} size={60} color="#FFFFFF" />
+        <div className="flex flex-col xl:flex-row xl:items-center gap-4">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
+          <div className="anim-pop shrink-0"><Avatar name={c.company || c.name} size={60} color="#FFFFFF" /></div>
           <div className="min-w-0 flex-1">
             <h1 className="h1 truncate">{c.company || c.name}</h1>
             <div className="text-[14px] text-ink/70 flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
               {c.company && <span>{c.name}</span>}
               {c.phone && <span>{c.phone}</span>}
-              {c.email && <span className="truncate">{c.email}</span>}
+              {c.email && <span className="truncate max-w-full">{c.email}</span>}
               {c.client_user_id ? <StatusPill status="aprobado" label="En su portal" /> : <StatusPill status="borrador" label="Sin conectar" />}
             </div>
+          </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href={`/panel/parrilla/nueva?cliente=${c.id}`} className="btn btn-primary btn-sm">+ Pieza</Link>
