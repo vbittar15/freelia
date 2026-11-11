@@ -12,6 +12,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
       <h1 className="text-[26px] font-semibold tracking-tight">Hola de nuevo</h1>
       <p className="text-muted mt-1">Ingresa a tu espacio en Freelia.</p>
 
+      {sp.eliminada && <p className="mt-6 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">Tu cuenta fue eliminada. Gracias por haber usado Freelia 💙</p>}
       {sp.error && <p className="mt-6 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{sp.error}</p>}
       {sp.aviso && <p className="mt-6 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">{sp.aviso}</p>}
 

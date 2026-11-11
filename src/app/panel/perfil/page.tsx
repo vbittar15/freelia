@@ -3,12 +3,13 @@ import { NotifyCard } from "@/components/pwa";
 import { Field, PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/client-ui";
 import { updateProfile } from "../actions";
-import { signOut } from "@/app/(auth)/actions";
+import { deleteAccount, signOut } from "@/app/(auth)/actions";
+import { DeleteAccount } from "@/components/delete-account";
 
 export const metadata = { title: "Mi perfil" };
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ ok?: string }> }) {
-  const { ok } = await searchParams;
+export default async function Page({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
+  const { ok, error } = await searchParams;
   const { profile } = await requireCreative();
   return (
     <>
@@ -28,6 +29,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ o
       </form>
       <div className="mt-6 max-w-3xl"><NotifyCard /></div>
       <form action={signOut} className="mt-6"><button className="btn btn-ghost btn-sm">Cerrar sesión</button></form>
+      <DeleteAccount action={deleteAccount} back="/panel/perfil" role="creative" error={error} />
     </>
   );
 }

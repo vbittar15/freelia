@@ -61,3 +61,27 @@ export async function acceptInvite(formData: FormData) {
   if (error) redirect(`/invitacion/${token}?error=${encodeURIComponent(error.message)}`);
   redirect("/cliente");
 }
+
+/** Elimina la cuenta del usuario que llama: archivos, datos y acceso */
+export async function deleteAccount(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/ingresar");
+  const back = String(formData.get("back") || "/");
+  if (String(formData.get("confirm") || "").trim().toUpperCase() !== "ELIMINAR") {
+    redirect(`${back}?error=${encodeURIComponent("Escribe ELIMINAR para confirmar")}#eliminar`);
+  }
+  // Archivos subidos por el usuario (carpeta con su id)
+  const bucket = supabase.storage.from("freelia-assets");
+  for (let i = 0; i < 20; i++) {
+    const { data: files } = await bucket.list(user.id, { limit: 100 });
+    if (!files?.length) break;
+    await bucket.remove(files.map((f) => `${user.id}/${f.name}`));
+    if (files.length < 100) break;
+  }
+  await supabase.from("push_subscriptions").delete().eq("user_id", user.id);
+  const { error } = await supabase.rpc("delete_my_account");
+  if (error) redirect(`${back}?error=${encodeURIComponent("No pudimos eliminar la cuenta: " + error.message)}#eliminar`);
+  await supabase.auth.signOut();
+  redirect("/ingresar?eliminada=1");
+}
