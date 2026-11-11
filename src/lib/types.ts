@@ -196,3 +196,42 @@ export type ReviewRequest = {
   created_at: string;
   clients?: Pick<Client, "name" | "company" | "color" | "phone" | "client_user_id"> | null;
 };
+
+export type ClientService = {
+  id: string;
+  client_id: string;
+  service_id: string | null;
+  package_id: string | null;
+  name: string;
+  includes: string | null;
+  qty: number;
+  price: number;
+  period: "mensual" | "unico";
+  position: number;
+};
+
+export type ContractTerms = { start?: string; months?: number | null; pay_day?: number; advance?: number; notice_days?: number; rounds?: number; due_days?: number; city?: string };
+export type Contract = {
+  id: string;
+  owner_id: string;
+  client_id: string;
+  number: number;
+  title: string;
+  body: string;
+  services: Pick<ClientService, "name" | "includes" | "qty" | "price" | "period">[];
+  terms: ContractTerms;
+  status: "borrador" | "enviado" | "firmado" | "anulado";
+  creative_name: string | null;
+  creative_doc: string | null;
+  sent_at: string | null;
+  signed_at: string | null;
+  signer_name: string | null;
+  signer_doc: string | null;
+  signer_email: string | null;
+  signature: string | null;
+  signer_ip: string | null;
+  signer_agent: string | null;
+  body_hash: string | null;
+  created_at: string;
+  clients?: Pick<Client, "name" | "company" | "color" | "email" | "phone" | "client_user_id"> | null;
+};

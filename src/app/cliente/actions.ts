@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { requireClient } from "@/lib/auth";
 import { parseRequest } from "@/lib/requests";
 
@@ -83,3 +84,17 @@ export async function updateClientProfile(formData: FormData) {
   redirect("/cliente/perfil?ok=1");
 }
 
+
+export async function signContract(formData: FormData) {
+  const { supabase } = await requireClient();
+  const id = s(formData, "id")!;
+  const h = await headers();
+  const ip = (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || h.get("x-real-ip") || null;
+  const { error } = await supabase.rpc("sign_contract", {
+    p_contract: id, p_name: s(formData, "name"), p_doc: s(formData, "doc"), p_signature: s(formData, "signature"),
+    p_hash: s(formData, "hash"), p_ip: ip, p_agent: h.get("user-agent"),
+  });
+  if (error) redirect(`/cliente/contratos/${id}?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/cliente", "layout");
+  redirect(`/cliente/contratos/${id}?ok=1`);
+}

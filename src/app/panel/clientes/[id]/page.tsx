@@ -5,9 +5,10 @@ import { requireCreative } from "@/lib/auth";
 import { Avatar, EmptyState, Notice, Row, RowList, Section, Stat, StatusBadge } from "@/components/ui";
 import { ConfirmSubmit, SubmitButton } from "@/components/client-ui";
 import { InvitePanel } from "@/components/invite-panel";
+import { newContract } from "../../contratos/actions";
 import { ContentCalendar, monthRange } from "@/components/content-calendar";
 import { Lia, Sparkle, StatusPill } from "@/components/brand";
-import type { Brief, Client, Invoice, Post, Quote } from "@/lib/types";
+import type { Brief, Client, ClientService, Contract, Invoice, Post, Quote } from "@/lib/types";
 import { FORMATS, NETWORKS, cn, fmtDate, fmtDateTime, isoToBogotaLocal, money, total } from "@/lib/utils";
 import { archiveClient, deleteClient, resetInvite } from "../../actions";
 
@@ -30,12 +31,20 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   if (!data) notFound();
   const c = data as Client;
 
-  const [{ data: postsD }, { data: briefsD }, { data: quotesD }, { data: invoicesD }] = await Promise.all([
+  const [{ data: postsD }, { data: briefsD }, { data: quotesD }, { data: invoicesD }, { data: svcD }, { data: kD }] = await Promise.all([
     supabase.from("posts").select("*").eq("client_id", id).order("scheduled_at", { ascending: true, nullsFirst: false }),
     supabase.from("briefs").select("*").eq("client_id", id).order("created_at", { ascending: false }),
     supabase.from("quotes").select("*, quote_items(quantity, unit_price)").eq("client_id", id).order("created_at", { ascending: false }),
     supabase.from("invoices").select("*, invoice_items(quantity, unit_price)").eq("client_id", id).order("created_at", { ascending: false }),
+    supabase.from("client_services").select("*").eq("client_id", id).order("position"),
+    supabase.from("contracts").select("id, number, status, sent_at, signed_at, created_at").eq("client_id", id).order("created_at", { ascending: false }),
   ]);
+  const svcs = (svcD ?? []) as ClientService[];
+  const contracts = (kD ?? []) as Pick<Contract, "id" | "number" | "status" | "sent_at" | "signed_at" | "created_at">[];
+  const monthly = svcs.filter((x) => x.period === "mensual").reduce((a, x) => a + Number(x.price) * Number(x.qty), 0);
+  const once = svcs.filter((x) => x.period === "unico").reduce((a, x) => a + Number(x.price) * Number(x.qty), 0);
+  const K_LABEL = { borrador: "Borrador", enviado: "Esperando firma", firmado: "Firmado", anulado: "Anulado" } as const;
+  const K_STATE = { borrador: "borrador", enviado: "en_revision", firmado: "aprobado", anulado: "rechazada" } as const;
   const posts = (postsD ?? []) as Post[];
   const briefs = (briefsD ?? []) as Brief[];
   const quotes = (quotesD ?? []) as Quote[];
@@ -128,6 +137,41 @@ export default async function Page({ params, searchParams }: { params: Promise<{
               </form>
             </div>
           )}
+
+          <div className="grid lg:grid-cols-2 gap-9 lg:gap-8 [&>*]:min-w-0">
+            <Section title="Servicios" action={<Link href={`/panel/clientes/${c.id}/editar`} className="text-[13px] font-semibold text-brand-dark">Editar</Link>}>
+              {svcs.length ? (
+                <div className="card p-5">
+                  <div className="flex flex-col gap-2">
+                    {svcs.map((x) => (
+                      <div key={x.id} className="flex items-start justify-between gap-3 text-[14px]">
+                        <div className="min-w-0">
+                          <div className="font-semibold">{Number(x.qty) !== 1 && `${x.qty} × `}{x.name}{x.package_id && <span className="ml-2 badge bg-lila-t text-ink">Paquete</span>}</div>
+                          {x.includes && <div className="text-[12px] text-muted">{x.includes}</div>}
+                        </div>
+                        <div className="text-right shrink-0 font-semibold">{money(Number(x.price) * Number(x.qty))}<div className="text-[11px] text-muted font-normal">{x.period === "mensual" ? "al mes" : "pago único"}</div></div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-line flex flex-wrap gap-x-6 text-[14px]">
+                    {monthly > 0 && <span>Mensual <b>{money(monthly)}</b></span>}
+                    {once > 0 && <span>Pago único <b>{money(once)}</b></span>}
+                  </div>
+                </div>
+              ) : (
+                <div className="card p-5 text-[14px] text-muted">Aún no defines qué servicios le prestas. <Link href={`/panel/clientes/${c.id}/editar`} className="font-semibold text-brand-dark">Agregarlos</Link></div>
+              )}
+            </Section>
+            <Section title="Contrato" action={<form action={newContract}><input type="hidden" name="client_id" value={c.id} /><SubmitButton className="text-[13px] font-semibold text-brand-dark cursor-pointer" pendingText="Creando…">+ Nuevo</SubmitButton></form>}>
+              <RowList empty={<div className="card p-5 text-[14px] text-muted">Sin contrato. Crea uno con los servicios de este cliente y envíaselo para firmar desde la app.</div>}>
+                {contracts.map((k) => (
+                  <Row key={k.id} href={`/panel/contratos/${k.id}`} status={K_STATE[k.status]} title={`Contrato N.º ${k.number}`}
+                    sub={k.signed_at ? `Firmado el ${fmtDate(k.signed_at)}` : k.sent_at ? `Enviado el ${fmtDate(k.sent_at)}` : `Creado el ${fmtDate(k.created_at)}`}
+                    pill={<StatusBadge status={K_STATE[k.status]} label={K_LABEL[k.status]} />} />
+                ))}
+              </RowList>
+            </Section>
+          </div>
 
           <div className="grid lg:grid-cols-2 gap-9 lg:gap-8 [&>*]:min-w-0">
             <Section title="Para hoy" count={changes.length + late.length}>

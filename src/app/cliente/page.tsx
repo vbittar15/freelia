@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { NotifyCard } from "@/components/pwa";
+import { Icon } from "@/components/icons";
 import { requireClient } from "@/lib/auth";
 import { Lia, Logo, Trazo } from "@/components/brand";
 import { Hero, Row, RowList, Section } from "@/components/ui";
@@ -33,6 +34,8 @@ export default async function Page() {
     supabase.from("invoices").select("*, invoice_items(quantity, unit_price)").eq("status", "enviada").order("due_date"),
   ]);
   const posts = (pending ?? []) as Post[];
+  const { data: ks } = await supabase.from("contracts").select("id, title").eq("status", "enviado");
+  const toSign = (ks ?? []) as { id: string; title: string }[];
   const n = posts.length;
   const byReq = new Map<string, Post[]>();
   posts.forEach((p) => { if (p.review_request_id) byReq.set(p.review_request_id, [...(byReq.get(p.review_request_id) ?? []), p]); });
@@ -52,6 +55,14 @@ export default async function Page() {
           {n > 0 ? <>Tienes <Trazo>{n} {n === 1 ? "pieza" : "piezas"}</Trazo> por aprobar</> : <>No tienes nada <Trazo>por aprobar</Trazo></>}
         </p>
       </Hero>
+
+      {toSign.length > 0 && (
+        <Link href={`/cliente/contratos/${toSign[0].id}`} className="flex items-center gap-4 rounded-[22px] bg-brand text-white p-5 hover:bg-brand-dark transition-colors">
+          <span className="size-11 rounded-[14px] bg-white/20 grid place-items-center shrink-0"><Icon name="pen" /></span>
+          <span className="min-w-0 flex-1"><span className="block font-semibold text-[16px]">Tienes un contrato por firmar</span><span className="block text-[13px] text-white/80 truncate">{toSign[0].title}</span></span>
+          <span className="btn btn-sm bg-white text-brand-dark shrink-0">Firmar</span>
+        </Link>
+      )}
 
       <NotifyCard compact />
 

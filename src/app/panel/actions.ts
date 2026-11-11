@@ -6,6 +6,7 @@ import { requireCreative } from "@/lib/auth";
 import { bogotaLocalToISO } from "@/lib/utils";
 import type { LineItem } from "@/lib/types";
 import { parseRequest } from "@/lib/requests";
+import { buildContract, defaultTerms } from "@/lib/contract";
 
 const s = (f: FormData, k: string) => {
   const v = f.get(k);
@@ -45,7 +46,7 @@ function parseItems(f: FormData): LineItem[] {
 
 // ---------------------------------------------------------------- Clientes
 export async function saveClient(formData: FormData) {
-  const { supabase } = await requireCreative();
+  const { supabase, profile } = await requireCreative();
   const id = s(formData, "id");
   const row = {
     name: s(formData, "name")!,
@@ -56,18 +57,51 @@ export async function saveClient(formData: FormData) {
     color: s(formData, "color") ?? "#C9D6FF",
     notes: s(formData, "notes"),
   };
-  if (!row.name) fail(id ? `/panel/clientes/${id}/editar` : "/panel/clientes/nuevo", "El nombre es obligatorio");
+  const back = id ? `/panel/clientes/${id}/editar` : "/panel/clientes/nuevo";
+  if (!row.name) fail(back, "El nombre es obligatorio");
 
+  // Servicios que se le prestan
+  let lines: { service_id: string | null; package_id: string | null; name: string; includes: string | null; qty: number; price: number; period: string }[] = [];
+  try {
+    lines = (JSON.parse(String(formData.get("services") || "[]")) as typeof lines)
+      .filter((l) => l.name && String(l.name).trim())
+      .map((l) => ({ service_id: l.service_id || null, package_id: l.package_id || null, name: String(l.name).trim().slice(0, 160),
+        includes: l.includes ? String(l.includes).trim().slice(0, 500) : null, qty: Math.max(0, Number(l.qty) || 1),
+        price: Math.max(0, Math.round(Number(l.price) || 0)), period: l.period === "unico" ? "unico" : "mensual" }));
+  } catch { /* sin servicios */ }
+
+  let clientId = id;
   if (id) {
     const { error } = await supabase.from("clients").update(row).eq("id", id);
-    if (error) fail(`/panel/clientes/${id}/editar`, error.message);
-    revalidatePath("/panel", "layout");
-    redirect(`/panel/clientes/${id}`);
+    if (error) fail(back, error.message);
+  } else {
+    const { data, error } = await supabase.from("clients").insert(row).select("id").single();
+    if (error || !data) fail(back, error?.message ?? "No se pudo crear");
+    clientId = data.id;
   }
-  const { data, error } = await supabase.from("clients").insert(row).select("id").single();
-  if (error || !data) fail("/panel/clientes/nuevo", error?.message ?? "No se pudo crear");
+  if (formData.has("services")) {
+    await supabase.from("client_services").delete().eq("client_id", clientId!);
+    if (lines.length) await supabase.from("client_services").insert(lines.map((l, i) => ({ ...l, client_id: clientId, position: i })));
+  }
+
+  // Contrato
+  let contractId: string | null = null;
+  if (formData.get("contract") === "on") {
+    const { data: draft } = await supabase.from("contracts").select("id, terms").eq("client_id", clientId!).eq("status", "borrador")
+      .order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const terms = { ...defaultTerms(profile), ...((draft?.terms as object) ?? {}) };
+    const built = buildContract({ creative: profile, client: row, services: lines as never, terms });
+    const payload = { ...built, services: lines.map(({ name, includes, qty, price, period }) => ({ name, includes, qty, price, period })), terms,
+      creative_name: profile.full_name, creative_doc: profile.document_id };
+    if (draft) { await supabase.from("contracts").update(payload).eq("id", draft.id); contractId = draft.id; }
+    else {
+      const { data: k } = await supabase.from("contracts").insert({ ...payload, client_id: clientId }).select("id").single();
+      contractId = k?.id ?? null;
+    }
+  }
   revalidatePath("/panel", "layout");
-  redirect(`/panel/clientes/${data.id}?nuevo=1`);
+  if (contractId) redirect(`/panel/contratos/${contractId}?nuevo=1`);
+  redirect(id ? `/panel/clientes/${id}` : `/panel/clientes/${clientId}?nuevo=1`);
 }
 
 /** Genera un enlace de invitación nuevo (el anterior deja de funcionar) */

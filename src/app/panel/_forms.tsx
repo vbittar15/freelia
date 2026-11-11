@@ -1,11 +1,12 @@
 import { SubmitButton } from "@/components/client-ui";
 import { Field } from "@/components/ui";
 import { ItemsEditor } from "@/components/items-editor";
+import { ClientServicesEditor } from "@/components/client-services-editor";
 import { RequestFields } from "@/components/request-fields";
 import type { RequestKind } from "@/lib/requests";
 import type { CatalogItem } from "@/lib/catalog";
 import { FilePicker } from "@/components/file-picker";
-import type { Brief, Client, Invoice, Post, Quote } from "@/lib/types";
+import type { Brief, Client, ClientService, Invoice, Package, Post, Quote, Service } from "@/lib/types";
 import { FORMATS, NETWORKS, isoToBogotaLocal } from "@/lib/utils";
 import { saveBrief, saveClient, saveInvoice, savePost, saveQuote } from "./actions";
 
@@ -30,9 +31,10 @@ function ClientSelect({ clients, value, disabled }: { clients: ClientOpt[]; valu
 
 const SWATCHES = ["#C9D6FF", "#E2D9FF", "#CFEFDF", "#FFE9B8", "#FFD3E4", "#D4ECFF", "#E9E3D6"];
 
-export function ClientForm({ client }: { client?: Client }) {
+export function ClientForm({ client, services = [], packages = [], lines = [], hasDraft }: { client?: Client; services?: Service[]; packages?: Package[]; lines?: ClientService[]; hasDraft?: boolean }) {
   return (
-    <form action={saveClient} className="card p-6 grid sm:grid-cols-2 gap-4 max-w-3xl">
+    <form action={saveClient} className="grid gap-5 max-w-3xl">
+    <div className="card p-6 grid sm:grid-cols-2 gap-4">
       {client && <input type="hidden" name="id" value={client.id} />}
       <Field label="Nombre de contacto *"><input name="name" className="input" required defaultValue={client?.name} /></Field>
       <Field label="Marca / empresa"><input name="company" className="input" defaultValue={client?.company ?? ""} /></Field>
@@ -56,9 +58,20 @@ export function ClientForm({ client }: { client?: Client }) {
       <Field label="Notas internas" className="sm:col-span-2">
         <textarea name="notes" rows={3} className="input" defaultValue={client?.notes ?? ""} placeholder="Tono de marca, horarios, personas clave…" />
       </Field>
-      <div className="sm:col-span-2 flex justify-end">
-        <SubmitButton>{client ? "Guardar cambios" : "Crear cliente"}</SubmitButton>
-      </div>
+    </div>
+    <div className="card p-6">
+      <h2 className="h2">Servicios que le prestas</h2>
+      <p className="text-[13px] text-muted mt-1 mb-4">Elige de tus servicios o paquetes, o escribe uno a la medida. Ajusta el valor para este cliente.</p>
+      <ClientServicesEditor services={services} packages={packages} initial={lines} />
+    </div>
+    <label className="flex items-start gap-3 rounded-[18px] bg-azul-t px-4 py-3.5 cursor-pointer">
+      <input type="checkbox" name="contract" defaultChecked={!client || hasDraft} className="size-4 mt-1 accent-[#3d5bf5]" />
+      <span><span className="block font-semibold text-[15px]">{client ? (hasDraft ? "Actualizar el contrato en borrador con estos servicios" : "Generar un contrato nuevo con estos servicios") : "Generar el contrato para que lo firme"}</span>
+        <span className="block text-[13px] text-muted">Lo revisas y se lo envías desde la app. {client?.client_user_id ? "Lo firma desde su portal." : "Lo firma cuando entre a su portal con la invitación."}</span></span>
+    </label>
+    <div className="flex justify-end">
+      <SubmitButton>{client ? "Guardar cambios" : "Crear cliente"}</SubmitButton>
+    </div>
     </form>
   );
 }
