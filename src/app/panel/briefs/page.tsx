@@ -4,6 +4,7 @@ import { EmptyState, PageHeader, Row, RowList, StatusBadge } from "@/components/
 import type { Brief, Post } from "@/lib/types";
 import { KINDS, STAGE_LABEL, kindOf, stageOf } from "@/lib/requests";
 import { clientLabel, cn, fmtDate, fmtDateTime } from "@/lib/utils";
+import { Icon, IconTile } from "@/components/icons";
 
 export const metadata = { title: "Solicitudes" };
 
@@ -35,7 +36,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ v
         <div className="flex gap-1 overflow-x-auto">
           {KINDS.map((k) => (
             <Link key={k.key} href={href({ tipo: tipo === k.key ? "" : k.key })}
-              className={cn("btn btn-sm whitespace-nowrap", tipo === k.key ? "bg-ink text-white" : "bg-surface text-ink hover:bg-surface-2")}>{k.emoji} {k.label}</Link>
+              className={cn("btn btn-sm whitespace-nowrap", tipo === k.key ? "bg-ink text-white" : "bg-surface text-ink hover:bg-surface-2")}><Icon name={k.icon} className="size-4" /> {k.label}</Link>
           ))}
         </div>
       </div>
@@ -44,7 +45,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ v
           const k = kindOf(b);
           return (
             <Row key={b.id} href={`/panel/briefs/${b.id}`} status={stage === "nuevo" ? "nuevo" : stage}
-              icon={<span className="size-10 rounded-[14px] bg-surface-2 grid place-items-center text-[20px] shrink-0" aria-hidden>{k.emoji}</span>}
+              icon={<IconTile name={k.icon} tint={k.tint} />}
               title={b.title}
               sub={`${clientLabel(b.clients)} · ${k.label}${b.created_by !== user.id ? " · pedida por el cliente" : ""}${k.key === "reunion" ? (b.meeting_at ? ` · ${fmtDateTime(b.meeting_at)}` : "") : b.deadline ? ` · para ${fmtDate(b.deadline)}` : ""}`}
               pill={<StatusBadge status={stage} />} />

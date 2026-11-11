@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Brief } from "@/lib/types";
 import { KINDS, type RequestKind, fieldValue } from "@/lib/requests";
 import { cn } from "@/lib/utils";
+import { Icon, IconTile } from "./icons";
 
 /** Elegir el tipo de solicitud */
 export function KindPicker({ href, current }: { href: (k: string) => string; current?: string }) {
@@ -11,7 +12,7 @@ export function KindPicker({ href, current }: { href: (k: string) => string; cur
         {KINDS.map((k) => (
           <Link key={k.key} href={href(k.key)} scroll={false}
             className={cn("btn btn-sm whitespace-nowrap", current === k.key ? "bg-brand text-white" : "bg-surface text-ink hover:bg-surface-2")}>
-            <span aria-hidden>{k.emoji}</span> {k.label}
+            <Icon name={k.icon} className="size-4" /> {k.label}
           </Link>
         ))}
       </div>
@@ -23,7 +24,7 @@ export function KindPicker({ href, current }: { href: (k: string) => string; cur
         <Link key={k.key} href={href(k.key)} scroll={false}
           className={cn("rounded-[22px] p-4 flex flex-col gap-2 transition-all active:scale-[.98]",
             current === k.key ? "bg-brand text-white shadow-[0_8px_22px_rgba(61,91,245,.28)]" : "bg-surface hover:bg-surface-2")}>
-          <span className="text-[26px]" aria-hidden>{k.emoji}</span>
+          <IconTile name={k.icon} tint={k.tint} size={42} className={current === k.key ? "!bg-white/20 !text-white" : ""} />
           <span className="font-semibold text-[16px] leading-tight">{k.label}</span>
           <span className={cn("text-[12px] leading-snug", current === k.key ? "text-white/80" : "text-muted")}>{k.desc}</span>
         </Link>

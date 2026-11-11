@@ -1,8 +1,12 @@
 import type { FileRef } from "@/lib/types";
 import { fileKind } from "@/lib/files";
 import { cn } from "@/lib/utils";
+import { Icon } from "./icons";
 
-const ICON: Record<string, string> = { pdf: "PDF", audio: "♪", video: "▶", file: "📎", image: "🖼" };
+const ICON: Record<string, React.ReactNode> = {
+  pdf: <span className="text-[10px] font-bold">PDF</span>, audio: <Icon name="music" className="size-[18px]" />, video: <Icon name="play" className="size-[18px]" />,
+  file: <Icon name="file" className="size-[18px]" />, image: <Icon name="image" className="size-[18px]" />,
+};
 
 /** Muestra un archivo: imagen en miniatura, audio/video reproducible o ficha descargable */
 export function FileView({ file, compact, onDark }: { file: FileRef; compact?: boolean; onDark?: boolean }) {

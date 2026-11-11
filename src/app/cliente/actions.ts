@@ -22,7 +22,7 @@ export async function reviewPost(formData: FormData) {
       .eq("post_id", id).not("x", "is", null).eq("resolved", false);
     if (!count) redirect(`${self}error=${encodeURIComponent("Cuéntale al equipo qué cambios necesitas o márcalos sobre el arte")}`);
   }
-  const { error } = await supabase.rpc("review_post", { p_post: id, p_action: action, p_comment: comment ?? (action === "cambios" ? "Marqué los cambios sobre el arte 📍" : null) });
+  const { error } = await supabase.rpc("review_post", { p_post: id, p_action: action, p_comment: comment ?? (action === "cambios" ? "Marqué los cambios sobre el material" : null) });
   if (error) redirect(`${self}error=${encodeURIComponent(error.message)}`);
   revalidatePath("/cliente", "layout");
   if (r) {

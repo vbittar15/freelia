@@ -12,6 +12,7 @@ import { ErrorNote, PostForm } from "../../_forms";
 import { FORMATS } from "@/lib/utils";
 import { pieceWord, rankedFormats, usesSocial, withDefaults, workLabel } from "@/lib/rubros";
 import { deletePost, deliverPost, setPostStatus } from "../../actions";
+import { Icon } from "@/components/icons";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; ok?: string }> }) {
   const { id } = await params;
@@ -79,7 +80,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
               <ol className="mt-3 space-y-1.5">
                 {pins.map((k) => (
                   <li key={k.id} className="flex gap-2 text-[14px]">
-                    <span className="size-5 shrink-0 rounded-full bg-rosa text-white text-[11px] font-bold grid place-items-center">📍</span>
+                    <span className="size-6 shrink-0 rounded-full bg-rosa text-white grid place-items-center"><Icon name="pin" className="size-3.5" /></span>
                     <span>{k.body}</span>
                   </li>
                 ))}
@@ -99,7 +100,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
       {(p.status === "aprobado" || p.status === "publicado" || p.status === "entregado") && (
         <section className="mt-8 rounded-[22px] bg-verde-t p-5 sm:p-6 max-w-3xl">
-          <h2 className="h2">{p.status === "entregado" ? "📦 Entregada al cliente" : "Entrega final"}</h2>
+          <h2 className="h2"><span className="inline-flex items-center gap-2"><Icon name="box" className="size-5" />{p.status === "entregado" ? "Entregada al cliente" : "Entrega final"}</span></h2>
           <p className="text-[14px] text-muted mt-1 mb-4">
             {p.status === "entregado" ? "Tu cliente puede descargar estos archivos. Puedes actualizarlos." : "Sube los archivos finales (en alta, editables, por formato…). Si no subes nada, se entrega el material aprobado."}
           </p>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { LineItem } from "@/lib/types";
 import { money } from "@/lib/utils";
 import type { CatalogItem } from "@/lib/catalog";
+import { Icon } from "./icons";
 
 /** Editor de ítems para cotizaciones y cuentas de cobro. Envía un input oculto "items" en JSON. */
 export function ItemsEditor({ initial, catalog = [] }: { initial?: LineItem[]; catalog?: CatalogItem[] }) {
@@ -39,7 +40,7 @@ export function ItemsEditor({ initial, catalog = [] }: { initial?: LineItem[]; c
                 onChange={(e) => update(i, { unit_price: Number(e.target.value) })} aria-label="Valor unitario" /></label>
             <span className="font-semibold text-[14px] lg:text-right pl-1 lg:pl-0"><span className="lg:hidden text-muted font-medium text-[12px]">Subtotal </span>{money(Number(it.quantity) * Number(it.unit_price))}</span>
             <button type="button" className="btn btn-ghost btn-sm px-2 justify-self-end" aria-label="Quitar"
-              onClick={() => setItems((arr) => (arr.length > 1 ? arr.filter((_, idx) => idx !== i) : arr))}>✕</button>
+              onClick={() => setItems((arr) => (arr.length > 1 ? arr.filter((_, idx) => idx !== i) : arr))}><Icon name="x" className="size-4" strokeWidth={2.2} /></button>
           </div>
         ))}
       </div>

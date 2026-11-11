@@ -18,7 +18,7 @@ function buildSteps(keys: string[], name: string): Step[] {
       text: "Crea la ficha de cada cliente. Desde ahí lo invitas a su portal con un enlace único por WhatsApp o correo." },
     { target: ["/panel/parrilla"], title: social ? "Tu parrilla de contenido" : "Tus entregas", mood: "idea",
       text: social
-        ? "Planea las piezas por fecha y red social. Tu cliente marca sobre el arte lo que quiere cambiar 📍."
+        ? "Planea las piezas por fecha y red social. Tu cliente marca sobre el arte lo que quiere cambiar."
         : "Organiza pantallas, sitios, archivos y entregas por fecha. Tu cliente los revisa y marca sobre ellos lo que quiere ajustar." },
     { target: ["/panel/envios", "more"], title: "Revisiones", mood: "smile",
       text: "Cuando tengas varias listas, las envías juntas con un mensaje. Tu cliente las revisa una por una y aquí ves cómo va." },

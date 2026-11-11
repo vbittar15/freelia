@@ -5,6 +5,7 @@ import { Lia, Logo } from "./brand";
 import { SubmitButton } from "./client-ui";
 import { RUBROS, UNITS, rubroMap, suggestedServices, usesSocial } from "@/lib/rubros";
 import { cn, money } from "@/lib/utils";
+import { Icon, IconTile } from "./icons";
 
 /** Bienvenida en 3 pasos: rubros → servicios y precios sugeridos → datos del negocio */
 export function Onboarding({ action, name, initial, business, city, error }: {
@@ -59,7 +60,7 @@ export function Onboarding({ action, name, initial, business, city, error }: {
                   <button key={r.key} type="button" onClick={() => toggleR(r.key)} aria-pressed={on}
                     className={cn("flex flex-col items-start gap-1.5 rounded-[20px] p-3.5 text-left transition-all active:scale-[.98]",
                       on ? "bg-brand text-white shadow-[0_8px_22px_rgba(61,91,245,.28)]" : "bg-surface hover:bg-surface-2")}>
-                    <span className="text-[22px]" aria-hidden>{r.emoji}</span>
+                    <IconTile name={r.icon} tint={r.tint} size={38} className={on ? "!bg-white/20 !text-white" : ""} />
                     <span className="text-[14px] font-semibold leading-tight">{r.label}</span>
                   </button>
                 );
@@ -78,7 +79,7 @@ export function Onboarding({ action, name, initial, business, city, error }: {
               if (!list.length) return null;
               return (
                 <div key={k} className="mb-5">
-                  <div className="font-semibold text-[14px] mb-2 px-1">{rubroMap[k].emoji} {rubroMap[k].label}</div>
+                  <div className="font-semibold text-[14px] mb-2 px-1 flex items-center gap-2"><IconTile name={rubroMap[k].icon} tint={rubroMap[k].tint} size={26} /> {rubroMap[k].label}</div>
                   <div className="flex flex-col gap-2">
                     {list.map((x) => {
                       const on = !off.has(x.name);

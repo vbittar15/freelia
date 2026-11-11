@@ -5,6 +5,7 @@ import { PrintButton, SubmitButton } from "@/components/client-ui";
 import { QuoteDocument } from "@/components/shared";
 import type { Profile, Quote } from "@/lib/types";
 import { respondQuote } from "../../actions";
+import { Icon } from "@/components/icons";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
   const { id } = await params;
@@ -28,7 +29,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             <form action={respondQuote}><input type="hidden" name="id" value={q.id} /><input type="hidden" name="accept" value="false" />
               <SubmitButton className="btn btn-ghost" pendingText="…">Rechazar</SubmitButton></form>
             <form action={respondQuote}><input type="hidden" name="id" value={q.id} /><input type="hidden" name="accept" value="true" />
-              <SubmitButton className="btn btn-approve" pendingText="Aceptando…">✓ Aceptar cotización</SubmitButton></form>
+              <SubmitButton className="btn btn-approve" pendingText="Aceptando…"><Icon name="check" className="size-[18px]" strokeWidth={2.4} /> Aceptar cotización</SubmitButton></form>
           </div>
         )}
       </div>

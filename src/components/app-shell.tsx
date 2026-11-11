@@ -8,30 +8,8 @@ import { cn } from "@/lib/utils";
 import { Logo } from "./brand";
 import { Avatar } from "./ui";
 
-/** Íconos de trazo 1.8 de la biblioteca de componentes */
-const ICONS: Record<string, React.ReactNode> = {
-  home: <path d="M4 11.5l8-7 8 7V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z" />,
-  users: <><circle cx="9" cy="8.5" r="3.5" /><path d="M2.5 20c.6-3.6 3.3-5.6 6.5-5.6s5.9 2 6.5 5.6" /><path d="M16 5.2a3.4 3.4 0 0 1 0 6.6M18 14.7c1.9.7 3.2 2.5 3.6 5.3" /></>,
-  brief: <><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M14 3v5h5M9 13h6M9 17h4" /></>,
-  calendar: <><rect x="3.5" y="5" width="17" height="15.5" rx="4" /><path d="M3.5 10h17M8.5 3v4M15.5 3v4" /></>,
-  quote: <><rect x="4.5" y="3" width="15" height="18" rx="3" /><path d="M8.5 8h7M8.5 12h7M8.5 16h4" /></>,
-  money: <><path d="M5.5 3h13v18l-3.2-2-3.3 2-3.3-2-3.2 2z" /><path d="M9 8.5h6M9 12.5h6" /></>,
-  chat: <path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.3A8 8 0 1 1 20 11.5z" />,
-  bell: <><path d="M6 9a6 6 0 1 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15.5 6 9" /><path d="M10.3 20.5a1.94 1.94 0 0 0 3.4 0" /></>,
-  check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
-  settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>,
-  send: <><path d="M20.5 3.5L10 14" /><path d="M20.5 3.5l-6.5 17-4-6.5-6.5-4z" /></>,
-  more: <><circle cx="5.5" cy="12" r="1.3" /><circle cx="12" cy="12" r="1.3" /><circle cx="18.5" cy="12" r="1.3" /></>,
-};
-export type IconName = keyof typeof ICONS & string;
-
-export function Icon({ name, className }: { name: IconName; className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={cn("size-[22px] shrink-0", className)} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      {ICONS[name]}
-    </svg>
-  );
-}
+export { Icon, type IconName } from "./icons";
+import { Icon, type IconName } from "./icons";
 
 export type NavItem = { href: string; label: string; short?: string; icon: IconName; exact?: boolean; tab?: boolean };
 

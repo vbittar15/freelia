@@ -1,5 +1,6 @@
 /** Tipos de solicitud que puede hacer un cliente y sus campos */
 import type { Brief, Post } from "./types";
+import type { IconName, Tint } from "@/components/icons";
 
 export type FieldDef = {
   key: string; // columna de briefs o "d.<clave>" para details
@@ -14,7 +15,8 @@ export type FieldDef = {
 export type RequestKind = {
   key: "proyecto" | "pieza" | "parrilla" | "campana" | "reunion";
   label: string;
-  emoji: string;
+  icon: IconName;
+  tint: Tint;
   desc: string;
   titleLabel: string;
   titlePlaceholder: string;
@@ -26,7 +28,7 @@ export type RequestKind = {
 const REDES: [string, string][] = [["instagram", "Instagram"], ["facebook", "Facebook"], ["tiktok", "TikTok"], ["linkedin", "LinkedIn"], ["youtube", "YouTube"], ["x", "X"]];
 
 export const KINDS: RequestKind[] = [
-  { key: "pieza", label: "Pieza", emoji: "🖼️", desc: "Un diseño, video, foto o texto puntual",
+  { key: "pieza", label: "Pieza", icon: "image", tint: "rosa", desc: "Un diseño, video, foto o texto puntual",
     titleLabel: "¿Qué pieza necesitas?", titlePlaceholder: "Ej. Flyer para el evento del sábado", files: true, material: true,
     fields: [
       { key: "d.formato", label: "Tipo de pieza", type: "select", options: [["post", "Post para redes"], ["carrusel", "Carrusel"], ["historia", "Historia"], ["video", "Video / reel"], ["flyer", "Flyer o afiche"], ["logo", "Logo"], ["presentacion", "Presentación"], ["foto", "Fotografía"], ["web", "Página web"], ["otro", "Otro"]] },
@@ -34,7 +36,7 @@ export const KINDS: RequestKind[] = [
       { key: "key_message", label: "Texto o mensaje que debe llevar", type: "textarea", wide: true },
       { key: "refs", label: "Referencias o links", type: "textarea", wide: true },
     ] },
-  { key: "parrilla", label: "Parrilla", emoji: "🗓️", desc: "El contenido de redes de un mes",
+  { key: "parrilla", label: "Parrilla", icon: "grid", tint: "azul", desc: "El contenido de redes de un mes",
     titleLabel: "Nombre de la parrilla", titlePlaceholder: "Ej. Parrilla de diciembre", files: true, material: true,
     fields: [
       { key: "d.mes", label: "Mes", type: "month", required: true },
@@ -43,7 +45,7 @@ export const KINDS: RequestKind[] = [
       { key: "objective", label: "Objetivo del mes", type: "textarea", wide: true, placeholder: "Ej. Lanzar el sabor nuevo y vender más los fines de semana" },
       { key: "d.fechas", label: "Fechas o temas importantes", type: "textarea", wide: true, placeholder: "Ej. 8 dic promo 2x1, Navidad, cierre de año" },
     ] },
-  { key: "campana", label: "Campaña", emoji: "📣", desc: "Varias piezas alrededor de un objetivo",
+  { key: "campana", label: "Campaña", icon: "megaphone", tint: "amarillo", desc: "Varias piezas alrededor de un objetivo",
     titleLabel: "Nombre de la campaña", titlePlaceholder: "Ej. Lanzamiento sabor maracuyá", files: true, material: true,
     fields: [
       { key: "objective", label: "Objetivo", type: "textarea", wide: true, required: true },
@@ -54,7 +56,7 @@ export const KINDS: RequestKind[] = [
       { key: "d.canales", label: "Canales", type: "text", wide: true, placeholder: "Ej. Instagram, TikTok, punto de venta" },
       { key: "budget", label: "Presupuesto (opcional)", type: "money" },
     ] },
-  { key: "proyecto", label: "Proyecto", emoji: "🧩", desc: "Algo más grande: marca, web, video…",
+  { key: "proyecto", label: "Proyecto", icon: "layers", tint: "lila", desc: "Algo más grande: marca, web, video…",
     titleLabel: "Nombre del proyecto", titlePlaceholder: "Ej. Rediseño de la página web", files: true, material: true,
     fields: [
       { key: "objective", label: "¿Qué quieres lograr?", type: "textarea", wide: true, required: true },
@@ -63,7 +65,7 @@ export const KINDS: RequestKind[] = [
       { key: "budget", label: "Presupuesto (opcional)", type: "money" },
       { key: "refs", label: "Referencias o links", type: "textarea", wide: true },
     ] },
-  { key: "reunion", label: "Reunión", emoji: "📅", desc: "Hablar en vivo con tu equipo",
+  { key: "reunion", label: "Reunión", icon: "video", tint: "verde", desc: "Hablar en vivo con tu equipo",
     titleLabel: "¿De qué quieres hablar?", titlePlaceholder: "Ej. Revisar resultados del mes", files: false, material: false,
     fields: [
       { key: "d.modo", label: "Modalidad", type: "select", options: [["virtual", "Virtual (videollamada)"], ["presencial", "Presencial"], ["llamada", "Llamada"]] },

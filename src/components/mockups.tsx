@@ -1,5 +1,6 @@
 import { Lia, Logo, Sparkle, StatusPill, Trazo } from "./brand";
 import { cn } from "@/lib/utils";
+import { Icon } from "./icons";
 
 /* Mockups estáticos de la app para la landing (datos de ejemplo) */
 
@@ -77,7 +78,7 @@ export function ScreenApproval() {
         </div>
       </div>
       <div className="mt-4 space-y-2">
-        <div className="h-[42px] rounded-full bg-verde flex items-center justify-center text-[13px] font-semibold">✓ Aprobar</div>
+        <div className="h-[42px] rounded-full bg-verde flex items-center justify-center text-[13px] font-semibold gap-1.5"><Icon name="check" className="size-4" strokeWidth={2.4} /> Aprobar</div>
         <div className="h-[42px] rounded-full bg-rosa-t flex items-center justify-center text-[13px] font-semibold">Pedir cambios</div>
       </div>
     </div>
@@ -117,8 +118,8 @@ export function ScreenChat() {
         <div><div className="text-[12px] font-semibold">Café Orilla</div><div className="text-[9.5px] text-verde font-medium">En su portal</div></div>
       </div>
       <div className="flex-1 space-y-2 pt-3 text-[11px]">
-        <div className="max-w-[78%] bg-surface rounded-[16px] rounded-bl-[5px] px-3 py-2">¿Me mandas la parrilla de diciembre? ☕</div>
-        <div className="max-w-[78%] ml-auto bg-brand text-white rounded-[16px] rounded-br-[5px] px-3 py-2">¡Lista! Ya te llegó para aprobar 💙</div>
+        <div className="max-w-[78%] bg-surface rounded-[16px] rounded-bl-[5px] px-3 py-2">¿Me mandas la parrilla de diciembre?</div>
+        <div className="max-w-[78%] ml-auto bg-brand text-white rounded-[16px] rounded-br-[5px] px-3 py-2">¡Lista! Ya te llegó para aprobar.</div>
         <div className="max-w-[78%] bg-surface rounded-[16px] rounded-bl-[5px] px-3 py-2">Aprobada. Me encantó el reel.</div>
         <div className="mx-auto w-fit"><StatusPill status="aprobado" label="Parrilla aprobada" /></div>
       </div>
@@ -169,7 +170,7 @@ export function InvoiceCard() {
         <div className="flex justify-between"><span>Sesión de fotos</span><b>$ 300.000</b></div>
       </div>
       <div className="mt-3 pt-3 border-t border-line flex justify-between items-end"><span className="text-muted text-[10px]">Total</span><span className="text-[20px] font-bold">$ 1.200.000</span></div>
-      <div className="absolute -right-4 -top-4 rotate-12 rounded-full bg-verde text-ink font-bold text-[13px] px-4 py-2 shadow-lg anim-pop">✓ Pagada</div>
+      <div className="absolute -right-4 -top-4 rotate-12 rounded-full bg-verde text-ink font-bold text-[13px] px-4 py-2 shadow-lg anim-pop inline-flex items-center gap-1"><Icon name="check" className="size-4" strokeWidth={2.6} /> Pagada</div>
     </div>
   );
 }

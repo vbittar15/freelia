@@ -9,6 +9,7 @@ import type { Package, Service } from "@/lib/types";
 import { RUBROS, UNITS, rubroMap, suggestedServices, usesSocial, withDefaults } from "@/lib/rubros";
 import { NETWORKS, cn, money } from "@/lib/utils";
 import { addSuggested, deletePackage, deleteService, savePackage, saveService, saveSettings, saveSpecialties } from "./actions";
+import { Icon, IconTile } from "@/components/icons";
 
 export const metadata = { title: "Ajustes" };
 
@@ -150,7 +151,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
                 </form>
               ) : (
                 <div key={sv.id} className="flex items-center gap-3 rounded-[20px] bg-surface px-4 py-3">
-                  <span className="text-[20px] shrink-0" aria-hidden>{rubroMap[sv.category ?? ""]?.emoji ?? "•"}</span>
+                  <IconTile name={rubroMap[sv.category ?? ""]?.icon ?? "file"} tint={rubroMap[sv.category ?? ""]?.tint ?? "gris"} size={38} />
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-[15px] truncate">{sv.name}</div>
                     <div className="text-[13px] text-muted truncate">{sv.description || rubroMap[sv.category ?? ""]?.label || "Servicio"}</div>
@@ -160,9 +161,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
                     <div className="text-[12px] text-muted">{UNITS[sv.unit] ?? sv.unit}</div>
                   </div>
                   <div className="flex shrink-0">
-                    <Link href={`/panel/ajustes?tab=servicios&editar=${sv.id}`} scroll={false} className="btn btn-ghost btn-sm !px-2.5" aria-label={`Editar ${sv.name}`}>✎</Link>
+                    <Link href={`/panel/ajustes?tab=servicios&editar=${sv.id}`} scroll={false} className="btn btn-ghost btn-sm !px-2.5" aria-label={`Editar ${sv.name}`}><Icon name="pencil" className="size-4" /></Link>
                     <form action={deleteService}><input type="hidden" name="id" value={sv.id} />
-                      <ConfirmSubmit message={`¿Eliminar "${sv.name}"?`} className="btn btn-ghost btn-sm !px-2.5">✕</ConfirmSubmit></form>
+                      <ConfirmSubmit message={`¿Eliminar "${sv.name}"?`} className="btn btn-ghost btn-sm !px-2.5"><Icon name="trash" className="size-4" /></ConfirmSubmit></form>
                   </div>
                 </div>
               ))}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { RUBROS } from "@/lib/rubros";
 import { cn } from "@/lib/utils";
+import { IconTile } from "./icons";
 
 /** Selector múltiple de rubros (envía inputs "specialties") */
 export function RubroPicker({ initial = [], name = "specialties", compact }: { initial?: string[]; name?: string; compact?: boolean }) {
@@ -18,7 +19,7 @@ export function RubroPicker({ initial = [], name = "specialties", compact }: { i
             <button key={r.key} type="button" onClick={() => toggle(r.key)} aria-pressed={on}
               className={cn("flex items-center gap-2 rounded-[16px] px-3 py-2.5 text-left text-[13px] leading-tight font-medium transition-all active:scale-[.98]",
                 on ? "bg-brand text-white shadow-[0_6px_16px_rgba(61,91,245,.25)]" : compact ? "bg-white text-ink hover:ring-2 hover:ring-brand/20" : "bg-surface text-ink hover:bg-surface-2")}>
-              <span className="text-[17px] shrink-0" aria-hidden>{r.emoji}</span>
+              <IconTile name={r.icon} tint={r.tint} size={30} className={on ? "!bg-white/20 !text-white" : ""} />
               <span className="min-w-0">{r.label}</span>
             </button>
           );

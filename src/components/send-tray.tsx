@@ -6,6 +6,7 @@ import { StatusBadge } from "./ui";
 import { SubmitButton } from "./client-ui";
 import { FORMATS, NETWORKS, cn, fmtDateTime } from "@/lib/utils";
 import type { Post } from "@/lib/types";
+import { Icon } from "./icons";
 
 export type TrayPost = Post & { openPins: number; lastChange: string | null };
 
@@ -71,8 +72,8 @@ export function SendTray({ action, clientId, clientName, hasAccount, posts, pres
                 )}
                 {(warn || p.openPins > 0) && (
                   <span className="mt-1.5 flex flex-wrap gap-1.5 text-[11px] font-semibold">
-                    {p.openPins > 0 && <span className="rounded-full bg-amarillo-t px-2 py-0.5">📍 {p.openPins} {p.openPins === 1 ? "marca" : "marcas"} sin resolver</span>}
-                    {warn && <span className="rounded-full bg-amarillo-t px-2 py-0.5">⚠ {warn}</span>}
+                    {p.openPins > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-amarillo-t px-2 py-0.5"><Icon name="pin" className="size-3.5" /> {p.openPins} {p.openPins === 1 ? "marca" : "marcas"} sin resolver</span>}
+                    {warn && <span className="inline-flex items-center gap-1 rounded-full bg-amarillo-t px-2 py-0.5"><Icon name="alert" className="size-3.5" /> {warn}</span>}
                   </span>
                 )}
               </span>
@@ -95,12 +96,12 @@ export function SendTray({ action, clientId, clientName, hasAccount, posts, pres
           <label className="block">
             <span className="label">Mensaje para {first} <span className="text-muted font-normal">(opcional)</span></span>
             <textarea name="message" rows={3} maxLength={500} value={msg} onChange={(e) => setMsg(e.target.value)} className="input"
-              placeholder={fixes.length ? "Ej. Ya ajusté los colores y el logo como pediste. ¡Quedo atenta!" : "Ej. Te comparto la parrilla de diciembre. Si puedes, apruébala antes del viernes 🙌"} />
+              placeholder={fixes.length ? "Ej. Ya ajusté los colores y el logo como pediste. ¡Quedo atenta!" : "Ej. Te comparto la parrilla de diciembre. Si puedes, apruébala antes del viernes."} />
           </label>
           {fixes.length > 0 && (
             <label className="flex items-start gap-2.5 text-[14px] cursor-pointer">
               <input type="checkbox" name="resolve" defaultChecked className="mt-0.5 size-4 accent-[#3d5bf5]" />
-              <span>Marcar como resueltas las marcas 📍 de las correcciones<span className="block text-[12px] text-muted">Tu cliente las verá como “corregido” para comprobarlo.</span></span>
+              <span>Marcar como resueltas las marcas de las correcciones<span className="block text-[12px] text-muted">Tu cliente las verá como “corregido” para comprobarlo.</span></span>
             </label>
           )}
         </div>
@@ -123,8 +124,8 @@ export function SendTray({ action, clientId, clientName, hasAccount, posts, pres
                 {n > 6 && <span className="size-10 rounded-[14px] bg-surface ring-2 ring-white grid place-items-center text-[12px] font-semibold">+{n - 6}</span>}
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-semibold whitespace-nowrap">
-                <span className="rounded-full bg-verde-t px-2 py-1">✓ Aprobar</span>
-                <span className="rounded-full bg-rosa-t px-2 py-1">📍 Pedir cambios</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-verde-t px-2 py-1"><Icon name="check" className="size-3.5" strokeWidth={2.4} /> Aprobar</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-rosa-t px-2 py-1"><Icon name="pin" className="size-3.5" /> Pedir cambios</span>
                 <span className="rounded-full bg-surface px-2 py-1">Aprobar todas</span>
               </div>
             </div>
@@ -134,7 +135,7 @@ export function SendTray({ action, clientId, clientName, hasAccount, posts, pres
         {!hasAccount && (
           <p className="rounded-[18px] bg-amarillo-t px-4 py-3 text-[13px]">{first} aún no tiene cuenta en Freelia. Al enviar te damos el enlace para mandárselo por WhatsApp.</p>
         )}
-        {n > 0 && warnings > 0 && <p className="text-[12px] text-muted px-1">⚠ {warnings} {warnings === 1 ? "pieza tiene" : "piezas tienen"} avisos. Puedes enviarlas igual.</p>}
+        {n > 0 && warnings > 0 && <p className="flex items-center gap-1.5 text-[12px] text-muted px-1"><Icon name="alert" className="size-3.5" /> {warnings} {warnings === 1 ? "pieza tiene" : "piezas tienen"} avisos. Puedes enviarlas igual.</p>}
         <SubmitButton className={cn("btn btn-lg w-full", n ? "btn-primary" : "bg-surface text-muted pointer-events-none")} pendingText="Enviando…">
           {n ? `Enviar ${n} ${n === 1 ? "pieza" : "piezas"} a ${first}` : "Elige al menos una pieza"}
         </SubmitButton>

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { FileRef } from "@/lib/types";
 import { uploadFile } from "@/lib/upload";
 import { fileKind } from "@/lib/files";
+import { Icon } from "./icons";
 
 /** Adjuntar varios archivos a un formulario (guarda JSON en un input oculto) */
 export function FilePicker({ userId, name = "attachments", initial = [] }: { userId: string; name?: string; initial?: FileRef[] }) {
@@ -38,7 +39,7 @@ export function FilePicker({ userId, name = "attachments", initial = [] }: { use
               ? <img src={f.url} alt={f.name} className="size-20 rounded-[14px] object-cover bg-surface-2" />
               : <div className="h-20 w-36 rounded-[14px] bg-white p-2.5 flex flex-col justify-between"><span className="text-[10px] font-bold text-brand-dark uppercase">{fileKind(f.type, f.name)}</span><span className="text-[12px] font-semibold line-clamp-2 break-all">{f.name}</span></div>}
             <button type="button" aria-label={`Quitar ${f.name}`} onClick={() => setFiles((p) => p.filter((_, j) => j !== i))}
-              className="absolute -top-2 -right-2 size-6 rounded-full bg-ink text-white text-[11px] flex items-center justify-center shadow cursor-pointer">✕</button>
+              className="absolute -top-2 -right-2 size-6 rounded-full bg-ink text-white text-[11px] flex items-center justify-center shadow cursor-pointer"><Icon name="x" className="size-3.5" strokeWidth={2.4} /></button>
           </div>
         ))}
         {Array.from({ length: busy }).map((_, i) => <div key={i} className="size-20 rounded-[14px] bg-surface-2 animate-pulse" />)}

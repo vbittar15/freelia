@@ -7,6 +7,7 @@ import { Lia } from "@/components/brand";
 import { kindMap } from "@/lib/requests";
 import { createRequest } from "../../actions";
 import { creativeName, getWorkspaces } from "../../data";
+import { Icon, IconTile } from "@/components/icons";
 
 export const metadata = { title: "Nueva solicitud" };
 
@@ -24,7 +25,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
       {kind ? (
         <form action={createRequest} className="card p-5 sm:p-6 grid sm:grid-cols-2 gap-4 max-w-3xl mt-6 anim-page">
           <div className="sm:col-span-2 flex items-center gap-3">
-            <span className="text-[28px]" aria-hidden>{kind.emoji}</span>
+            <IconTile name={kind.icon} tint={kind.tint} size={44} />
             <div><div className="font-semibold text-[17px]">{kind.label}</div><div className="text-[13px] text-muted">{kind.desc}</div></div>
           </div>
           {ws.length > 1 ? (

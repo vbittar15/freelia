@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { VAPID_PUBLIC_KEY, urlBase64ToUint8Array } from "@/lib/push";
 import { Lia } from "./brand";
+import { Icon } from "./icons";
 
 /** Registra el service worker (app instalable + push) */
 export function SWRegister() {
@@ -94,7 +95,7 @@ export function NotifyCard({ compact = false }: { compact?: boolean }) {
 
   const close = compact && (
     <button type="button" aria-label="Cerrar" onClick={() => { setHidden(true); store("freelia-notify-hide", "1"); }}
-      className="absolute top-3 right-3 size-8 rounded-full hover:bg-white/60 flex items-center justify-center text-muted cursor-pointer">✕</button>
+      className="absolute top-3 right-3 size-8 rounded-full hover:bg-white/60 flex items-center justify-center text-muted cursor-pointer"><Icon name="x" className="size-4" /></button>
   );
 
   return (
@@ -107,7 +108,7 @@ export function NotifyCard({ compact = false }: { compact?: boolean }) {
             <>
               <div className="font-semibold">Instala Freelia en tu iPhone</div>
               <p className="text-[14px] text-ink/75 mt-1 leading-relaxed">
-                Toca <b>Compartir</b> <span aria-hidden>⬆︎</span> en Safari y luego <b>“Agregar a pantalla de inicio”</b>. Ábrela desde ahí para activar las notificaciones.
+                Toca <b>Compartir</b> <Icon name="share" className="inline size-[17px] -mt-1 text-brand-dark" /> en Safari y luego <b>“Agregar a pantalla de inicio”</b>. Ábrela desde ahí para activar las notificaciones.
               </p>
             </>
           )}

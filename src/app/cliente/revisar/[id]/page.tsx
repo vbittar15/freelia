@@ -9,6 +9,7 @@ import type { Post, ReviewRequest } from "@/lib/types";
 import { fmtDateTime } from "@/lib/utils";
 import { approveAll } from "../../actions";
 import { creativeName, getWorkspaces } from "../../data";
+import { Icon } from "@/components/icons";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ fin?: string; aprobada?: string; error?: string }> }) {
   const { id } = await params;
@@ -67,7 +68,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
                   <form action={approveAll}>
                     <input type="hidden" name="back" value={`/cliente/revisar/${r.id}`} />
                     {pending.map((p) => <input key={p.id} type="hidden" name="post_ids" value={p.id} />)}
-                    <SubmitButton className="btn btn-lg bg-verde-t text-ink hover:bg-verde/30 w-full" pendingText="Aprobando…">✓ Aprobar todas ({pending.length})</SubmitButton>
+                    <SubmitButton className="btn btn-lg bg-verde-t text-ink hover:bg-verde/30 w-full" pendingText="Aprobando…"><Icon name="check" className="size-[18px]" strokeWidth={2.4} /> Aprobar todas ({pending.length})</SubmitButton>
                   </form>
                 )}
               </div>

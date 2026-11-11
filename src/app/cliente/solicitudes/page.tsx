@@ -5,6 +5,7 @@ import { KindPicker } from "@/components/request-fields";
 import type { Brief, Post } from "@/lib/types";
 import { kindOf, stageOf } from "@/lib/requests";
 import { fmtDate, fmtDateTime } from "@/lib/utils";
+import { Icon, IconTile } from "@/components/icons";
 
 export const metadata = { title: "Solicitudes" };
 
@@ -32,7 +33,7 @@ export default async function Page() {
             const stage = stageOf(b, posts.filter((p) => p.brief_id === b.id && p.status !== "borrador"));
             return (
               <Row key={b.id} href={`/cliente/solicitudes/${b.id}`} title={b.title}
-                icon={<span className="size-10 rounded-[14px] bg-surface-2 grid place-items-center text-[20px] shrink-0" aria-hidden>{k.emoji}</span>}
+                icon={<IconTile name={k.icon} tint={k.tint} />}
                 sub={`${k.label} · ${k.key === "reunion" ? (b.meeting_at ? fmtDateTime(b.meeting_at) : "fecha por confirmar") : `pedida el ${fmtDate(b.created_at)}`}`}
                 pill={<StatusBadge status={stage} />} />
             );

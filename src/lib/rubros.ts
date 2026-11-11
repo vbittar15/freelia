@@ -1,3 +1,4 @@
+import type { IconName, Tint } from "@/components/icons";
 /** Rubros (tipos de freelance) y lo que cambia en la app según cada uno */
 
 export type SuggestedService = { name: string; unit: string; price: number; description?: string };
@@ -5,7 +6,8 @@ export type Rubro = {
   key: string;
   label: string;
   short: string;
-  emoji: string;
+  icon: IconName;
+  tint: Tint;
   content: boolean; // trabaja con parrilla de redes sociales
   formats: string[]; // formatos de pieza más usados
   services: SuggestedService[];
@@ -17,21 +19,21 @@ export const UNITS: Record<string, string> = {
 };
 
 export const RUBROS: Rubro[] = [
-  { key: "marketing", label: "Marketing digital", short: "Marketing", emoji: "📈", content: true, formats: ["post", "carrusel", "reel", "historia"],
+  { key: "marketing", label: "Marketing digital", short: "Marketing", icon: "trend", tint: "azul", content: true, formats: ["post", "carrusel", "reel", "historia"],
     services: [
       { name: "Estrategia de marketing digital", unit: "proyecto", price: 1500000 },
       { name: "Plan de contenidos mensual", unit: "mes", price: 900000 },
       { name: "Auditoría de marca y redes", unit: "proyecto", price: 600000 },
       { name: "Informe mensual de resultados", unit: "mes", price: 300000 },
     ] },
-  { key: "community", label: "Community manager", short: "Community", emoji: "💬", content: true, formats: ["post", "carrusel", "reel", "historia"],
+  { key: "community", label: "Community manager", short: "Community", icon: "community", tint: "lila", content: true, formats: ["post", "carrusel", "reel", "historia"],
     services: [
       { name: "Gestión de redes (1 red)", unit: "mes", price: 1200000, description: "Planeación, publicación y respuesta a la comunidad" },
       { name: "Publicación adicional", unit: "pieza", price: 60000 },
       { name: "Gestión de comunidad (mensajes y comentarios)", unit: "mes", price: 400000 },
       { name: "Calendario de contenido", unit: "mes", price: 350000 },
     ] },
-  { key: "grafico", label: "Diseño gráfico", short: "Diseño", emoji: "🎨", content: true, formats: ["post", "carrusel", "historia", "documento"],
+  { key: "grafico", label: "Diseño gráfico", short: "Diseño", icon: "pen", tint: "rosa", content: true, formats: ["post", "carrusel", "historia", "documento"],
     services: [
       { name: "Pieza gráfica para redes", unit: "pieza", price: 80000 },
       { name: "Carrusel (hasta 10 láminas)", unit: "pieza", price: 180000 },
@@ -39,88 +41,88 @@ export const RUBROS: Rubro[] = [
       { name: "Flyer o afiche", unit: "pieza", price: 150000 },
       { name: "Manual de marca", unit: "proyecto", price: 1800000 },
     ] },
-  { key: "uxui", label: "Diseño UX/UI", short: "UX/UI", emoji: "📱", content: false, formats: ["pantalla", "web", "documento", "entrega"],
+  { key: "uxui", label: "Diseño UX/UI", short: "UX/UI", icon: "phone", tint: "azul", content: false, formats: ["pantalla", "web", "documento", "entrega"],
     services: [
       { name: "Diseño de pantalla (app o web)", unit: "pieza", price: 250000 },
       { name: "Prototipo interactivo", unit: "proyecto", price: 2500000 },
       { name: "Investigación UX y entrevistas", unit: "proyecto", price: 1500000 },
       { name: "Hora de diseño", unit: "hora", price: 80000 },
     ] },
-  { key: "dev", label: "Programador / desarrollo web", short: "Desarrollo", emoji: "💻", content: false, formats: ["web", "pantalla", "entrega", "documento"],
+  { key: "dev", label: "Programador / desarrollo web", short: "Desarrollo", icon: "code", tint: "gris", content: false, formats: ["web", "pantalla", "entrega", "documento"],
     services: [
       { name: "Landing page", unit: "proyecto", price: 1800000 },
       { name: "Sitio web corporativo", unit: "proyecto", price: 4500000 },
       { name: "Hora de desarrollo", unit: "hora", price: 90000 },
       { name: "Mantenimiento web", unit: "mes", price: 350000 },
     ] },
-  { key: "audiovisual", label: "Realizador audiovisual", short: "Audiovisual", emoji: "🎬", content: true, formats: ["reel", "video", "historia", "entrega"],
+  { key: "audiovisual", label: "Realizador audiovisual", short: "Audiovisual", icon: "clapper", tint: "amarillo", content: true, formats: ["reel", "video", "historia", "entrega"],
     services: [
       { name: "Video para redes (reel)", unit: "video", price: 350000 },
       { name: "Edición de video", unit: "minuto", price: 120000 },
       { name: "Video corporativo", unit: "proyecto", price: 2500000 },
       { name: "Día de grabación", unit: "dia", price: 900000 },
     ] },
-  { key: "foto", label: "Fotógrafo", short: "Fotografía", emoji: "📷", content: true, formats: ["foto", "sesion", "carrusel", "post"],
+  { key: "foto", label: "Fotógrafo", short: "Fotografía", icon: "camera", tint: "verde", content: true, formats: ["foto", "sesion", "carrusel", "post"],
     services: [
       { name: "Sesión de producto (hasta 20 fotos)", unit: "sesion", price: 600000 },
       { name: "Sesión de retrato", unit: "sesion", price: 350000 },
       { name: "Cobertura de evento", unit: "hora", price: 250000 },
       { name: "Foto editada adicional", unit: "pieza", price: 25000 },
     ] },
-  { key: "copy", label: "Copywriter / redactor", short: "Copy", emoji: "✍️", content: true, formats: ["post", "articulo", "documento"],
+  { key: "copy", label: "Copywriter / redactor", short: "Copy", icon: "type", tint: "lila", content: true, formats: ["post", "articulo", "documento"],
     services: [
       { name: "Copy para publicación", unit: "pieza", price: 25000 },
       { name: "Artículo de blog", unit: "pieza", price: 120000 },
       { name: "Textos para página web", unit: "pagina", price: 180000 },
       { name: "Guion para video", unit: "video", price: 150000 },
     ] },
-  { key: "ilustracion", label: "Ilustrador", short: "Ilustración", emoji: "🖌️", content: true, formats: ["post", "entrega", "documento"],
+  { key: "ilustracion", label: "Ilustrador", short: "Ilustración", icon: "brush", tint: "rosa", content: true, formats: ["post", "entrega", "documento"],
     services: [
       { name: "Ilustración sencilla", unit: "pieza", price: 150000 },
       { name: "Ilustración detallada", unit: "pieza", price: 450000 },
       { name: "Diseño de personaje o mascota", unit: "proyecto", price: 900000 },
     ] },
-  { key: "motion", label: "Motion graphics / animación", short: "Motion", emoji: "✨", content: true, formats: ["reel", "video", "historia"],
+  { key: "motion", label: "Motion graphics / animación", short: "Motion", icon: "wand", tint: "amarillo", content: true, formats: ["reel", "video", "historia"],
     services: [
       { name: "Animación de logo", unit: "pieza", price: 350000 },
       { name: "Video animado (30 s)", unit: "video", price: 900000 },
       { name: "Pieza animada para redes", unit: "pieza", price: 200000 },
     ] },
-  { key: "branding", label: "Branding / estrategia de marca", short: "Branding", emoji: "🧭", content: false, formats: ["documento", "entrega", "post"],
+  { key: "branding", label: "Branding / estrategia de marca", short: "Branding", icon: "compass", tint: "azul", content: false, formats: ["documento", "entrega", "post"],
     services: [
       { name: "Naming", unit: "proyecto", price: 800000 },
       { name: "Estrategia de marca", unit: "proyecto", price: 2000000 },
       { name: "Identidad visual completa", unit: "proyecto", price: 3000000 },
     ] },
-  { key: "ads", label: "Pauta digital / trafficker", short: "Pauta", emoji: "🎯", content: true, formats: ["post", "reel", "historia", "documento"],
+  { key: "ads", label: "Pauta digital / trafficker", short: "Pauta", icon: "target", tint: "rosa", content: true, formats: ["post", "reel", "historia", "documento"],
     services: [
       { name: "Gestión de campañas en Meta Ads", unit: "mes", price: 700000 },
       { name: "Gestión de Google Ads", unit: "mes", price: 800000 },
       { name: "Configuración de píxel y analítica", unit: "proyecto", price: 300000 },
     ] },
-  { key: "seo", label: "SEO / posicionamiento", short: "SEO", emoji: "🔎", content: false, formats: ["articulo", "documento", "web"],
+  { key: "seo", label: "SEO / posicionamiento", short: "SEO", icon: "search", tint: "verde", content: false, formats: ["articulo", "documento", "web"],
     services: [
       { name: "Auditoría SEO", unit: "proyecto", price: 700000 },
       { name: "SEO mensual", unit: "mes", price: 900000 },
       { name: "Optimización de artículo", unit: "pieza", price: 80000 },
     ] },
-  { key: "ugc", label: "Creador de contenido / UGC", short: "UGC", emoji: "🤳", content: true, formats: ["reel", "video", "historia"],
+  { key: "ugc", label: "Creador de contenido / UGC", short: "UGC", icon: "selfie", tint: "lila", content: true, formats: ["reel", "video", "historia"],
     services: [
       { name: "Video UGC", unit: "video", price: 250000 },
       { name: "Reseña o unboxing", unit: "video", price: 300000 },
     ] },
-  { key: "audio", label: "Podcast / producción de audio", short: "Audio", emoji: "🎙️", content: false, formats: ["audio", "video", "entrega"],
+  { key: "audio", label: "Podcast / producción de audio", short: "Audio", icon: "mic", tint: "amarillo", content: false, formats: ["audio", "video", "entrega"],
     services: [
       { name: "Edición de episodio", unit: "episodio", price: 150000 },
       { name: "Producción completa de episodio", unit: "episodio", price: 400000 },
       { name: "Locución (hasta 1 min)", unit: "pieza", price: 120000 },
     ] },
-  { key: "agencia", label: "Agencia / equipo creativo", short: "Agencia", emoji: "🏢", content: true, formats: ["post", "carrusel", "reel", "historia", "video"],
+  { key: "agencia", label: "Agencia / equipo creativo", short: "Agencia", icon: "building", tint: "gris", content: true, formats: ["post", "carrusel", "reel", "historia", "video"],
     services: [
       { name: "Fee mensual de agencia", unit: "mes", price: 3500000 },
       { name: "Proyecto integral de marca", unit: "proyecto", price: 5000000 },
     ] },
-  { key: "otro", label: "Otro servicio creativo", short: "Otro", emoji: "💡", content: true, formats: [], services: [] },
+  { key: "otro", label: "Otro servicio creativo", short: "Otro", icon: "bulb", tint: "amarillo", content: true, formats: [], services: [] },
 ];
 
 export const rubroMap = Object.fromEntries(RUBROS.map((r) => [r.key, r])) as Record<string, Rubro>;

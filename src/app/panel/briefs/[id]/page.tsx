@@ -11,6 +11,7 @@ import { kindOf, stageOf, stagesFor } from "@/lib/requests";
 import { NETWORKS, clientLabel, fmtDateTime, isoToBogotaLocal } from "@/lib/utils";
 import { ErrorNote } from "../../_forms";
 import { confirmMeeting, deleteBrief, deliverBrief, linkPosts, setBriefStatus, unlinkPost } from "../../actions";
+import { Icon, IconTile } from "@/components/icons";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ ok?: string; n?: string; error?: string }> }) {
   const { id } = await params;
@@ -42,7 +43,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     : toSend ? `Tienes ${toSend} ${toSend === 1 ? "pieza lista" : "piezas listas"} para enviar a revisión.`
     : inReview ? `Esperando que el cliente revise ${inReview} ${inReview === 1 ? "pieza" : "piezas"}.`
     : approved ? "Todo aprobado: entrega los archivos finales."
-    : b.delivered_at ? "Solicitud entregada ✨" : null;
+    : b.delivered_at ? "Solicitud entregada." : null;
 
   return (
     <>
@@ -51,7 +52,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         title={b.title}
         subtitle={<span className="flex flex-wrap items-center gap-3 mt-1">
           <Link href={`/panel/clientes/${b.client_id}`}><ClientChip name={clientLabel(b.clients)} color={b.clients?.color} /></Link>
-          <span className="badge bg-surface text-ink">{kind.emoji} {kind.label}</span>
+          <span className="badge bg-surface text-ink inline-flex items-center gap-1.5"><Icon name={kind.icon} className="size-4" /> {kind.label}</span>
           {b.created_by !== user.id && <span className="badge bg-lila-t text-ink">Pedida por el cliente</span>}
         </span>}
         actions={<>
@@ -100,7 +101,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
                     <form action={unlinkPost}>
                       <input type="hidden" name="id" value={b.id} />
                       <input type="hidden" name="post_id" value={p.id} />
-                      <button className="btn btn-ghost btn-sm !px-2.5" title="Quitar de la solicitud" aria-label={`Quitar ${p.title} de la solicitud`}>✕</button>
+                      <button className="btn btn-ghost btn-sm !px-2.5" title="Quitar de la solicitud" aria-label={`Quitar ${p.title} de la solicitud`}><Icon name="x" className="size-4" strokeWidth={2.2} /></button>
                     </form>
                   )} />
                 </div>
@@ -109,7 +110,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
                   {approved > 0 && (
                     <form action={deliverBrief}>
                       <input type="hidden" name="id" value={b.id} />
-                      <SubmitButton className="btn btn-approve" pendingText="Entregando…">📦 Entregar {approved + delivered === posts.length ? "todo" : `${approved} aprobadas`}</SubmitButton>
+                      <SubmitButton className="btn btn-approve" pendingText="Entregando…"><Icon name="box" className="size-[18px]" /> Entregar {approved + delivered === posts.length ? "todo" : `${approved} aprobadas`}</SubmitButton>
                     </form>
                   )}
                   {approved > 0 && <span className="text-[13px] text-muted">Para subir archivos finales distintos, ábrelos uno por uno antes de entregar.</span>}

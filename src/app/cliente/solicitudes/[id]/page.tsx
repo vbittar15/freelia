@@ -12,6 +12,7 @@ import type { Brief, FileRef, Post } from "@/lib/types";
 import { STAGE_LABEL, kindOf, stageOf, stagesFor } from "@/lib/requests";
 import { fmtDateTime } from "@/lib/utils";
 import { creativeName, getWorkspaces } from "../../data";
+import { Icon, IconTile } from "@/components/icons";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ ok?: string; aprobada?: string; error?: string }> }) {
   const { id } = await params;
@@ -33,7 +34,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   return (
     <>
       <PageHeader back={{ href: "/cliente/solicitudes", label: "Solicitudes" }} title={b.title}
-        subtitle={<span className="flex flex-wrap items-center gap-2 mt-1"><span className="badge bg-surface text-ink">{kind.emoji} {kind.label}</span><span className="text-[13px]">{STAGE_LABEL[stage]}</span></span>} />
+        subtitle={<span className="flex flex-wrap items-center gap-2 mt-1"><span className="badge bg-surface text-ink inline-flex items-center gap-1.5"><Icon name={kind.icon} className="size-4" /> {kind.label}</span><span className="text-[13px]">{STAGE_LABEL[stage]}</span></span>} />
       {ok && <div className="mb-5"><Notice tone="ok">{kind.key === "reunion" ? `Listo, ${who} te confirmará la fecha y el enlace.` : `Solicitud enviada. ${who} ya fue notificado.`}</Notice></div>}
       {aprobada && <div className="mb-5"><Notice tone="ok">{Number(aprobada) > 0 ? `¡Aprobaste ${aprobada} ${aprobada === "1" ? "pieza" : "piezas"}! Tu equipo ya fue notificado.` : "No había piezas pendientes por aprobar."}</Notice></div>}
       {error && <div className="mb-5"><Notice tone="error">{error}</Notice></div>}
@@ -72,7 +73,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <section className="mb-6 rounded-[22px] bg-verde-t p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
             <div className="flex-1">
-              <div className="font-semibold text-[17px]">📦 Tu material está listo</div>
+              <div className="font-semibold text-[17px] flex items-center gap-2"><Icon name="box" className="size-5" /> Tu material está listo</div>
               <div className="text-[14px] text-muted">{finalFiles.length} {finalFiles.length === 1 ? "archivo" : "archivos"} para descargar.</div>
             </div>
             <DownloadAll files={finalFiles} zipName={b.title} />

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { PinBoard } from "./pin-board";
 import { FileView } from "./files";
 import { Lia } from "./brand";
+import { Icon } from "./icons";
 
 /** Visor del material: varios archivos, pines por imagen y versiones anteriores */
 export function AssetViewer({ postId, userId, assets, link, comments, versions = [], currentRound = 1, canPin, canResolve }: {
@@ -81,7 +82,7 @@ export function AssetViewer({ postId, userId, assets, link, comments, versions =
 
       {link && (
         <a href={link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-[18px] bg-azul-t px-4 py-3 hover:ring-2 hover:ring-brand/30 transition">
-          <span className="size-9 rounded-[12px] bg-white grid place-items-center text-[16px]" aria-hidden>🔗</span>
+          <span className="size-9 rounded-[12px] bg-white grid place-items-center text-brand-dark"><Icon name="link" className="size-[18px]" /></span>
           <span className="min-w-0 flex-1"><span className="block font-semibold text-[14px]">Abrir enlace</span><span className="block text-[12px] text-muted truncate">{link}</span></span>
         </a>
       )}

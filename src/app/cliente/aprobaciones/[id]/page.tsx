@@ -10,6 +10,7 @@ import { FileGrid } from "@/components/files";
 import type { Post, PostComment, PostVersion } from "@/lib/types";
 import { FORMATS, NETWORKS, fmtDateTime } from "@/lib/utils";
 import { reviewPost } from "../../actions";
+import { Icon } from "@/components/icons";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; ok?: string; r?: string; prev?: string }> }) {
   const { id } = await params;
@@ -62,13 +63,13 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           <span className="text-[12px]">{NETWORKS[p.network]} · {FORMATS[p.format]} · {p.scheduled_at ? fmtDateTime(p.scheduled_at) : "Sin fecha"}</span></span>} />
 
       {error && <p className="mb-5 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{error}</p>}
-      {prev && <p className="mb-4 text-[13px] text-muted anim-page">{prev === "aprobado" ? "✓ Aprobaste la anterior." : "📍 Enviamos tus cambios de la anterior."} Sigue con esta.</p>}
+      {prev && <p className="mb-4 flex items-center gap-1.5 text-[13px] text-muted anim-page"><Icon name={prev === "aprobado" ? "check" : "pin"} className="size-4" />{prev === "aprobado" ? "Aprobaste la anterior." : "Enviamos tus cambios de la anterior."} Sigue con esta.</p>}
       {round > 1 && p.status === "en_revision" && (lastAsk?.body || fixedPins.length > 0) && (
         <div className="mb-5 rounded-[20px] bg-amarillo-t px-4 py-3.5">
           <div className="font-semibold text-[14px]">Corrección · ronda {round}</div>
           <div className="text-[13px] text-muted">Esto fue lo que pediste. Compara con la versión anterior:</div>
           {lastAsk?.body && <p className="mt-1.5 text-[14px]">“{lastAsk.body}”</p>}
-          {fixedPins.length > 0 && <ul className="mt-1.5 space-y-0.5 text-[14px]">{fixedPins.map((k) => <li key={k.id}>✓ {k.body}</li>)}</ul>}
+          {fixedPins.length > 0 && <ul className="mt-1.5 space-y-0.5 text-[14px]">{fixedPins.map((k) => <li key={k.id} className="flex items-start gap-1.5"><Icon name="check" className="size-4 mt-0.5 text-[#1E8C57]" strokeWidth={2.4} />{k.body}</li>)}</ul>}
         </div>
       )}
       {ok === "aprobado" && <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">¡Listo! Aprobaste la pieza y tu equipo ya fue notificado.</p>}
@@ -93,7 +94,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             const files = (p.final_files?.length ? p.final_files : assets);
             return (
               <div className="rounded-[22px] bg-verde-t p-5 space-y-3">
-                <div className="font-semibold">📦 Archivos finales</div>
+                <div className="font-semibold flex items-center gap-2"><Icon name="box" className="size-5" /> Archivos finales</div>
                 <FileGrid files={files} />
                 <DownloadAll files={files} zipName={p.title} className="btn btn-primary w-full" />
               </div>
@@ -104,7 +105,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
               <h3 className="h2">¿Qué te parece?</h3>
               <form action={reviewPost}>
                 <input type="hidden" name="id" value={p.id} /><input type="hidden" name="action" value="aprobado" />{r && <input type="hidden" name="r" value={r} />}
-                <SubmitButton className="btn btn-approve btn-lg w-full" pendingText="Aprobando…">{seq && seq.pending > 1 ? "✓ Aprobar y seguir" : "✓ Aprobar"}</SubmitButton>
+                <SubmitButton className="btn btn-approve btn-lg w-full" pendingText="Aprobando…"><><Icon name="check" className="size-[18px]" strokeWidth={2.4} />{seq && seq.pending > 1 ? "Aprobar y seguir" : "Aprobar"}</></SubmitButton>
               </form>
               <div className="text-center text-[11px] text-muted">o</div>
               <form action={reviewPost} className="space-y-2">

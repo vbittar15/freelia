@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/browser";
 import type { PostComment } from "@/lib/types";
 import { cn, timeAgo } from "@/lib/utils";
 import { Lia } from "./brand";
+import { Icon } from "./icons";
 
 /** Comentarios sobre el arte: toca un punto de la imagen y deja tu comentario ahí */
 export function PinBoard({ postId, imageUrl, comments, userId, canResolve, assetIdx = 0, readOnly, hideList }:
@@ -71,7 +72,7 @@ export function PinBoard({ postId, imageUrl, comments, userId, canResolve, asset
               className={cn("absolute -translate-x-1/2 -translate-y-1/2 size-8 rounded-full border-[2.5px] border-white shadow-[0_2px_8px_rgba(34,26,58,.3)] text-[13px] font-bold flex items-center justify-center transition-transform anim-pop cursor-pointer",
                 s.resolved ? "bg-verde/90 text-ink" : "bg-rosa text-ink", active === c.id && "scale-125 ring-4 ring-rosa/30")}
               style={{ left: `${(c.x ?? 0) * 100}%`, top: `${(c.y ?? 0) * 100}%` }}>
-              {s.resolved ? "✓" : i + 1}
+              {s.resolved ? <Icon name="check" className="size-4" strokeWidth={2.6} /> : i + 1}
             </button>
           );
         })}
@@ -101,7 +102,7 @@ export function PinBoard({ postId, imageUrl, comments, userId, canResolve, asset
               return (
                 <div key={c.id} onMouseEnter={() => setActive(c.id)} onMouseLeave={() => setActive(null)}
                   className={cn("flex items-start gap-3 rounded-[18px] px-3.5 py-3 transition-colors", active === c.id ? "bg-rosa-t" : "bg-white", s.resolved && "opacity-60")}>
-                  <span className={cn("size-7 rounded-full text-[12px] font-bold flex items-center justify-center shrink-0", s.resolved ? "bg-verde-t" : "bg-rosa")}>{s.resolved ? "✓" : i + 1}</span>
+                  <span className={cn("size-7 rounded-full text-[12px] font-bold flex items-center justify-center shrink-0", s.resolved ? "bg-verde-t" : "bg-rosa")}>{s.resolved ? <Icon name="check" className="size-4" strokeWidth={2.6} /> : i + 1}</span>
                   <div className="min-w-0 flex-1">
                     <div className="text-[12px] text-muted"><b className="text-ink font-semibold">{c.author_id === userId ? "Tú" : c.profiles?.full_name ?? "Cliente"}</b> · {timeAgo(c.created_at)}</div>
                     <p className={cn("text-[14px] leading-snug mt-0.5", s.resolved && "line-through")}>{c.body}</p>
