@@ -15,7 +15,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
       <PageHeader title="Nueva cuenta de cobro" back={{ href: "/panel/cobros", label: "Cobros" }} />
       <ErrorNote error={error} />
       {missing && (
-        <p className="mb-5 rounded-xl bg-mantequilla px-4 py-3 text-[13px]">
+        <p className="mb-5 rounded-[18px] bg-amarillo-t px-4 py-3 text-[14px]">
           Completa tu cédula/NIT y datos bancarios en <Link href="/panel/perfil" className="text-brand font-medium">tu perfil</Link> para que aparezcan en la cuenta de cobro.
         </p>
       )}

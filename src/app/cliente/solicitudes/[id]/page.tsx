@@ -15,7 +15,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     <>
       <PageHeader back={{ href: "/cliente/solicitudes", label: "Solicitudes" }} title={b.title}
         subtitle={<span className="inline-flex mt-1"><StatusBadge status={b.status} /></span>} />
-      {ok && <p className="mb-5 rounded-xl bg-menta text-[#2c7a57] px-4 py-3 text-[13px]">Solicitud enviada. Tu equipo creativo ya fue notificado.</p>}
+      {ok && <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">Solicitud enviada. Tu equipo creativo ya fue notificado.</p>}
       <BriefView brief={b} />
     </>
   );

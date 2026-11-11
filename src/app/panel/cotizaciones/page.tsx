@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireCreative } from "@/lib/auth";
-import { ClientChip, EmptyState, PageHeader, Stat, StatusBadge } from "@/components/ui";
+import { EmptyState, PageHeader, Row, RowList, Stat, StatusBadge } from "@/components/ui";
 import type { Quote } from "@/lib/types";
 import { clientLabel, fmtDate, money, total } from "@/lib/utils";
 
@@ -21,23 +21,13 @@ export default async function Page() {
         <Stat label="Aceptadas" value={money(sum("aceptada"))} tone="menta" />
         <Stat label="Borradores" value={quotes.filter((q) => q.status === "borrador").length} tone="lavanda" />
       </div>
-      {quotes.length === 0 ? <EmptyState title="Aún no tienes cotizaciones" /> : (
-        <div className="card overflow-x-auto">
-          <table className="table">
-            <thead><tr><th>#</th><th>Título</th><th>Cliente</th><th>Fecha</th><th className="text-right">Total</th><th>Estado</th></tr></thead>
-            <tbody>{quotes.map((q) => (
-              <tr key={q.id}>
-                <td className="text-muted">{q.number}</td>
-                <td><Link href={`/panel/cotizaciones/${q.id}`} className="font-medium hover:text-brand">{q.title}</Link></td>
-                <td><ClientChip name={clientLabel(q.clients)} color={q.clients?.color} /></td>
-                <td className="text-muted whitespace-nowrap">{fmtDate(q.created_at)}</td>
-                <td className="text-right font-medium whitespace-nowrap">{money(total(q.quote_items))}</td>
-                <td><StatusBadge status={q.status} /></td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </div>
-      )}
+      <RowList empty={<EmptyState title="Aún no tienes cotizaciones" action={<Link href="/panel/cotizaciones/nueva" className="btn btn-primary">Crear cotización</Link>} />}>
+        {quotes.map((q) => (
+          <Row key={q.id} href={`/panel/cotizaciones/${q.id}`} status={q.status} title={q.title}
+            sub={`${String(q.number).padStart(3, "0")} · ${clientLabel(q.clients)} · ${fmtDate(q.created_at)}`}
+            right={money(total(q.quote_items))} pill={<StatusBadge status={q.status} />} />
+        ))}
+      </RowList>
     </>
   );
 }

@@ -19,7 +19,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           subtitle={<span className="inline-flex mt-1"><StatusBadge status={inv.status} label={inv.status === "enviada" ? "Pendiente de pago" : undefined} /></span>}
           actions={<PrintButton />} />
         {inv.status === "enviada" && (
-          <p className="mb-5 rounded-xl bg-cielo px-4 py-3 text-[13px] max-w-3xl">
+          <p className="mb-5 rounded-[18px] bg-azul-t px-4 py-3 text-[14px] max-w-3xl">
             Cuando hagas el pago, avísale a tu equipo por <a href={`/cliente/mensajes/${inv.client_id}`} className="text-brand font-medium">mensajes</a> y adjunta el comprobante.
           </p>
         )}

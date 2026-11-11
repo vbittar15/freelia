@@ -42,7 +42,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         />
         <ErrorNote error={error} />
         {q.status === "enviada" && (
-          <p className="mb-5 rounded-xl bg-cielo px-4 py-3 text-[13px]">Esperando respuesta del cliente. Te avisaremos cuando la acepte o la rechace.</p>
+          <p className="mb-5 rounded-[18px] bg-azul-t px-4 py-3 text-[14px]">Esperando respuesta del cliente. Te avisaremos cuando la acepte o la rechace.</p>
         )}
       </div>
       <div className="max-w-3xl">

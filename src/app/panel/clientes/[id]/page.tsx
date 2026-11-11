@@ -10,12 +10,12 @@ import { archiveClient, deleteClient } from "../../actions";
 
 function List({ children, empty }: { children: React.ReactNode[]; empty: string }) {
   return (
-    <div className="card divide-y divide-line">
-      {children.length ? children : <p className="px-5 py-6 text-center text-muted text-[13px]">{empty}</p>}
+    <div className="flex flex-col gap-2">
+      {children.length ? children : <p className="card px-5 py-5 text-muted text-[13px]">{empty}</p>}
     </div>
   );
 }
-const row = "flex items-center gap-3 px-5 py-3 hover:bg-surface/60";
+const row = "flex items-center gap-3 bg-surface rounded-[20px] px-4 py-3 hover:bg-surface-2 transition-colors";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -46,8 +46,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         </>}
       />
 
-      <div className="grid lg:grid-cols-[1fr_320px] gap-8">
-        <div className="space-y-8">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_320px] gap-8">
+        <div className="space-y-8 min-w-0">
           <Section title="Parrilla" action={<Link href={`/panel/parrilla/nueva?cliente=${c.id}`} className="btn btn-soft btn-sm">+ Pieza</Link>}>
             <List empty="Sin piezas todavía.">
               {((posts ?? []) as Post[]).map((p) => (
@@ -70,7 +70,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
               ))}
             </List>
           </Section>
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-2 gap-6 [&>*]:min-w-0">
             <Section title="Cotizaciones" action={<Link href={`/panel/cotizaciones/nueva?cliente=${c.id}`} className="btn btn-soft btn-sm">+</Link>}>
               <List empty="Sin cotizaciones.">
                 {((quotes ?? []) as Quote[]).map((q) => (
@@ -105,7 +105,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             {c.notes && <div><div className="text-[11px] text-muted">Notas</div><p className="whitespace-pre-wrap">{c.notes}</p></div>}
           </div>
 
-          <div className="rounded-2xl bg-cielo p-5">
+          <div className="rounded-2xl bg-azul-t p-5">
             {c.client_user_id ? (
               <>
                 <div className="font-medium">✓ Conectado a Freelia</div>

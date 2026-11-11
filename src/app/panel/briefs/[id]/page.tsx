@@ -30,7 +30,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         subtitle={<span className="flex flex-wrap items-center gap-3 mt-1">
           <Link href={`/panel/clientes/${b.client_id}`}><ClientChip name={clientLabel(b.clients)} color={b.clients?.color} /></Link>
           <StatusBadge status={b.status} />
-          {b.created_by !== user.id && <span className="badge bg-lavanda text-[#5b49c9]">Solicitud del cliente</span>}
+          {b.created_by !== user.id && <span className="badge bg-lila-t text-ink">Solicitud del cliente</span>}
         </span>}
         actions={<>
           {next && (

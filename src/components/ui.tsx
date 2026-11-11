@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Lia } from "./brand";
+import { Lia, type LiaMood, Sparkle, StateLia, StatusPill } from "./brand";
 
 export function PageHeader({
   title, subtitle, actions, back,
@@ -8,14 +8,15 @@ export function PageHeader({
   return (
     <div className="mb-7">
       {back && (
-        <Link href={back.href} className="inline-flex items-center gap-1 text-[12px] text-muted hover:text-brand mb-3">
-          ← {back.label}
+        <Link href={back.href} className="inline-flex items-center gap-1 text-[13px] font-medium text-brand-dark hover:underline mb-3">
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 6l-6 6 6 6" /></svg>
+          {back.label}
         </Link>
       )}
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-[22px] font-semibold tracking-tight">{title}</h1>
-          {subtitle && <p className="text-muted mt-1">{subtitle}</p>}
+        <div className="min-w-0">
+          <h1 className="h1">{title}</h1>
+          {subtitle && <div className="text-muted mt-1.5">{subtitle}</div>}
         </div>
         {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
       </div>
@@ -23,62 +24,83 @@ export function PageHeader({
   );
 }
 
+/** Encabezado en tono suave con Lia asomándose (Inicio y Cobros) */
+export function Hero({ children, tint = "#DCE3FF", lia = "#3D5BF5", mood = "peek" }:
+  { children: React.ReactNode; tint?: string; lia?: string; mood?: LiaMood }) {
+  return (
+    <div className="relative overflow-hidden rounded-[32px] px-6 md:px-9 pt-7 pb-8 md:pt-9 md:pb-10 mb-8" style={{ background: tint }}>
+      <Sparkle size={14} className="absolute right-[150px] top-[46%] hidden sm:block" />
+      <Sparkle size={9} color="#A98BFF" className="absolute right-[176px] top-[60%] hidden sm:block" />
+      <div className="absolute -right-5 -bottom-7 sm:-bottom-6 scale-75 sm:scale-100 origin-bottom-right"><Lia size={124} mood={mood} color={lia} /></div>
+      <div className="relative pr-16 sm:pr-28">{children}</div>
+    </div>
+  );
+}
+
 export function EmptyState({ title, text, action }: { title: string; text?: string; action?: React.ReactNode }) {
   return (
-    <div className="card flex flex-col items-center text-center px-6 py-14">
-      <Lia size={52} mood="calm" />
-      <h3 className="mt-4 font-medium">{title}</h3>
-      {text && <p className="text-muted mt-1 max-w-sm">{text}</p>}
+    <div className="card flex flex-col items-center text-center px-6 py-12">
+      <Lia size={64} mood="sleep" color="#A98BFF" />
+      <h3 className="mt-4 font-semibold text-[16px]">{title}</h3>
+      {text && <p className="text-muted mt-1 max-w-sm text-[14px]">{text}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
   );
 }
 
-export function Stat({ label, value, tone = "cielo", href }: { label: string; value: React.ReactNode; tone?: "cielo" | "lavanda" | "menta" | "mantequilla" | "rosa"; href?: string }) {
-  const bg = { cielo: "bg-cielo", lavanda: "bg-lavanda", menta: "bg-menta", mantequilla: "bg-mantequilla", rosa: "bg-rosa" }[tone];
+const TONES = {
+  cielo: "#DCE3FF", lavanda: "#E7DEFF", menta: "#CDF2DF", mantequilla: "#FFF1C2", rosa: "#FFDCEB",
+} as const;
+const DOTS = {
+  cielo: "#3D5BF5", lavanda: "#A98BFF", menta: "#2FBF7A", mantequilla: "#FFC93C", rosa: "#FF7EB6",
+} as const;
+
+export function Stat({ label, value, tone = "cielo", href }: { label: string; value: React.ReactNode; tone?: keyof typeof TONES; href?: string }) {
   const inner = (
-    <div className={cn("rounded-2xl p-5 h-full transition-transform", bg, href && "hover:-translate-y-0.5")}>
-      <div className="text-[12px] text-muted">{label}</div>
-      <div className="text-[24px] font-semibold mt-1 tracking-tight">{value}</div>
+    <div className={cn("rounded-[22px] p-5 h-full transition-transform", href && "hover:-translate-y-0.5")} style={{ background: TONES[tone] }}>
+      <div className="flex items-center gap-2 text-[13px] font-medium text-muted">
+        <span className="size-[7px] rounded-full" style={{ background: DOTS[tone] }} />{label}
+      </div>
+      <div className="text-[26px] font-bold mt-1.5 tracking-[-0.02em]">{value}</div>
     </div>
   );
   return href ? <Link href={href}>{inner}</Link> : inner;
 }
 
-const STATUS: Record<string, { label: string; cls: string }> = {
-  // parrilla
-  borrador: { label: "Borrador", cls: "bg-surface text-muted" },
-  en_revision: { label: "En revisión", cls: "bg-mantequilla text-[#9a7413]" },
-  cambios: { label: "Cambios pedidos", cls: "bg-rosa text-[#b13a68]" },
-  aprobado: { label: "Aprobado", cls: "bg-menta text-[#2c7a57]" },
-  publicado: { label: "Publicado", cls: "bg-lavanda text-[#5b49c9]" },
-  // briefs
-  nuevo: { label: "Nuevo", cls: "bg-cielo text-brand" },
-  en_proceso: { label: "En proceso", cls: "bg-mantequilla text-[#9a7413]" },
-  completado: { label: "Completado", cls: "bg-menta text-[#2c7a57]" },
-  // cotizaciones
-  enviada: { label: "Enviada", cls: "bg-cielo text-brand" },
-  aceptada: { label: "Aceptada", cls: "bg-menta text-[#2c7a57]" },
-  rechazada: { label: "Rechazada", cls: "bg-rosa text-[#b13a68]" },
-  // cobros
-  pagada: { label: "Pagada", cls: "bg-menta text-[#2c7a57]" },
-  vencida: { label: "Vencida", cls: "bg-rosa text-[#b13a68]" },
-};
-
 export function StatusBadge({ status, label }: { status: string; label?: string }) {
-  const s = STATUS[status] ?? { label: status, cls: "bg-surface text-muted" };
+  return <StatusPill status={status} label={label} />;
+}
+
+const Chevron = () => (
+  <svg viewBox="0 0 24 24" className="size-[18px] shrink-0" fill="none" stroke="#A69EBB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+);
+
+/** Fila de lista: Lia del estado + título + detalle + (valor) + chevron */
+export function Row({ href, status, icon, title, sub, right, pill }:
+  { href: string; status?: string; icon?: React.ReactNode; title: React.ReactNode; sub?: React.ReactNode; right?: React.ReactNode; pill?: React.ReactNode }) {
   return (
-    <span className={cn("badge", s.cls)}>
-      <span className="dot" />
-      {label ?? s.label}
-    </span>
+    <Link href={href} className="flex items-center gap-3 bg-surface rounded-[20px] pl-3 pr-3.5 py-3 hover:bg-surface-2 transition-colors">
+      {icon ?? (status && <StateLia status={status} />)}
+      <div className="min-w-0 flex-1">
+        <div className="text-[15px] leading-[21px] font-semibold truncate">{title}</div>
+        {sub && <div className="text-[13px] leading-[19px] text-muted truncate">{sub}</div>}
+      </div>
+      {right && <div className="text-[15px] font-semibold whitespace-nowrap">{right}</div>}
+      {pill && <div className="hidden sm:block">{pill}</div>}
+      <Chevron />
+    </Link>
   );
+}
+
+export function RowList({ children, empty }: { children: React.ReactNode[]; empty?: React.ReactNode }) {
+  if (!children.length) return <>{empty ?? null}</>;
+  return <div className="flex flex-col gap-2.5">{children}</div>;
 }
 
 export function ClientChip({ name, color }: { name: string; color?: string | null }) {
   return (
-    <span className="inline-flex items-center gap-2 min-w-0">
-      <span className="size-2.5 rounded-full shrink-0" style={{ background: color || "#C9D6FF" }} />
+    <span className="inline-flex items-center gap-1.5 min-w-0">
+      <span className="size-2 rounded-full shrink-0" style={{ background: color || "#C9D6FF" }} />
       <span className="truncate">{name}</span>
     </span>
   );
@@ -89,16 +111,20 @@ export function Field({ label, children, className, hint }: { label: string; chi
     <label className={cn("block", className)}>
       <span className="label">{label}</span>
       {children}
-      {hint && <span className="block text-[11px] text-muted mt-1">{hint}</span>}
+      {hint && <span className="block text-[12px] text-muted mt-1.5 px-1">{hint}</span>}
     </label>
   );
 }
 
-export function Section({ title, action, children, className }: { title: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
+export function Section({ title, action, children, className, count }:
+  { title: string; action?: React.ReactNode; children: React.ReactNode; className?: string; count?: number }) {
   return (
-    <section className={className}>
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="font-medium">{title}</h2>
+    <section className={cn("min-w-0", className)}>
+      <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center gap-2.5">
+          <h2 className="h2">{title}</h2>
+          {!!count && <span className="min-w-[22px] h-[22px] px-[7px] rounded-full bg-brand-soft text-[12px] font-bold inline-flex items-center justify-center">{count}</span>}
+        </div>
         {action}
       </div>
       {children}
@@ -110,10 +136,26 @@ export function Avatar({ name, size = 32, color }: { name?: string | null; size?
   const initials = (name || "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
   return (
     <span
-      className="inline-flex items-center justify-center rounded-full font-medium text-ink shrink-0"
-      style={{ width: size, height: size, fontSize: size * 0.36, background: color || "var(--color-lavanda)" }}
+      className="inline-flex items-center justify-center rounded-full font-semibold text-ink shrink-0"
+      style={{ width: size, height: size, fontSize: size * 0.36, background: color || "#E7DEFF" }}
     >
       {initials}
     </span>
+  );
+}
+
+/** Aviso con tono (éxito, info, error) */
+export function Notice({ tone = "info", children }: { tone?: "ok" | "info" | "error" | "warn"; children: React.ReactNode }) {
+  const map = {
+    ok: { bg: "#CDF2DF", c: "#2FBF7A", m: "happy" as LiaMood },
+    info: { bg: "#DCE3FF", c: "#3D5BF5", m: "base" as LiaMood },
+    error: { bg: "#FFDCEB", c: "#FF7EB6", m: "worry" as LiaMood },
+    warn: { bg: "#FFF1C2", c: "#FFC93C", m: "idea" as LiaMood },
+  }[tone];
+  return (
+    <div className="flex items-center gap-3 rounded-[20px] px-4 py-3 mb-5 text-[14px]" style={{ background: map.bg }}>
+      <Lia size={26} mood={map.m} color={map.c} />
+      <div className="flex-1">{children}</div>
+    </div>
   );
 }

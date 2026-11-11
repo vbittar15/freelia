@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { requireCreative } from "@/lib/auth";
-import { ClientChip, EmptyState, PageHeader, StatusBadge } from "@/components/ui";
+import { EmptyState, PageHeader, Row, RowList, StatusBadge } from "@/components/ui";
 import type { Post } from "@/lib/types";
 import { NETWORKS, FORMATS, clientLabel, cn, fmtDateTime, isoToBogotaLocal } from "@/lib/utils";
 
 export const metadata = { title: "Parrilla" };
 
 const STATUS_DOT: Record<string, string> = {
-  borrador: "#c4c7d8", en_revision: "#e8b84a", cambios: "#e3769f", aprobado: "#5cbf8f", publicado: "#8d7cf0",
+  borrador: "#B7AFC5", en_revision: "#3D5BF5", cambios: "#FF7EB6", aprobado: "#2FBF7A", publicado: "#A98BFF",
+};
+const STATUS_TINT: Record<string, string> = {
+  borrador: "#EFECF4", en_revision: "#DCE3FF", cambios: "#FFDCEB", aprobado: "#CDF2DF", publicado: "#E7DEFF",
 };
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
@@ -74,53 +77,43 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
         <form className="flex flex-wrap gap-2" action="/panel/parrilla">
           {sp.mes && <input type="hidden" name="mes" value={sp.mes} />}
           {sp.vista && <input type="hidden" name="vista" value={sp.vista} />}
-          <select name="cliente" defaultValue={sp.cliente ?? ""} className="input h-9 w-auto text-[13px]">
+          <select name="cliente" defaultValue={sp.cliente ?? ""} className="input h-10 w-auto text-[14px] bg-surface">
             <option value="">Todos los clientes</option>
             {(clients ?? []).map((c) => <option key={c.id} value={c.id}>{c.company || c.name}</option>)}
           </select>
-          <select name="estado" defaultValue={sp.estado ?? ""} className="input h-9 w-auto text-[13px]">
+          <select name="estado" defaultValue={sp.estado ?? ""} className="input h-10 w-auto text-[14px] bg-surface">
             <option value="">Todos los estados</option>
             <option value="borrador">Borrador</option><option value="en_revision">En revisión</option>
             <option value="cambios">Cambios pedidos</option><option value="aprobado">Aprobado</option><option value="publicado">Publicado</option>
           </select>
-          <button className="btn btn-soft btn-sm h-9">Filtrar</button>
+          <button className="btn btn-soft btn-sm h-10">Filtrar</button>
         </form>
         <div className="ml-auto flex rounded-full bg-surface p-1">
-          <Link href={qs({ vista: undefined })} className={cn("btn btn-sm", !list ? "bg-white shadow-sm text-ink" : "text-muted")}>Calendario</Link>
-          <Link href={qs({ vista: "lista" })} className={cn("btn btn-sm", list ? "bg-white shadow-sm text-ink" : "text-muted")}>Lista</Link>
+          <Link href={qs({ vista: undefined })} className={cn("btn btn-sm", !list ? "bg-white shadow-sm text-ink" : "text-muted font-medium")}>Calendario</Link>
+          <Link href={qs({ vista: "lista" })} className={cn("btn btn-sm", list ? "bg-white shadow-sm text-ink" : "text-muted font-medium")}>Lista</Link>
         </div>
       </div>
 
       {list ? (
-        posts.length === 0 ? <EmptyState title="No hay piezas" text="Crea tu primera pieza para empezar la parrilla." /> : (
-          <div className="card overflow-x-auto">
-            <table className="table">
-              <thead><tr><th>Pieza</th><th>Cliente</th><th>Red</th><th>Fecha</th><th>Estado</th></tr></thead>
-              <tbody>{posts.map((p) => (
-                <tr key={p.id}>
-                  <td><Link href={`/panel/parrilla/${p.id}`} className="font-medium hover:text-brand">{p.title}</Link>
-                    <div className="text-[12px] text-muted">{FORMATS[p.format] ?? p.format}</div></td>
-                  <td><ClientChip name={clientLabel(p.clients)} color={p.clients?.color} /></td>
-                  <td className="text-muted">{NETWORKS[p.network] ?? p.network}</td>
-                  <td className="text-muted whitespace-nowrap">{p.scheduled_at ? fmtDateTime(p.scheduled_at) : "Sin fecha"}</td>
-                  <td><StatusBadge status={p.status} /></td>
-                </tr>
-              ))}</tbody>
-            </table>
-          </div>
-        )
+        <RowList empty={<EmptyState title="No hay piezas" text="Crea tu primera pieza para empezar la parrilla." />}>
+          {posts.map((p) => (
+            <Row key={p.id} href={`/panel/parrilla/${p.id}`} status={p.status} title={p.title}
+              sub={`${clientLabel(p.clients)} · ${NETWORKS[p.network] ?? p.network} · ${FORMATS[p.format] ?? p.format} · ${p.scheduled_at ? fmtDateTime(p.scheduled_at) : "Sin fecha"}`}
+              pill={<StatusBadge status={p.status} />} />
+          ))}
+        </RowList>
       ) : (
         <>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[16px] font-medium first-letter:uppercase">{monthName}</h2>
+            <h2 className="h2 first-letter:uppercase">{monthName}</h2>
             <div className="flex gap-1">
               <Link href={qs({ mes: prev })} className="btn btn-ghost btn-sm" aria-label="Mes anterior">←</Link>
               <Link href={qs({ mes: undefined })} className="btn btn-ghost btn-sm">Hoy</Link>
               <Link href={qs({ mes: next })} className="btn btn-ghost btn-sm" aria-label="Mes siguiente">→</Link>
             </div>
           </div>
-          <div className="card overflow-hidden">
-            <div className="grid grid-cols-7 border-b border-line bg-surface/60">
+          <div className="rounded-[22px] border border-line overflow-hidden">
+            <div className="grid grid-cols-7 border-b border-line bg-surface">
               {WEEKDAYS.map((d) => <div key={d} className="px-2 py-2 text-[11px] text-muted text-center">{d}</div>)}
             </div>
             <div className="grid grid-cols-7">
@@ -131,15 +124,15 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
                     <>
                       <div className="flex items-center justify-between">
                         <span className={cn("text-[11px] size-6 inline-flex items-center justify-center rounded-full",
-                          day === todayLocal ? "bg-brand text-white font-medium" : "text-muted")}>{Number(day.slice(8))}</span>
+                          day === todayLocal ? "bg-brand text-white font-semibold" : "text-muted font-medium")}>{Number(day.slice(8))}</span>
                         <Link href={`/panel/parrilla/nueva?fecha=${day}${sp.cliente ? `&cliente=${sp.cliente}` : ""}`}
                           className="opacity-0 group-hover:opacity-100 text-brand text-[14px] leading-none px-1" aria-label="Agregar">+</Link>
                       </div>
                       <div className="mt-1 space-y-1">
                         {(byDay.get(day) ?? []).map((p) => (
                           <Link key={p.id} href={`/panel/parrilla/${p.id}`} title={`${p.title} · ${clientLabel(p.clients)}`}
-                            className="block rounded-md px-1.5 py-1 text-[10.5px] sm:text-[11px] leading-tight truncate hover:ring-1 ring-brand/30"
-                            style={{ background: (p.clients?.color ?? "#C9D6FF") + "66" }}>
+                            className="block rounded-lg px-1.5 py-1 text-[10.5px] sm:text-[11px] font-medium leading-tight truncate hover:ring-1 ring-brand/30"
+                            style={{ background: STATUS_TINT[p.status] }}>
                             <span className="inline-block size-1.5 rounded-full mr-1 align-middle" style={{ background: STATUS_DOT[p.status] }} />
                             {p.title}
                           </Link>
@@ -159,10 +152,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
           </div>
           {undated.length > 0 && (
             <div className="mt-8">
-              <h3 className="font-medium mb-3">Sin fecha</h3>
+              <h3 className="h2 mb-3">Sin fecha</h3>
               <div className="flex flex-wrap gap-2">
                 {undated.map((p) => (
-                  <Link key={p.id} href={`/panel/parrilla/${p.id}`} className="card px-3 py-2 text-[13px] hover:border-brand/40 flex items-center gap-2">
+                  <Link key={p.id} href={`/panel/parrilla/${p.id}`} className="card px-3.5 py-2 text-[13px] font-medium hover:bg-surface-2 flex items-center gap-2">
                     <span className="size-1.5 rounded-full" style={{ background: STATUS_DOT[p.status] }} />{p.title}
                   </Link>
                 ))}

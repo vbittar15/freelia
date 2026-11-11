@@ -10,7 +10,7 @@ export function BriefView({ brief }: { brief: Brief }) {
     ["Referencias", brief.refs],
   ];
   return (
-    <div className="grid lg:grid-cols-[1fr_260px] gap-5">
+    <div className="grid lg:grid-cols-[minmax(0,1fr)_260px] gap-5">
       <div className="card p-6 space-y-6">
         {blocks.filter(([, v]) => v).map(([k, v]) => (
           <div key={k}>
@@ -21,11 +21,11 @@ export function BriefView({ brief }: { brief: Brief }) {
         {blocks.every(([, v]) => !v) && <p className="text-muted">Este brief aún no tiene detalles.</p>}
       </div>
       <div className="space-y-3">
-        <div className="rounded-2xl bg-lavanda p-5">
+        <div className="rounded-2xl bg-lila-t p-5">
           <div className="text-[11px] text-muted">Fecha de entrega</div>
           <div className="font-medium">{fmtDate(brief.deadline)}</div>
         </div>
-        <div className="rounded-2xl bg-menta p-5">
+        <div className="rounded-2xl bg-verde-t p-5">
           <div className="text-[11px] text-muted">Presupuesto</div>
           <div className="font-medium">{brief.budget ? money(brief.budget) : "Por definir"}</div>
         </div>

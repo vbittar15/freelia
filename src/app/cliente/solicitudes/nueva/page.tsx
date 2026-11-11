@@ -14,7 +14,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
   return (
     <>
       <PageHeader title="Nueva solicitud" subtitle="Cuéntale a tu equipo qué necesitas." back={{ href: "/cliente/solicitudes", label: "Solicitudes" }} />
-      {error && <p className="mb-5 rounded-xl bg-rosa text-[#b13a68] px-4 py-3 text-[13px]">{error}</p>}
+      {error && <p className="mb-5 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{error}</p>}
       <form action={createRequest} className="card p-6 grid sm:grid-cols-2 gap-4 max-w-3xl">
         {ws.length > 1 ? (
           <Field label="Enviar a">

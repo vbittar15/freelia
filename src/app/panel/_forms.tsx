@@ -8,7 +8,7 @@ import { saveBrief, saveClient, saveInvoice, savePost, saveQuote } from "./actio
 
 export function ErrorNote({ error }: { error?: string }) {
   if (!error) return null;
-  return <p className="mb-5 rounded-xl bg-rosa text-[#b13a68] px-4 py-3 text-[13px]">{error}</p>;
+  return <p className="mb-5 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{error}</p>;
 }
 
 type ClientOpt = Pick<Client, "id" | "name" | "company">;
@@ -83,7 +83,7 @@ export function BriefForm({ brief, clients, clientId }: { brief?: Brief; clients
 export function PostForm({ post, clients, userId, clientId, date }: { post?: Post; clients: ClientOpt[]; userId: string; clientId?: string; date?: string }) {
   const canSend = !post || post.status === "borrador" || post.status === "cambios";
   return (
-    <form action={savePost} className="grid lg:grid-cols-[1fr_340px] gap-5">
+    <form action={savePost} className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-5">
       {post && <input type="hidden" name="id" value={post.id} />}
       <div className="card p-6 space-y-4">
         <Field label="Título de la pieza *"><input name="title" className="input" required defaultValue={post?.title} placeholder="Ej. Lanzamiento sabor maracuyá" /></Field>

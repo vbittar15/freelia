@@ -19,7 +19,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
           : "Gratis para empezar. Organiza clientes, parrilla, cotizaciones y cobros."}
       </p>
 
-      {sp.error && <p className="mt-6 rounded-xl bg-rosa text-[#b13a68] px-4 py-3 text-[13px]">{sp.error}</p>}
+      {sp.error && <p className="mt-6 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{sp.error}</p>}
 
       <form action={signUp} className="mt-8 space-y-4">
         <input type="hidden" name="role" value={isClient ? "client" : "creative"} />

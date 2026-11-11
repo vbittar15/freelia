@@ -32,7 +32,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             {inv.paid_at && <span className="text-[12px] text-muted">Pagada el {fmtDate(inv.paid_at)}</span>}</span>}
           actions={<>
             {inv.status === "borrador" && statusForm("enviada", "Enviar al cliente")}
-            {inv.status === "enviada" && statusForm("pagada", "Marcar como pagada")}
+            {inv.status === "enviada" && statusForm("pagada", "Marcar como pagada", "btn btn-approve")}
             <PrintButton />
             {inv.status !== "pagada" && <Link href={`/panel/cobros/${inv.id}/editar`} className="btn btn-ghost">Editar</Link>}
           </>}

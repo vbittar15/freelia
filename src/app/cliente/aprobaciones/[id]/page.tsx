@@ -25,17 +25,17 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         subtitle={<span className="flex flex-wrap items-center gap-2 mt-1"><StatusBadge status={p.status} />
           <span className="text-[12px]">{NETWORKS[p.network]} · {FORMATS[p.format]} · {p.scheduled_at ? fmtDateTime(p.scheduled_at) : "Sin fecha"}</span></span>} />
 
-      {error && <p className="mb-5 rounded-xl bg-rosa text-[#b13a68] px-4 py-3 text-[13px]">{error}</p>}
-      {ok === "aprobado" && <p className="mb-5 rounded-xl bg-menta text-[#2c7a57] px-4 py-3 text-[13px]">¡Listo! Aprobaste la pieza y tu equipo ya fue notificado.</p>}
-      {ok === "cambios" && <p className="mb-5 rounded-xl bg-cielo px-4 py-3 text-[13px]">Enviamos tus comentarios al equipo creativo.</p>}
+      {error && <p className="mb-5 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{error}</p>}
+      {ok === "aprobado" && <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">¡Listo! Aprobaste la pieza y tu equipo ya fue notificado.</p>}
+      {ok === "cambios" && <p className="mb-5 rounded-[18px] bg-azul-t px-4 py-3 text-[14px]">Enviamos tus comentarios al equipo creativo.</p>}
 
-      <div className="grid lg:grid-cols-[1fr_360px] gap-5">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-5">
         <div className="card overflow-hidden">
           {p.asset_url ? (
             isVideo ? <video src={p.asset_url} controls className="w-full max-h-[70vh] bg-surface" />
               // eslint-disable-next-line @next/next/no-img-element
               : <img src={p.asset_url} alt={p.title} className="w-full max-h-[70vh] object-contain bg-surface min-h-[240px]" />
-          ) : <div className="aspect-video bg-lavanda flex items-center justify-center text-muted">Sin arte adjunto</div>}
+          ) : <div className="aspect-video bg-lila-t flex items-center justify-center text-muted">Sin arte adjunto</div>}
           {p.copy && (
             <div className="p-6 border-t border-line">
               <div className="text-[11px] uppercase tracking-wide text-muted mb-2">Copy</div>
@@ -47,16 +47,16 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <div className="space-y-4">
           {p.status === "en_revision" && (
             <div className="card p-5 space-y-3">
-              <h3 className="font-medium">¿Qué te parece?</h3>
+              <h3 className="h2">¿Qué te parece?</h3>
               <form action={reviewPost}>
                 <input type="hidden" name="id" value={p.id} /><input type="hidden" name="action" value="aprobado" />
-                <SubmitButton className="btn btn-primary w-full h-11" pendingText="Aprobando…">✓ Aprobar pieza</SubmitButton>
+                <SubmitButton className="btn btn-approve btn-lg w-full" pendingText="Aprobando…">✓ Aprobar</SubmitButton>
               </form>
               <div className="text-center text-[11px] text-muted">o</div>
               <form action={reviewPost} className="space-y-2">
                 <input type="hidden" name="id" value={p.id} /><input type="hidden" name="action" value="cambios" />
                 <textarea name="comment" rows={4} className="input" placeholder="Describe los cambios que necesitas…" required />
-                <SubmitButton className="btn btn-soft w-full" pendingText="Enviando…">Pedir cambios</SubmitButton>
+                <SubmitButton className="btn btn-changes btn-lg w-full" pendingText="Enviando…">Pedir cambios</SubmitButton>
               </form>
             </div>
           )}

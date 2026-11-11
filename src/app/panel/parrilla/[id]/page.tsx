@@ -47,17 +47,17 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       />
       <ErrorNote error={error} />
       {ok && p.status === "en_revision" && (
-        <p className="mb-5 rounded-xl bg-menta text-[#2c7a57] px-4 py-3 text-[13px]">
+        <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">
           {p.clients?.client_user_id
             ? "Enviada a aprobación. Tu cliente ya recibió la notificación."
             : "Guardada en revisión. Tu cliente aún no tiene cuenta: invítalo desde su ficha para que pueda aprobar."}
         </p>
       )}
-      {ok && p.status !== "en_revision" && <p className="mb-5 rounded-xl bg-menta text-[#2c7a57] px-4 py-3 text-[13px]">Cambios guardados.</p>}
+      {ok && p.status !== "en_revision" && <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">Cambios guardados.</p>}
 
       <PostForm post={p} clients={clients ?? []} userId={user.id} />
 
-      <div className="mt-8 grid lg:grid-cols-[1fr_340px] gap-5">
+      <div className="mt-8 grid lg:grid-cols-[minmax(0,1fr)_340px] gap-5">
         <CommentThread comments={(comments ?? []) as PostComment[]} postId={p.id} path={`/panel/parrilla/${p.id}`} userId={user.id} />
         <form action={deletePost}>
           <input type="hidden" name="id" value={p.id} />

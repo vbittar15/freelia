@@ -1,73 +1,91 @@
 @import "tailwindcss";
 
 /* =========================================================
-   FREELIA · Tokens de marca
-   Cambia aquí los colores y se actualiza toda la app.
+   FREELIA · Tokens del sistema de diseño ("Punto.")
    ========================================================= */
 @theme {
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand: #3d5bf5;        /* azul de marca (el "punto") */
-  --color-brand-dark: #2c46d8;
-  --color-brand-soft: #dce3ff;
+  --color-brand: #3d5bf5;        /* azul de marca: el punto */
+  --color-brand-dark: #2c46d8;   /* azul para texto */
+  --color-brand-soft: #dce3ff;   /* azul suave */
 
   --color-ink: #221a3a;          /* tinta */
-  --color-muted: #5e5678;        /* texto secundario */
-  --color-line: #eceef6;         /* bordes */
-  --color-surface: #f8f9fd;      /* fondos suaves */
+  --color-muted: #5e5678;        /* gris de texto */
+  --color-faint: #8c849f;        /* placeholder */
+  --color-line: #ece8f1;
+  --color-surface: #f6f4fa;      /* tarjetas y campos */
+  --color-surface-2: #efecf4;
 
-  /* Pasteles de apoyo */
-  --color-lavanda: #eeebff;
-  --color-menta: #e3f6ee;
-  --color-cielo: #e6f0ff;
-  --color-mantequilla: #fff5d9;
-  --color-rosa: #fde8f1;
-
-  --radius-xl: 1rem;
-  --radius-2xl: 1.25rem;
+  /* Colores de estado (punto) y sus tonos suaves */
+  --color-amarillo: #ffc93c;  --color-amarillo-t: #fff1c2;
+  --color-lila: #a98bff;      --color-lila-t: #e7deff;
+  --color-verde: #2fbf7a;     --color-verde-t: #cdf2df;
+  --color-rosa: #ff7eb6;      --color-rosa-t: #ffdceb;
+  --color-azul-t: #dce3ff;
+  --color-gris: #b7afc5;      --color-gris-t: #efecf4;
 }
 
 @layer base {
   html { -webkit-font-smoothing: antialiased; }
-  body { @apply bg-white text-ink font-sans text-[14px]; }
+  body { @apply bg-white text-ink font-sans text-[15px] leading-[1.5]; }
   ::selection { background: var(--color-brand-soft); }
+  h1, h2, h3 { letter-spacing: -0.02em; }
 }
 
 @layer components {
-  .card { @apply bg-white border border-line rounded-2xl; }
+  /* Tarjeta suave (sin borde) */
+  .card { @apply bg-surface rounded-[22px]; }
+  /* Hoja blanca para documentos */
+  .sheet { @apply bg-white rounded-[22px] border border-line; }
+
+  /* Botones píldora */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 h-10 text-[13px] font-medium
-           transition-colors disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 h-11 text-[15px] font-semibold
+           transition-[background,transform] active:scale-[.98] disabled:opacity-60 disabled:pointer-events-none
+           whitespace-nowrap cursor-pointer select-none;
   }
   .btn-primary { @apply bg-brand text-white hover:bg-brand-dark; }
-  .btn-soft { @apply bg-brand-soft text-brand hover:bg-[#cfd8ff]; }
-  .btn-ghost { @apply text-muted hover:bg-surface hover:text-ink; }
-  .btn-danger { @apply text-[#c2416b] hover:bg-rosa; }
-  .btn-sm { @apply h-8 px-3 text-[12px]; }
-
-  .label { @apply block text-[12px] font-medium text-muted mb-1.5; }
-  .input {
-    @apply w-full rounded-xl border border-line bg-white px-3.5 h-10 text-[14px] text-ink
-           placeholder:text-[#a9adc4] outline-none transition
-           focus:border-brand focus:ring-4 focus:ring-brand-soft;
+  .btn-dark { @apply bg-ink text-white hover:bg-[#362c52]; }
+  .btn-approve { @apply bg-verde text-ink hover:bg-[#29ad6e]; }
+  .btn-changes { @apply bg-rosa-t text-ink hover:bg-[#ffcde2]; }
+  .btn-soft { @apply bg-brand-soft text-ink hover:bg-[#cfd8ff]; }
+  .btn-ghost { @apply text-brand-dark hover:bg-surface; }
+  .btn-danger { @apply text-[#c03a77] hover:bg-rosa-t; }
+  .btn-sm { @apply h-9 px-4 text-[13px]; }
+  .btn-lg { @apply h-[50px] px-6 text-[16px]; }
+  .icon-btn {
+    @apply inline-flex items-center justify-center size-11 rounded-full bg-white text-ink
+           shadow-[0_1px_4px_rgba(34,26,58,.10)] hover:bg-surface transition-colors;
   }
-  textarea.input { @apply h-auto py-2.5 leading-relaxed; }
-  select.input { @apply pr-8; }
 
-  .badge { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium whitespace-nowrap; }
-  .dot { @apply inline-block size-1.5 rounded-full bg-current; }
+  /* Campos: etiqueta visible, campo grande y redondo */
+  .label { @apply block text-[12px] leading-[17px] font-medium text-muted mb-1.5 px-1; }
+  .input {
+    @apply w-full rounded-[18px] bg-white px-4 h-12 text-[16px] font-medium text-ink
+           placeholder:text-faint placeholder:font-normal outline-none transition
+           ring-1 ring-transparent focus:ring-brand focus:ring-2;
+  }
+  .on-white .input { @apply bg-surface; }
+  textarea.input { @apply h-auto py-3 leading-relaxed; }
+  select.input { @apply pr-10 appearance-none bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E5678' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E");
+    background-size: 18px; background-position: right 14px center; }
 
-  .table { @apply w-full text-left; }
-  .table th { @apply text-[11px] font-medium uppercase tracking-wide text-muted px-4 py-3 border-b border-line; }
-  .table td { @apply px-4 py-3.5 border-b border-line align-middle; }
-  .table tr:last-child td { @apply border-b-0; }
-  .table tbody tr { @apply hover:bg-surface/60 transition-colors; }
+  .h1 { @apply text-[28px] md:text-[30px] leading-[1.15] font-semibold tracking-[-0.025em]; }
+  .h2 { @apply text-[16px] leading-[22px] font-bold tracking-[-0.01em]; }
+  .eyebrow { @apply text-[12px] font-semibold tracking-[.02em] text-muted; }
 }
 
 /* Impresión de cotizaciones y cuentas de cobro (Guardar como PDF) */
 @media print {
   .no-print { display: none !important; }
   body { background: white; }
-  .print-sheet { border: none !important; box-shadow: none !important; padding: 0 !important; }
+  .sheet { border: none !important; padding: 0 !important; }
   @page { margin: 18mm; }
+}
+
+@layer components {
+  .badge { @apply inline-flex items-center gap-1.5 h-[26px] pl-2 pr-2.5 rounded-full text-[12px] font-semibold whitespace-nowrap; }
+  .dot { @apply inline-block size-[7px] rounded-full bg-current; }
 }

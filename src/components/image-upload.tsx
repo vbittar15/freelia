@@ -44,7 +44,7 @@ export function ImageUpload({ userId, initial, name = "asset_url" }: { userId: s
           <input type="file" accept="image/*,video/*" className="hidden" onChange={onFile} disabled={loading} />
         </label>
       )}
-      {error && <p className="text-[12px] text-[#b13a68] mt-2">{error}</p>}
+      {error && <p className="text-[12px] text-ink mt-2">{error}</p>}
     </div>
   );
 }

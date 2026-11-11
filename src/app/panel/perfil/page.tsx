@@ -12,7 +12,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ o
   return (
     <>
       <PageHeader title="Mi perfil" subtitle="Estos datos aparecen en tus cotizaciones y cuentas de cobro." />
-      {ok && <p className="mb-5 rounded-xl bg-menta text-[#2c7a57] px-4 py-3 text-[13px] max-w-3xl">Perfil actualizado.</p>}
+      {ok && <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px] max-w-3xl">Perfil actualizado.</p>}
       <form action={updateProfile} className="card p-6 grid sm:grid-cols-2 gap-4 max-w-3xl">
         <Field label="Nombre completo"><input name="full_name" className="input" defaultValue={profile.full_name ?? ""} /></Field>
         <Field label="Nombre comercial / marca"><input name="business_name" className="input" defaultValue={profile.business_name ?? ""} /></Field>

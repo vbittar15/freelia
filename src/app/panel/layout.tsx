@@ -2,13 +2,13 @@ import { AppShell, type NavItem } from "@/components/app-shell";
 import { requireCreative } from "@/lib/auth";
 
 const NAV: NavItem[] = [
-  { href: "/panel", label: "Inicio", icon: "home", exact: true },
-  { href: "/panel/clientes", label: "Clientes", icon: "users" },
+  { href: "/panel", label: "Inicio", icon: "home", exact: true, tab: true },
+  { href: "/panel/clientes", label: "Clientes", icon: "users", tab: true },
+  { href: "/panel/parrilla", label: "Parrilla", icon: "calendar", tab: true },
+  { href: "/panel/cobros", label: "Cobros", icon: "money", tab: true },
   { href: "/panel/briefs", label: "Briefs", icon: "brief" },
-  { href: "/panel/parrilla", label: "Parrilla", icon: "calendar" },
-  { href: "/panel/cotizaciones", label: "Cotizaciones", short: "Cotizar", icon: "quote" },
-  { href: "/panel/cobros", label: "Cobros", icon: "money" },
-  { href: "/panel/mensajes", label: "Mensajes", short: "Chat", icon: "chat" },
+  { href: "/panel/cotizaciones", label: "Cotizaciones", icon: "quote" },
+  { href: "/panel/mensajes", label: "Mensajes", icon: "chat" },
 ];
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {

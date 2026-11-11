@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { requireCreative } from "@/lib/auth";
-import { Avatar, EmptyState, PageHeader } from "@/components/ui";
+import { Avatar, EmptyState, PageHeader, Row, RowList } from "@/components/ui";
 import type { Client, Message } from "@/lib/types";
 import { timeAgo } from "@/lib/utils";
 
@@ -21,23 +20,17 @@ export default async function Page() {
     <>
       <PageHeader title="Mensajes" subtitle="Una conversación por cliente, sin perder nada en WhatsApp." />
       {list.length === 0 ? <EmptyState title="Aún no tienes clientes" /> : (
-        <div className="card divide-y divide-line">
+        <RowList>
           {list.map((c) => {
             const m = last.get(c.id);
             return (
-              <Link key={c.id} href={`/panel/mensajes/${c.id}`} className="flex items-center gap-3 px-5 py-4 hover:bg-surface/60">
-                <Avatar name={c.company || c.name} size={40} color={c.color} />
-                <div className="min-w-0 flex-1">
-                  <div className="font-medium">{c.company || c.name}</div>
-                  <div className="text-[13px] text-muted truncate">
-                    {m ? `${m.sender_id === user.id ? "Tú: " : ""}${m.body}` : c.client_user_id ? "Sin mensajes todavía" : "El cliente aún no tiene cuenta"}
-                  </div>
-                </div>
-                {m && <span className="text-[11px] text-muted shrink-0">{timeAgo(m.created_at)}</span>}
-              </Link>
+              <Row key={c.id} href={`/panel/mensajes/${c.id}`} icon={<Avatar name={c.company || c.name} size={40} color={c.color} />}
+                title={c.company || c.name}
+                sub={m ? `${m.sender_id === user.id ? "Tú: " : ""}${m.body}` : c.client_user_id ? "Sin mensajes todavía" : "El cliente aún no tiene cuenta"}
+                right={m ? <span className="text-[12px] font-medium text-muted">{timeAgo(m.created_at)}</span> : undefined} />
             );
           })}
-        </div>
+        </RowList>
       )}
     </>
   );

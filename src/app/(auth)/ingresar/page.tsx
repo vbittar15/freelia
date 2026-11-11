@@ -12,8 +12,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
       <h1 className="text-[26px] font-semibold tracking-tight">Hola de nuevo</h1>
       <p className="text-muted mt-1">Ingresa a tu espacio en Freelia.</p>
 
-      {sp.error && <p className="mt-6 rounded-xl bg-rosa text-[#b13a68] px-4 py-3 text-[13px]">{sp.error}</p>}
-      {sp.aviso && <p className="mt-6 rounded-xl bg-menta text-[#2c7a57] px-4 py-3 text-[13px]">{sp.aviso}</p>}
+      {sp.error && <p className="mt-6 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{sp.error}</p>}
+      {sp.aviso && <p className="mt-6 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">{sp.aviso}</p>}
 
       <form action={signIn} className="mt-8 space-y-4">
         <input type="hidden" name="next" value={sp.next ?? ""} />

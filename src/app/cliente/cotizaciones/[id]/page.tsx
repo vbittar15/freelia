@@ -21,14 +21,14 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <PageHeader back={{ href: "/cliente/cotizaciones", label: "Cotizaciones" }} title={`Cotización #${q.number}`}
           subtitle={<span className="inline-flex mt-1"><StatusBadge status={q.status} label={q.status === "enviada" ? "Por responder" : undefined} /></span>}
           actions={<PrintButton />} />
-        {error && <p className="mb-5 rounded-xl bg-rosa text-[#b13a68] px-4 py-3 text-[13px]">{error}</p>}
+        {error && <p className="mb-5 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{error}</p>}
         {q.status === "enviada" && (
           <div className="card p-5 mb-5 flex flex-wrap items-center gap-3 max-w-3xl">
             <p className="flex-1 min-w-[200px]">¿Estás de acuerdo con esta propuesta?</p>
             <form action={respondQuote}><input type="hidden" name="id" value={q.id} /><input type="hidden" name="accept" value="false" />
               <SubmitButton className="btn btn-ghost" pendingText="…">Rechazar</SubmitButton></form>
             <form action={respondQuote}><input type="hidden" name="id" value={q.id} /><input type="hidden" name="accept" value="true" />
-              <SubmitButton pendingText="Aceptando…">✓ Aceptar cotización</SubmitButton></form>
+              <SubmitButton className="btn btn-approve" pendingText="Aceptando…">✓ Aceptar cotización</SubmitButton></form>
           </div>
         )}
       </div>

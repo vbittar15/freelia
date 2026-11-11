@@ -23,7 +23,7 @@ export function CommentThread({
               <div className="text-[12px]">
                 <span className="font-medium">{c.author_id === userId ? "Tú" : c.profiles?.full_name ?? "Usuario"}</span>
                 {c.action !== "comentario" && (
-                  <span className={cn("ml-1.5 badge", c.action === "aprobado" ? "bg-menta text-[#2c7a57]" : "bg-rosa text-[#b13a68]")}>
+                  <span className={cn("ml-1.5 badge", c.action === "aprobado" ? "bg-verde-t text-ink" : "bg-rosa-t text-ink")}>
                     {label[c.action]}
                   </span>
                 )}
@@ -56,12 +56,12 @@ export function NotificationList({ items, path }: { items: Notification[]; path:
           <SubmitButton className="btn btn-ghost btn-sm" pendingText="…">Marcar todas como leídas</SubmitButton>
         </form>
       )}
-      <div className="card divide-y divide-line">
+      <div className="flex flex-col gap-2.5">
         {items.map((n) => (
-          <Link key={n.id} href={n.link ?? "#"} className="flex items-start gap-3 px-5 py-4 hover:bg-surface/60">
-            <span className={cn("mt-1.5 size-2 rounded-full shrink-0", n.read_at ? "bg-line" : "bg-brand")} />
+          <Link key={n.id} href={n.link ?? "#"} className={cn("flex items-start gap-3 rounded-[20px] px-4 py-3.5 transition-colors", n.read_at ? "bg-surface hover:bg-surface-2" : "bg-azul-t hover:bg-[#cfd8ff]")}>
+            <span className={cn("mt-2 size-2 rounded-full shrink-0", n.read_at ? "bg-gris" : "bg-brand")} />
             <div className="min-w-0 flex-1">
-              <div className={cn(!n.read_at && "font-medium")}>{n.title}</div>
+              <div className={cn("text-[15px]", !n.read_at ? "font-semibold" : "font-medium")}>{n.title}</div>
               {n.body && <div className="text-muted text-[13px] truncate">{n.body}</div>}
             </div>
             <span className="text-[11px] text-muted shrink-0">{timeAgo(n.created_at)}</span>
@@ -107,7 +107,7 @@ type DocClient = Pick<Client, "name" | "company" | "email" | "document_id">;
 export function QuoteDocument({ quote, issuer, client }: { quote: Quote; issuer: Issuer | null; client: DocClient | null }) {
   const items = quote.quote_items ?? [];
   return (
-    <div className="card print-sheet p-6 sm:p-10">
+    <div className="sheet p-6 sm:p-10">
       <div className="flex flex-wrap justify-between gap-6">
         <div>
           <div className="text-[12px] text-muted">Cotización</div>
@@ -134,7 +134,7 @@ export function QuoteDocument({ quote, issuer, client }: { quote: Quote; issuer:
         </div>
       </div>
       {quote.notes && (
-        <div className="mt-8 rounded-xl bg-surface p-4 text-[13px] whitespace-pre-wrap leading-relaxed">
+        <div className="mt-8 rounded-[18px] bg-surface p-4 text-[13px] whitespace-pre-wrap leading-relaxed">
           <div className="text-[11px] text-muted mb-1">Condiciones</div>{quote.notes}
         </div>
       )}
@@ -149,7 +149,7 @@ export function InvoiceDocument({ invoice, issuer, client }: { invoice: Invoice;
   const items = invoice.invoice_items ?? [];
   const sum = total(items);
   return (
-    <div className="card print-sheet p-6 sm:p-10 text-[13px]">
+    <div className="sheet p-6 sm:p-10 text-[13px]">
       <div className="flex flex-wrap justify-between gap-4">
         <div>
           <div className="text-[12px] text-muted">Cuenta de cobro</div>
@@ -192,12 +192,12 @@ export function InvoiceDocument({ invoice, issuer, client }: { invoice: Invoice;
       {(issuer?.bank_info || invoice.notes) && (
         <div className="mt-8 grid sm:grid-cols-2 gap-4">
           {issuer?.bank_info && (
-            <div className="rounded-xl bg-surface p-4 whitespace-pre-wrap leading-relaxed">
+            <div className="rounded-[18px] bg-surface p-4 whitespace-pre-wrap leading-relaxed">
               <div className="text-[11px] text-muted mb-1">Datos para el pago</div>{issuer.bank_info}
             </div>
           )}
           {invoice.notes && (
-            <div className="rounded-xl bg-surface p-4 whitespace-pre-wrap leading-relaxed">
+            <div className="rounded-[18px] bg-surface p-4 whitespace-pre-wrap leading-relaxed">
               <div className="text-[11px] text-muted mb-1">Notas</div>{invoice.notes}
             </div>
           )}

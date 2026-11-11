@@ -2,12 +2,12 @@ import { AppShell, type NavItem } from "@/components/app-shell";
 import { requireClient } from "@/lib/auth";
 
 const NAV: NavItem[] = [
-  { href: "/cliente", label: "Inicio", icon: "home", exact: true },
-  { href: "/cliente/aprobaciones", label: "Aprobaciones", short: "Aprobar", icon: "check" },
-  { href: "/cliente/solicitudes", label: "Solicitudes", short: "Pedidos", icon: "brief" },
-  { href: "/cliente/cotizaciones", label: "Cotizaciones", short: "Cotizar", icon: "quote" },
-  { href: "/cliente/cobros", label: "Cobros", icon: "money" },
-  { href: "/cliente/mensajes", label: "Mensajes", short: "Chat", icon: "chat" },
+  { href: "/cliente", label: "Inicio", icon: "home", exact: true, tab: true },
+  { href: "/cliente/aprobaciones", label: "Por aprobar", short: "Aprobar", icon: "check", tab: true },
+  { href: "/cliente/cobros", label: "Cobros", icon: "money", tab: true },
+  { href: "/cliente/mensajes", label: "Mensajes", short: "Chat", icon: "chat", tab: true },
+  { href: "/cliente/solicitudes", label: "Pedidos", icon: "brief" },
+  { href: "/cliente/cotizaciones", label: "Cotizaciones", icon: "quote" },
 ];
 
 export default async function ClientLayout({ children }: { children: React.ReactNode }) {

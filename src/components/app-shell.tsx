@@ -8,28 +8,30 @@ import { cn } from "@/lib/utils";
 import { Logo } from "./brand";
 import { Avatar } from "./ui";
 
-export type NavItem = { href: string; label: string; short?: string; icon: keyof typeof ICONS; exact?: boolean };
-
-const ICONS = {
-  home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
-  users: "M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M21 19v-1a4 4 0 0 0-3-3.87M16 3.13a3.5 3.5 0 0 1 0 6.75",
-  brief: "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 13h6M9 17h4",
-  calendar: "M7 3v3M17 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1",
-  quote: "M4 4h16v16H4zM8 9h8M8 13h8M8 17h5",
-  money: "M12 3v18M17 7.5C17 5.6 14.8 5 12 5S7 6 7 8s2 2.7 5 3.3 5 1.4 5 3.5-2.2 3.2-5 3.2-5-.9-5-2.8",
-  chat: "M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12",
-  bell: "M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0",
-  check: "M20 6 9 17l-5-5",
-  user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8",
+/** Íconos de trazo 1.8 de la biblioteca de componentes */
+const ICONS: Record<string, React.ReactNode> = {
+  home: <path d="M4 11.5l8-7 8 7V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z" />,
+  users: <><circle cx="9" cy="8.5" r="3.5" /><path d="M2.5 20c.6-3.6 3.3-5.6 6.5-5.6s5.9 2 6.5 5.6" /><path d="M16 5.2a3.4 3.4 0 0 1 0 6.6M18 14.7c1.9.7 3.2 2.5 3.6 5.3" /></>,
+  brief: <><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M14 3v5h5M9 13h6M9 17h4" /></>,
+  calendar: <><rect x="3.5" y="5" width="17" height="15.5" rx="4" /><path d="M3.5 10h17M8.5 3v4M15.5 3v4" /></>,
+  quote: <><rect x="4.5" y="3" width="15" height="18" rx="3" /><path d="M8.5 8h7M8.5 12h7M8.5 16h4" /></>,
+  money: <><path d="M5.5 3h13v18l-3.2-2-3.3 2-3.3-2-3.2 2z" /><path d="M9 8.5h6M9 12.5h6" /></>,
+  chat: <path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 20l1.4-4.3A8 8 0 1 1 20 11.5z" />,
+  bell: <><path d="M6 9a6 6 0 1 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15.5 6 9" /><path d="M10.3 20.5a1.94 1.94 0 0 0 3.4 0" /></>,
+  check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  more: <><circle cx="5.5" cy="12" r="1.3" /><circle cx="12" cy="12" r="1.3" /><circle cx="18.5" cy="12" r="1.3" /></>,
 };
+export type IconName = keyof typeof ICONS & string;
 
-export function Icon({ name, className }: { name: keyof typeof ICONS; className?: string }) {
+export function Icon({ name, className }: { name: IconName; className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" className={cn("size-[18px]", className)} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d={ICONS[name]} />
+    <svg viewBox="0 0 24 24" className={cn("size-[22px] shrink-0", className)} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {ICONS[name]}
     </svg>
   );
 }
+
+export type NavItem = { href: string; label: string; short?: string; icon: IconName; exact?: boolean; tab?: boolean };
 
 export function AppShell({
   nav, userId, userName, unread, notificationsHref, profileHref, children,
@@ -40,8 +42,10 @@ export function AppShell({
   const pathname = usePathname();
   const router = useRouter();
   const [count, setCount] = useState(unread);
+  const [more, setMore] = useState(false);
 
   useEffect(() => setCount(unread), [unread]);
+  useEffect(() => setMore(false), [pathname]);
 
   // Notificaciones en tiempo real
   useEffect(() => {
@@ -55,6 +59,9 @@ export function AppShell({
   }, [userId, router]);
 
   const isActive = (i: NavItem) => (i.exact ? pathname === i.href : pathname === i.href || pathname.startsWith(i.href + "/"));
+  const tabs = nav.filter((i) => i.tab);
+  const rest = nav.filter((i) => !i.tab);
+  const restActive = rest.some(isActive);
 
   async function logout() {
     await createClient().auth.signOut();
@@ -65,53 +72,76 @@ export function AppShell({
   return (
     <div className="min-h-screen flex">
       {/* Barra lateral (escritorio) */}
-      <aside className="no-print hidden md:flex w-60 shrink-0 flex-col border-r border-line px-4 py-6 sticky top-0 h-screen">
-        <Link href={nav[0].href} className="px-2 mb-8"><Logo size={28} /></Link>
-        <nav className="flex flex-col gap-0.5 flex-1">
+      <aside className="no-print hidden md:flex w-[248px] shrink-0 flex-col px-4 py-7 sticky top-0 h-screen">
+        <Link href={nav[0].href} className="px-3 mb-9"><Logo size={28} /></Link>
+        <nav className="flex flex-col gap-1 flex-1">
           {nav.map((i) => (
             <Link key={i.href} href={i.href}
-              className={cn("flex items-center gap-3 rounded-xl px-3 h-10 text-[13px] transition-colors",
-                isActive(i) ? "bg-brand-soft text-brand font-medium" : "text-muted hover:bg-surface hover:text-ink")}>
-              <Icon name={i.icon} />{i.label}
+              className={cn("flex items-center gap-3 rounded-full px-4 h-11 text-[14px] transition-colors",
+                isActive(i) ? "bg-brand-soft text-brand-dark font-semibold" : "text-muted font-medium hover:bg-surface hover:text-ink")}>
+              <Icon name={i.icon} className="size-[20px]" />{i.label}
             </Link>
           ))}
         </nav>
-        <div className="border-t border-line pt-4 flex flex-col gap-0.5">
+        <div className="flex flex-col gap-1">
           <Link href={notificationsHref}
-            className={cn("flex items-center gap-3 rounded-xl px-3 h-10 text-[13px]",
-              pathname.startsWith(notificationsHref) ? "bg-brand-soft text-brand font-medium" : "text-muted hover:bg-surface hover:text-ink")}>
-            <Icon name="bell" />Notificaciones
-            {count > 0 && <span className="ml-auto badge bg-brand text-white">{count}</span>}
+            className={cn("flex items-center gap-3 rounded-full px-4 h-11 text-[14px]",
+              pathname.startsWith(notificationsHref) ? "bg-brand-soft text-brand-dark font-semibold" : "text-muted font-medium hover:bg-surface hover:text-ink")}>
+            <Icon name="bell" className="size-[20px]" />Notificaciones
+            {count > 0 && <span className="ml-auto min-w-[22px] h-[22px] px-[7px] rounded-full bg-brand text-white text-[12px] font-bold inline-flex items-center justify-center">{count}</span>}
           </Link>
-          <Link href={profileHref} className="flex items-center gap-3 rounded-xl px-3 h-12 hover:bg-surface">
-            <Avatar name={userName} size={28} />
-            <span className="text-[13px] truncate">{userName}</span>
-          </Link>
-          <button onClick={logout} className="text-left px-3 py-2 text-[12px] text-muted hover:text-ink cursor-pointer">Cerrar sesión</button>
+          <div className="mt-2 flex items-center gap-3 rounded-[20px] bg-surface px-3 py-2.5">
+            <Link href={profileHref}><Avatar name={userName} size={34} /></Link>
+            <div className="min-w-0 flex-1">
+              <Link href={profileHref} className="block text-[13px] font-semibold truncate">{userName}</Link>
+              <button onClick={logout} className="text-[12px] text-muted hover:text-ink cursor-pointer">Cerrar sesión</button>
+            </div>
+          </div>
         </div>
       </aside>
 
-      {/* Barra superior + navegación inferior (móvil) */}
       <div className="flex-1 min-w-0 flex flex-col">
-        <header className="no-print md:hidden flex items-center justify-between px-5 h-14 border-b border-line sticky top-0 bg-white/90 backdrop-blur z-20">
-          <Logo size={24} />
-          <div className="flex items-center gap-1">
-            <Link href={notificationsHref} className="relative btn-ghost btn btn-sm px-2" aria-label="Notificaciones">
+        {/* Barra superior (móvil) */}
+        <header className="no-print md:hidden flex items-center justify-between px-4 h-16 sticky top-0 bg-white/90 backdrop-blur z-20">
+          <Link href={nav[0].href} className="pl-1"><Logo size={24} /></Link>
+          <div className="flex items-center gap-2.5">
+            <Link href={notificationsHref} className="icon-btn relative" aria-label="Notificaciones">
               <Icon name="bell" />
-              {count > 0 && <span className="absolute top-1 right-1 size-2 rounded-full bg-brand" />}
+              {count > 0 && <span className="absolute top-2 right-2.5 size-2.5 rounded-full bg-brand ring-2 ring-white" />}
             </Link>
-            <Link href={profileHref} aria-label="Perfil"><Avatar name={userName} size={28} /></Link>
+            <Link href={profileHref} aria-label="Perfil"><Avatar name={userName} size={40} /></Link>
           </div>
         </header>
-        <main className="flex-1 px-5 md:px-10 py-7 md:py-10 pb-28 md:pb-10 max-w-6xl w-full mx-auto">{children}</main>
-        <nav className="no-print md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-line flex z-20 pb-[env(safe-area-inset-bottom)]">
-          {nav.map((i) => (
+
+        <main className="flex-1 min-w-0 overflow-x-clip px-4 md:px-10 pt-3 md:pt-10 pb-32 md:pb-12 max-w-[1080px] w-full mx-auto">{children}</main>
+
+        {/* Pestañas flotantes (móvil) */}
+        {more && (
+          <div className="no-print md:hidden fixed inset-x-4 bottom-[98px] z-30 rounded-[24px] bg-white shadow-[0_10px_40px_rgba(34,26,58,.16)] border border-line p-2">
+            {rest.map((i) => (
+              <Link key={i.href} href={i.href}
+                className={cn("flex items-center gap-3 rounded-full px-4 h-12 text-[15px]", isActive(i) ? "bg-brand-soft text-brand-dark font-semibold" : "font-medium")}>
+                <Icon name={i.icon} />{i.label}
+              </Link>
+            ))}
+          </div>
+        )}
+        <nav aria-label="Pestañas"
+          className="no-print md:hidden fixed left-4 right-4 bottom-[max(16px,env(safe-area-inset-bottom))] z-30 h-[62px] rounded-full bg-white/95 backdrop-blur shadow-[0_6px_24px_rgba(34,26,58,.10)] border border-line flex items-center px-[5px] gap-0.5">
+          {tabs.map((i) => (
             <Link key={i.href} href={i.href}
-              className={cn("flex-1 min-w-0 flex flex-col items-center gap-1 py-2.5 text-[10px] truncate",
-                isActive(i) ? "text-brand" : "text-muted")}>
+              className={cn("flex-1 min-w-0 h-[52px] rounded-full flex flex-col items-center justify-center gap-px text-[11px]",
+                isActive(i) ? "bg-brand-soft text-brand-dark font-semibold" : "text-muted font-medium")}>
               <Icon name={i.icon} />{i.short ?? i.label}
             </Link>
           ))}
+          {rest.length > 0 && (
+            <button type="button" onClick={() => setMore((m) => !m)} aria-expanded={more}
+              className={cn("flex-1 min-w-0 h-[52px] rounded-full flex flex-col items-center justify-center gap-px text-[11px] cursor-pointer",
+                restActive || more ? "bg-brand-soft text-brand-dark font-semibold" : "text-muted font-medium")}>
+              <Icon name="more" />Más
+            </button>
+          )}
         </nav>
       </div>
     </div>
