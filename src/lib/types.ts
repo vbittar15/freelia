@@ -59,6 +59,7 @@ export type Post = {
   scheduled_at: string | null;
   copy: string | null;
   asset_url: string | null;
+  brief_id?: string | null;
   status: PostStatus;
   created_at: string;
   updated_at: string;

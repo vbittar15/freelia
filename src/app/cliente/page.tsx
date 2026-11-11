@@ -34,6 +34,12 @@ export default async function Page() {
   ]);
   const posts = (pending ?? []) as Post[];
   const n = posts.length;
+  const byBrief = new Map<string, number>();
+  posts.forEach((p) => { if (p.brief_id) byBrief.set(p.brief_id, (byBrief.get(p.brief_id) ?? 0) + 1); });
+  const { data: bd } = byBrief.size
+    ? await supabase.from("briefs").select("id, title").in("id", [...byBrief.keys()])
+    : { data: [] as { id: string; title: string }[] };
+  const ready = (bd ?? []) as { id: string; title: string }[];
 
   return (
     <div className="space-y-9">
@@ -48,6 +54,18 @@ export default async function Page() {
       </Hero>
 
       <NotifyCard compact />
+
+      {ready.length > 0 && (
+        <Section title="Parrillas listas para aprobar" count={ready.length}>
+          <RowList>
+            {ready.map((r) => (
+              <Row key={r.id} href={`/cliente/solicitudes/${r.id}`} status="en_revision" title={r.title}
+                sub={`${byBrief.get(r.id)} ${byBrief.get(r.id) === 1 ? "pieza" : "piezas"} por aprobar`}
+                pill={<span className="badge bg-azul-t text-brand-dark">Ver parrilla →</span>} />
+            ))}
+          </RowList>
+        </Section>
+      )}
 
       <Section title="Por aprobar" count={n}>
         {n ? (

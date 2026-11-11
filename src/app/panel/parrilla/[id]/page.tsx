@@ -19,6 +19,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     supabase.from("post_comments").select("*, profiles(full_name)").eq("post_id", id).order("created_at"),
     supabase.from("clients").select("id, name, company"),
   ]);
+  const { data: briefs } = await supabase.from("briefs").select("id, title, client_id").order("created_at", { ascending: false });
   if (!data) notFound();
   const p = data as Post & { clients: { client_user_id: string | null } };
 
@@ -30,6 +31,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         subtitle={<span className="flex flex-wrap items-center gap-3 mt-1">
           <Link href={`/panel/clientes/${p.client_id}`}><ClientChip name={clientLabel(p.clients)} color={p.clients?.color} /></Link>
           <StatusBadge status={p.status} />
+          {p.brief_id && <Link href={`/panel/briefs/${p.brief_id}`} className="text-[13px] font-semibold text-brand-dark hover:underline">Ver pedido →</Link>}
         </span>}
         actions={<>
           {p.status === "aprobado" && (
@@ -56,7 +58,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       )}
       {ok && p.status !== "en_revision" && <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">Cambios guardados.</p>}
 
-      <PostForm post={p} clients={clients ?? []} userId={user.id} />
+      <PostForm post={p} clients={clients ?? []} userId={user.id} briefs={briefs ?? []} />
 
       {p.asset_url && !/\.(mp4|mov|webm)$/i.test(p.asset_url) && (
         <section className="mt-8 card p-4 sm:p-5 max-w-3xl">

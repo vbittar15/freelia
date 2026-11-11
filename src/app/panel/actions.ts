@@ -155,10 +155,18 @@ export async function savePost(formData: FormData) {
     scheduled_at: bogotaLocalToISO(s(formData, "scheduled_at")),
     copy: s(formData, "copy"),
     asset_url: s(formData, "asset_url"),
+    brief_id: s(formData, "brief_id"),
   };
   if (intent === "review") row.status = "en_revision";
   const back = id ? `/panel/parrilla/${id}` : "/panel/parrilla/nueva";
   if (!row.client_id || !row.title) fail(back, "Elige un cliente y escribe un título");
+
+  // El pedido debe ser del mismo cliente
+  if (row.brief_id) {
+    const cid = row.client_id ?? (await supabase.from("posts").select("client_id").eq("id", id!).single()).data?.client_id;
+    const { data: br } = await supabase.from("briefs").select("client_id").eq("id", row.brief_id as string).single();
+    if (!br || br.client_id !== cid) row.brief_id = null;
+  }
 
   if (id) {
     delete row.client_id;
@@ -319,4 +327,31 @@ export async function updateProfile(formData: FormData) {
   }).eq("id", user.id);
   revalidatePath("/panel", "layout");
   redirect("/panel/perfil?ok=1");
+}
+
+// ---------------------------------------------------------------- Parrilla de un pedido
+export async function sendBriefForReview(formData: FormData) {
+  const { supabase } = await requireCreative();
+  const id = s(formData, "id")!;
+  const { data, error } = await supabase.rpc("send_brief_for_review", { p_brief: id });
+  if (error) redirect(`/panel/briefs/${id}?error=${encodeURIComponent(error.message)}`);
+  revalidatePath(`/panel/briefs/${id}`);
+  revalidatePath("/panel/parrilla", "layout");
+  redirect(`/panel/briefs/${id}?enviada=${data ?? 0}`);
+}
+
+export async function linkPosts(formData: FormData) {
+  const { supabase } = await requireCreative();
+  const id = s(formData, "id")!;
+  const ids = formData.getAll("post_ids").map(String).filter(Boolean);
+  const { data: br } = await supabase.from("briefs").select("client_id").eq("id", id).single();
+  if (br && ids.length) await supabase.from("posts").update({ brief_id: id }).in("id", ids).eq("client_id", br.client_id);
+  revalidatePath(`/panel/briefs/${id}`);
+}
+
+export async function unlinkPost(formData: FormData) {
+  const { supabase } = await requireCreative();
+  const id = s(formData, "id")!;
+  await supabase.from("posts").update({ brief_id: null }).eq("id", s(formData, "post_id")!);
+  revalidatePath(`/panel/briefs/${id}`);
 }

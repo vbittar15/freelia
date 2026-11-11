@@ -66,3 +66,12 @@ export async function updateClientProfile(formData: FormData) {
   revalidatePath("/cliente", "layout");
   redirect("/cliente/perfil?ok=1");
 }
+
+export async function approveBrief(formData: FormData) {
+  const { supabase } = await requireClient();
+  const id = s(formData, "id")!;
+  const { data, error } = await supabase.rpc("approve_brief_posts", { p_brief: id });
+  if (error) redirect(`/cliente/solicitudes/${id}?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/cliente", "layout");
+  redirect(`/cliente/solicitudes/${id}?aprobada=${data ?? 0}`);
+}

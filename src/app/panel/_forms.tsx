@@ -82,7 +82,11 @@ export function BriefForm({ brief, clients, clientId, userId }: { brief?: Brief;
   );
 }
 
-export function PostForm({ post, clients, userId, clientId, date }: { post?: Post; clients: ClientOpt[]; userId: string; clientId?: string; date?: string }) {
+type BriefOpt = { id: string; title: string; client_id: string };
+
+export function PostForm({ post, clients, userId, clientId, date, briefs = [], briefId }: { post?: Post; clients: ClientOpt[]; userId: string; clientId?: string; date?: string; briefs?: BriefOpt[]; briefId?: string }) {
+  const cid = post?.client_id ?? clientId;
+  const briefOpts = briefs.filter((b) => !cid || b.client_id === cid);
   const canSend = !post || post.status === "borrador" || post.status === "cambios";
   return (
     <form action={savePost} className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-5">
@@ -112,6 +116,14 @@ export function PostForm({ post, clients, userId, clientId, date }: { post?: Pos
             <input name="scheduled_at" type="datetime-local" className="input"
               defaultValue={post ? isoToBogotaLocal(post.scheduled_at) : date ? `${date}T10:00` : ""} />
           </Field>
+          {briefOpts.length > 0 && (
+            <Field label="Pedido / brief" hint="Agrupa la pieza en la parrilla de un pedido del cliente.">
+              <select name="brief_id" className="input" defaultValue={post?.brief_id ?? briefId ?? ""}>
+                <option value="">Sin pedido</option>
+                {briefOpts.map((b) => <option key={b.id} value={b.id}>{!cid ? `${clients.find((c) => c.id === b.client_id)?.company || clients.find((c) => c.id === b.client_id)?.name || "Cliente"} · ` : ""}{b.title}</option>)}
+              </select>
+            </Field>
+          )}
         </div>
         <div className="flex flex-col gap-2">
           {canSend && (
