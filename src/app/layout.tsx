@@ -1,10 +1,17 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { SWRegister } from "@/components/pwa";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "Freelia", template: "%s · Freelia" },
   description: "El espacio de trabajo para freelancers creativos y sus clientes.",
+  applicationName: "Freelia",
+  appleWebApp: { capable: true, title: "Freelia", statusBarStyle: "default" },
+  icons: { apple: "/apple-touch-icon.png" },
+  formatDetection: { telephone: false },
 };
+
+export const viewport: Viewport = { themeColor: "#FFFFFF", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>{children}<SWRegister /></body>
     </html>
   );
 }

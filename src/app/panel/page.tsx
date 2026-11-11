@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NotifyCard } from "@/components/pwa";
 import { requireCreative } from "@/lib/auth";
 import { Lia, Trazo } from "@/components/brand";
 import { Hero, Row, RowList, Section, Stat } from "@/components/ui";
@@ -49,6 +50,8 @@ export default async function Dashboard() {
           </div>
         )}
       </Hero>
+
+      <NotifyCard compact />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="Clientes activos" value={clientsCount ?? 0} tone="cielo" href="/panel/clientes" />

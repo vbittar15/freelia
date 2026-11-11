@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NotifyCard } from "@/components/pwa";
 import { requireClient } from "@/lib/auth";
 import { Lia, Logo, Trazo } from "@/components/brand";
 import { Hero, Row, RowList, Section } from "@/components/ui";
@@ -45,6 +46,8 @@ export default async function Page() {
           {n > 0 ? <>Tienes <Trazo>{n} {n === 1 ? "pieza" : "piezas"}</Trazo> por aprobar</> : <>No tienes nada <Trazo>por aprobar</Trazo></>}
         </p>
       </Hero>
+
+      <NotifyCard compact />
 
       <Section title="Por aprobar" count={n}>
         {n ? (

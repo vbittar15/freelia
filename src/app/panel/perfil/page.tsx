@@ -1,4 +1,5 @@
 import { requireCreative } from "@/lib/auth";
+import { NotifyCard } from "@/components/pwa";
 import { Field, PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/client-ui";
 import { updateProfile } from "../actions";
@@ -25,6 +26,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ o
         </Field>
         <div className="sm:col-span-2 flex justify-end"><SubmitButton>Guardar</SubmitButton></div>
       </form>
+      <div className="mt-6 max-w-3xl"><NotifyCard /></div>
       <form action={signOut} className="mt-6"><button className="btn btn-ghost btn-sm">Cerrar sesión</button></form>
     </>
   );
