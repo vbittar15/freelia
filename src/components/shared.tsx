@@ -8,8 +8,9 @@ import { Logo } from "./brand";
 
 // ------------------------------------------------------------ Comentarios de una pieza
 export function CommentThread({
-  comments, postId, path, userId,
+  comments: all, postId, path, userId,
 }: { comments: PostComment[]; postId: string; path: string; userId: string }) {
+  const comments = all.filter((c) => c.x == null);
   const label = { comentario: "", aprobado: "aprobó la pieza", cambios: "pidió cambios" };
   return (
     <div className="card p-5">

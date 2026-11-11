@@ -19,6 +19,13 @@ function fail(path: string, msg: string): never {
   redirect(`${path}${path.includes("?") ? "&" : "?"}error=${encodeURIComponent(msg)}`);
 }
 
+function parseFiles(f: FormData) {
+  try {
+    const arr = JSON.parse(String(f.get("attachments") || "[]")) as { url: string; name: string; type: string }[];
+    return arr.filter((x) => typeof x.url === "string" && x.url.startsWith("http")).map(({ url, name, type }) => ({ url, name, type }));
+  } catch { return []; }
+}
+
 function parseItems(f: FormData): LineItem[] {
   try {
     const raw = JSON.parse(String(f.get("items") || "[]")) as LineItem[];
@@ -101,6 +108,7 @@ export async function saveBrief(formData: FormData) {
     refs: s(formData, "refs"),
     deadline: s(formData, "deadline"),
     budget: n(formData, "budget"),
+    attachments: parseFiles(formData),
   };
   const back = id ? `/panel/briefs/${id}/editar` : "/panel/briefs/nuevo";
   if (!row.client_id || !row.title) fail(back, "Elige un cliente y escribe un título");

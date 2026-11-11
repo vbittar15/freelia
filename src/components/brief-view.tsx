@@ -1,4 +1,5 @@
 import type { Brief } from "@/lib/types";
+import { FileGrid } from "./files";
 import { fmtDate, money } from "@/lib/utils";
 
 export function BriefView({ brief }: { brief: Brief }) {
@@ -18,7 +19,13 @@ export function BriefView({ brief }: { brief: Brief }) {
             <p className="whitespace-pre-wrap leading-relaxed break-words">{v}</p>
           </div>
         ))}
-        {blocks.every(([, v]) => !v) && <p className="text-muted">Este brief aún no tiene detalles.</p>}
+        {!!brief.attachments?.length && (
+          <div>
+            <div className="text-[11px] uppercase tracking-wide text-muted mb-2">Archivos</div>
+            <FileGrid files={brief.attachments} />
+          </div>
+        )}
+        {blocks.every(([, v]) => !v) && !brief.attachments?.length && <p className="text-muted">Este brief aún no tiene detalles.</p>}
       </div>
       <div className="space-y-3">
         <div className="rounded-2xl bg-lila-t p-5">

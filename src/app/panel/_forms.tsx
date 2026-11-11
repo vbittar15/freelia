@@ -2,6 +2,7 @@ import { SubmitButton } from "@/components/client-ui";
 import { Field } from "@/components/ui";
 import { ItemsEditor } from "@/components/items-editor";
 import { ImageUpload } from "@/components/image-upload";
+import { FilePicker } from "@/components/file-picker";
 import type { Brief, Client, Invoice, Post, Quote } from "@/lib/types";
 import { FORMATS, NETWORKS, isoToBogotaLocal } from "@/lib/utils";
 import { saveBrief, saveClient, saveInvoice, savePost, saveQuote } from "./actions";
@@ -60,7 +61,7 @@ export function ClientForm({ client }: { client?: Client }) {
   );
 }
 
-export function BriefForm({ brief, clients, clientId }: { brief?: Brief; clients: ClientOpt[]; clientId?: string }) {
+export function BriefForm({ brief, clients, clientId, userId }: { brief?: Brief; clients: ClientOpt[]; clientId?: string; userId: string }) {
   return (
     <form action={saveBrief} className="card p-6 grid sm:grid-cols-2 gap-4 max-w-3xl">
       {brief && <input type="hidden" name="id" value={brief.id} />}
@@ -71,6 +72,7 @@ export function BriefForm({ brief, clients, clientId }: { brief?: Brief; clients
       <Field label="Mensaje clave"><textarea name="key_message" rows={3} className="input" defaultValue={brief?.key_message ?? ""} /></Field>
       <Field label="Entregables" className="sm:col-span-2"><textarea name="deliverables" rows={3} className="input" defaultValue={brief?.deliverables ?? ""} placeholder="Ej. 8 posts, 4 reels, 1 landing" /></Field>
       <Field label="Referencias / links" className="sm:col-span-2"><textarea name="refs" rows={2} className="input" defaultValue={brief?.refs ?? ""} /></Field>
+      <div className="sm:col-span-2"><span className="label">Archivos</span><FilePicker userId={userId} initial={brief?.attachments ?? []} /></div>
       <Field label="Fecha de entrega"><input name="deadline" type="date" className="input" defaultValue={brief?.deadline ?? ""} /></Field>
       <Field label="Presupuesto (COP)"><input name="budget" type="number" min="0" step="1000" className="input" defaultValue={brief?.budget ?? ""} /></Field>
       <div className="sm:col-span-2 flex justify-end">

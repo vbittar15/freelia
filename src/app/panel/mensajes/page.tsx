@@ -26,7 +26,7 @@ export default async function Page() {
             return (
               <Row key={c.id} href={`/panel/mensajes/${c.id}`} icon={<Avatar name={c.company || c.name} size={40} color={c.color} />}
                 title={c.company || c.name}
-                sub={m ? `${m.sender_id === user.id ? "Tú: " : ""}${m.body}` : c.client_user_id ? "Sin mensajes todavía" : "El cliente aún no tiene cuenta"}
+                sub={m ? `${m.sender_id === user.id ? "Tú: " : ""}${m.body || "📎 " + (m.attachment_name ?? "Archivo")}` : c.client_user_id ? "Sin mensajes todavía" : "El cliente aún no tiene cuenta"}
                 right={m ? <span className="text-[12px] font-medium text-muted">{timeAgo(m.created_at)}</span> : undefined} />
             );
           })}

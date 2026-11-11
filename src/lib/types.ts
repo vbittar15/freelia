@@ -43,6 +43,7 @@ export type Brief = {
   deadline: string | null;
   budget: number | null;
   status: BriefStatus;
+  attachments?: FileRef[] | null;
   created_at: string;
   clients?: Pick<Client, "name" | "company" | "color"> | null;
 };
@@ -70,6 +71,9 @@ export type PostComment = {
   author_id: string;
   body: string | null;
   action: "comentario" | "aprobado" | "cambios";
+  x?: number | null;
+  y?: number | null;
+  resolved?: boolean;
   created_at: string;
   profiles?: Pick<Profile, "full_name"> | null;
 };
@@ -119,6 +123,9 @@ export type Message = {
   client_id: string;
   sender_id: string;
   body: string;
+  attachment_url?: string | null;
+  attachment_name?: string | null;
+  attachment_type?: string | null;
   created_at: string;
 };
 
@@ -132,3 +139,5 @@ export type Notification = {
   read_at: string | null;
   created_at: string;
 };
+
+export type FileRef = { url: string; name: string; type: string };

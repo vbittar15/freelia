@@ -14,8 +14,12 @@ export async function reviewPost(formData: FormData) {
   const id = s(formData, "id")!;
   const action = s(formData, "action");
   const comment = s(formData, "comment");
-  if (action === "cambios" && !comment) redirect(`/cliente/aprobaciones/${id}?error=${encodeURIComponent("Cuéntale al equipo qué cambios necesitas")}`);
-  const { error } = await supabase.rpc("review_post", { p_post: id, p_action: action, p_comment: comment });
+  if (action === "cambios" && !comment) {
+    const { count } = await supabase.from("post_comments").select("id", { count: "exact", head: true })
+      .eq("post_id", id).not("x", "is", null).eq("resolved", false);
+    if (!count) redirect(`/cliente/aprobaciones/${id}?error=${encodeURIComponent("Cuéntale al equipo qué cambios necesitas o márcalos sobre el arte")}`);
+  }
+  const { error } = await supabase.rpc("review_post", { p_post: id, p_action: action, p_comment: comment ?? (action === "cambios" ? "Marqué los cambios sobre el arte 📍" : null) });
   if (error) redirect(`/cliente/aprobaciones/${id}?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/cliente", "layout");
   redirect(`/cliente/aprobaciones/${id}?ok=${action}`);
@@ -42,6 +46,12 @@ export async function createRequest(formData: FormData) {
     deliverables: s(formData, "deliverables"),
     refs: s(formData, "refs"),
     deadline: s(formData, "deadline"),
+    attachments: (() => {
+      try {
+        const arr = JSON.parse(String(formData.get("attachments") || "[]")) as { url: string; name: string; type: string }[];
+        return arr.filter((x) => typeof x.url === "string" && x.url.startsWith("http")).map(({ url, name, type }) => ({ url, name, type }));
+      } catch { return []; }
+    })(),
   };
   if (!row.client_id || !row.title) redirect(`/cliente/solicitudes/nueva?error=${encodeURIComponent("Escribe un título para tu solicitud")}`);
   const { data, error } = await supabase.from("briefs").insert(row).select("id").single();

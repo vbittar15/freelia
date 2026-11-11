@@ -4,6 +4,7 @@ import { requireCreative } from "@/lib/auth";
 import { ClientChip, PageHeader, StatusBadge } from "@/components/ui";
 import { ConfirmSubmit, SubmitButton } from "@/components/client-ui";
 import { CommentThread } from "@/components/shared";
+import { PinBoard } from "@/components/pin-board";
 import type { Post, PostComment } from "@/lib/types";
 import { clientLabel } from "@/lib/utils";
 import { ErrorNote, PostForm } from "../../_forms";
@@ -56,6 +57,12 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {ok && p.status !== "en_revision" && <p className="mb-5 rounded-[18px] bg-verde-t text-ink px-4 py-3 text-[14px]">Cambios guardados.</p>}
 
       <PostForm post={p} clients={clients ?? []} userId={user.id} />
+
+      {p.asset_url && !/\.(mp4|mov|webm)$/i.test(p.asset_url) && (
+        <section className="mt-8 card p-4 sm:p-5 max-w-3xl">
+          <PinBoard postId={p.id} imageUrl={p.asset_url} comments={(comments ?? []) as PostComment[]} userId={user.id} canResolve />
+        </section>
+      )}
 
       <div className="mt-8 grid lg:grid-cols-[minmax(0,1fr)_340px] gap-5">
         <CommentThread comments={(comments ?? []) as PostComment[]} postId={p.id} path={`/panel/parrilla/${p.id}`} userId={user.id} />

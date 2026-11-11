@@ -3,6 +3,7 @@ import { requireClient } from "@/lib/auth";
 import { PageHeader, StatusBadge } from "@/components/ui";
 import { SubmitButton } from "@/components/client-ui";
 import { CommentThread } from "@/components/shared";
+import { PinBoard } from "@/components/pin-board";
 import type { Post, PostComment } from "@/lib/types";
 import { FORMATS, NETWORKS, fmtDateTime } from "@/lib/utils";
 import { reviewPost } from "../../actions";
@@ -33,8 +34,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <div className="card overflow-hidden">
           {p.asset_url ? (
             isVideo ? <video src={p.asset_url} controls className="w-full max-h-[70vh] bg-surface" />
-              // eslint-disable-next-line @next/next/no-img-element
-              : <img src={p.asset_url} alt={p.title} className="w-full max-h-[70vh] object-contain bg-surface min-h-[240px]" />
+              : <div className="p-3 sm:p-4"><PinBoard postId={p.id} imageUrl={p.asset_url} comments={(comments ?? []) as PostComment[]} userId={user.id} canResolve={false} /></div>
           ) : <div className="aspect-video bg-lila-t flex items-center justify-center text-muted">Sin arte adjunto</div>}
           {p.copy && (
             <div className="p-6 border-t border-line">
@@ -55,7 +55,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
               <div className="text-center text-[11px] text-muted">o</div>
               <form action={reviewPost} className="space-y-2">
                 <input type="hidden" name="id" value={p.id} /><input type="hidden" name="action" value="cambios" />
-                <textarea name="comment" rows={4} className="input" placeholder="Describe los cambios que necesitas…" required />
+                <textarea name="comment" rows={4} className="input" placeholder={isVideo || !p.asset_url ? "Describe los cambios que necesitas…" : "Describe los cambios (o márcalos sobre el arte)…"} />
                 <SubmitButton className="btn btn-changes btn-lg w-full" pendingText="Enviando…">Pedir cambios</SubmitButton>
               </form>
             </div>

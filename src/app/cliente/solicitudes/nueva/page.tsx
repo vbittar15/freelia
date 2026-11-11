@@ -1,6 +1,7 @@
 import { requireClient } from "@/lib/auth";
 import { EmptyState, Field, PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/client-ui";
+import { FilePicker } from "@/components/file-picker";
 import { createRequest } from "../../actions";
 import { creativeName, getWorkspaces } from "../../data";
 
@@ -31,6 +32,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
         <Field label="Mensaje principal"><textarea name="key_message" rows={3} className="input" /></Field>
         <Field label="¿Qué piezas necesitas?" className="sm:col-span-2"><textarea name="deliverables" rows={3} className="input" placeholder="Ej. 4 posts, 2 historias, 1 video corto" /></Field>
         <Field label="Referencias o links" className="sm:col-span-2"><textarea name="refs" rows={2} className="input" /></Field>
+        <div className="sm:col-span-2"><span className="label">Archivos (logos, referencias, audios…)</span><FilePicker userId={user.id} /></div>
         <Field label="¿Para cuándo?"><input name="deadline" type="date" className="input" /></Field>
         <div className="sm:col-span-2 flex justify-end"><SubmitButton pendingText="Enviando…">Enviar solicitud</SubmitButton></div>
       </form>
