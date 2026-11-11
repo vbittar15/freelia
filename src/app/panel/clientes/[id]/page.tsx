@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { requireCreative } from "@/lib/auth";
 import { Avatar, PageHeader, Section, StatusBadge } from "@/components/ui";
 import { ConfirmSubmit, CopyButton, SubmitButton } from "@/components/client-ui";
@@ -30,7 +31,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     supabase.from("invoices").select("*, invoice_items(quantity, unit_price)").eq("client_id", id).order("created_at", { ascending: false }).limit(5),
   ]);
 
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const h = await headers();
+  const site = process.env.NEXT_PUBLIC_SITE_URL || `${h.get("x-forwarded-proto") ?? "https"}://${h.get("host")}`;
   const invite = `${site}/registro?rol=cliente&email=${encodeURIComponent(c.email ?? "")}`;
 
   return (
