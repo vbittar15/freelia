@@ -5,6 +5,7 @@ import { SubmitButton } from "@/components/client-ui";
 import { updateProfile } from "../actions";
 import { deleteAccount, signOut } from "@/app/(auth)/actions";
 import { DeleteAccount } from "@/components/delete-account";
+import { BackupCard } from "@/components/backup-card";
 
 export const metadata = { title: "Mi perfil" };
 
@@ -28,6 +29,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ o
         <div className="sm:col-span-2 flex justify-end"><SubmitButton>Guardar</SubmitButton></div>
       </form>
       <div className="mt-6 max-w-3xl"><NotifyCard /></div>
+      <BackupCard role="creative" />
       <form action={signOut} className="mt-6"><button className="btn btn-ghost btn-sm">Cerrar sesión</button></form>
       <DeleteAccount action={deleteAccount} back="/panel/perfil" role="creative" error={error} />
     </>

@@ -29,7 +29,7 @@ export function DeleteAccount({ action, back, role, error }: { action: (f: FormD
             <div className="text-[14px]">
               <div className="font-semibold mb-1">{role === "creative" ? "Se eliminará para siempre:" : "Qué pasa al eliminarla:"}</div>
               <ul className="space-y-0.5">{lost.map((l) => <li key={l}>· {l}</li>)}</ul>
-              {role === "creative" && <p className="mt-2 text-muted">Si necesitas tus cotizaciones o cuentas de cobro, descárgalas antes.</p>}
+              {role === "creative" && <p className="mt-2 text-muted">Antes, descarga tu copia de seguridad (arriba) para guardar todo.</p>}
             </div>
           </div>
           {error && <p className="rounded-[14px] bg-rosa-t px-3 py-2 text-[13px]">{error}</p>}

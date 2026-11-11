@@ -5,6 +5,7 @@ import { SubmitButton } from "@/components/client-ui";
 import { updateClientProfile } from "../actions";
 import { deleteAccount, signOut } from "@/app/(auth)/actions";
 import { DeleteAccount } from "@/components/delete-account";
+import { BackupCard } from "@/components/backup-card";
 
 export const metadata = { title: "Mi perfil" };
 
@@ -22,6 +23,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ o
         <div className="flex justify-end"><SubmitButton>Guardar</SubmitButton></div>
       </form>
       <div className="mt-6 max-w-3xl"><NotifyCard /></div>
+      <BackupCard role="client" />
       <form action={signOut} className="mt-6"><button className="btn btn-ghost btn-sm">Cerrar sesión</button></form>
       <DeleteAccount action={deleteAccount} back="/cliente/perfil" role="client" error={error} />
     </>
