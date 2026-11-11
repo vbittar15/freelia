@@ -121,8 +121,12 @@ export const STATES: Record<string, StateDef> = {
   cambios:     { label: "Cambios pedidos", dot: "#FF7EB6", tint: "#FFDCEB", mood: "worry" },
   aprobado:    { label: "Aprobado",        dot: "#2FBF7A", tint: "#CDF2DF", mood: "happy" },
   publicado:   { label: "Publicado",       dot: "#A98BFF", tint: "#E7DEFF", mood: "smile" },
+  entregado:   { label: "Entregado",       dot: "#A98BFF", tint: "#E7DEFF", mood: "smile" },
+  revision:    { label: "En revisión",     dot: "#3D5BF5", tint: "#DCE3FF", mood: "right" },
+  confirmada:  { label: "Confirmada",      dot: "#2FBF7A", tint: "#CDF2DF", mood: "happy" },
+  realizada:   { label: "Realizada",       dot: "#A98BFF", tint: "#E7DEFF", mood: "smile" },
   // briefs
-  nuevo:       { label: "Brief nuevo",     dot: "#FFC93C", tint: "#FFF1C2", mood: "idea" },
+  nuevo:       { label: "Nueva",     dot: "#FFC93C", tint: "#FFF1C2", mood: "idea" },
   en_proceso:  { label: "En proceso",      dot: "#3D5BF5", tint: "#DCE3FF", mood: "right" },
   completado:  { label: "Completado",      dot: "#2FBF7A", tint: "#CDF2DF", mood: "happy" },
   // cotizaciones

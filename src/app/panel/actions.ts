@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireCreative } from "@/lib/auth";
 import { bogotaLocalToISO } from "@/lib/utils";
 import type { LineItem } from "@/lib/types";
+import { parseRequest } from "@/lib/requests";
 
 const s = (f: FormData, k: string) => {
   const v = f.get(k);
@@ -19,9 +20,9 @@ function fail(path: string, msg: string): never {
   redirect(`${path}${path.includes("?") ? "&" : "?"}error=${encodeURIComponent(msg)}`);
 }
 
-function parseFiles(f: FormData) {
+function parseFiles(f: FormData, name = "attachments") {
   try {
-    const arr = JSON.parse(String(f.get("attachments") || "[]")) as { url: string; name: string; type: string }[];
+    const arr = JSON.parse(String(f.get(name) || "[]")) as { url: string; name: string; type: string }[];
     return arr.filter((x) => typeof x.url === "string" && x.url.startsWith("http")).map(({ url, name, type }) => ({ url, name, type }));
   } catch { return []; }
 }
@@ -98,33 +99,43 @@ export async function deleteClient(formData: FormData) {
 export async function saveBrief(formData: FormData) {
   const { supabase } = await requireCreative();
   const id = s(formData, "id");
-  const row = {
-    client_id: s(formData, "client_id")!,
-    title: s(formData, "title")!,
-    objective: s(formData, "objective"),
-    audience: s(formData, "audience"),
-    key_message: s(formData, "key_message"),
-    deliverables: s(formData, "deliverables"),
-    refs: s(formData, "refs"),
-    deadline: s(formData, "deadline"),
-    budget: n(formData, "budget"),
-    attachments: parseFiles(formData),
-  };
-  const back = id ? `/panel/briefs/${id}/editar` : "/panel/briefs/nuevo";
-  if (!row.client_id || !row.title) fail(back, "Elige un cliente y escribe un título");
+  const tipo = s(formData, "kind") ?? "proyecto";
+  const { row, missing } = parseRequest(formData, tipo);
+  const back = id ? `/panel/briefs/${id}/editar` : `/panel/briefs/nuevo?tipo=${tipo}`;
+  const clientId = s(formData, "client_id");
+  if ((!id && !clientId) || !row.title) fail(back, "Elige un cliente y escribe un título");
+  if (missing.length) fail(back, "Falta: " + missing.join(", "));
+  const full = { ...row, attachments: parseFiles(formData) };
 
   if (id) {
-    const { client_id: _ignored, ...upd } = row;
-    void _ignored;
-    const { error } = await supabase.from("briefs").update(upd).eq("id", id);
+    const { error } = await supabase.from("briefs").update(full).eq("id", id);
     if (error) fail(back, error.message);
     revalidatePath("/panel/briefs");
     redirect(`/panel/briefs/${id}`);
   }
-  const { data, error } = await supabase.from("briefs").insert(row).select("id").single();
+  const { data, error } = await supabase.from("briefs").insert({ ...full, client_id: clientId }).select("id").single();
   if (error || !data) fail(back, error?.message ?? "No se pudo crear");
   revalidatePath("/panel/briefs");
   redirect(`/panel/briefs/${data.id}`);
+}
+
+export async function confirmMeeting(formData: FormData) {
+  const { supabase } = await requireCreative();
+  const id = s(formData, "id")!;
+  const at = bogotaLocalToISO(s(formData, "meeting_at"));
+  if (!at) fail(`/panel/briefs/${id}`, "Elige fecha y hora");
+  await supabase.from("briefs").update({ meeting_at: at, meeting_link: s(formData, "meeting_link"), status: "en_proceso" }).eq("id", id);
+  revalidatePath("/panel", "layout");
+  redirect(`/panel/briefs/${id}?ok=reunion`);
+}
+
+export async function deliverBrief(formData: FormData) {
+  const { supabase } = await requireCreative();
+  const id = s(formData, "id")!;
+  const { data, error } = await supabase.rpc("deliver_brief", { p_brief: id });
+  if (error) fail(`/panel/briefs/${id}`, error.message);
+  revalidatePath("/panel", "layout");
+  redirect(`/panel/briefs/${id}?ok=entrega&n=${data ?? 0}`);
 }
 
 export async function setBriefStatus(formData: FormData) {
@@ -154,9 +165,17 @@ export async function savePost(formData: FormData) {
     format: s(formData, "format") ?? "post",
     scheduled_at: bogotaLocalToISO(s(formData, "scheduled_at")),
     copy: s(formData, "copy"),
-    asset_url: s(formData, "asset_url"),
     brief_id: s(formData, "brief_id"),
+    link_url: s(formData, "link_url"),
+    social: formData.get("social") === "on",
   };
+  if (formData.has("assets")) {
+    const assets = parseFiles(formData, "assets");
+    row.assets = assets;
+    // Portada: la primera imagen o video (para calendario y listas)
+    row.asset_url = assets.find((a) => /^(image|video)\//.test(a.type) || /\.(png|jpe?g|gif|webp|mp4|mov|webm)$/i.test(a.url))?.url ?? null;
+  }
+  if (!row.social) row.network = "entrega";
   const back = id ? `/panel/parrilla/${id}` : "/panel/parrilla/nueva";
   if (!row.client_id || !row.title) fail(back, "Elige un cliente y escribe un título");
 
@@ -186,6 +205,16 @@ export async function setPostStatus(formData: FormData) {
   await supabase.from("posts").update({ status: s(formData, "status") }).eq("id", id);
   revalidatePath("/panel/parrilla", "layout");
   revalidatePath("/panel");
+}
+
+export async function deliverPost(formData: FormData) {
+  const { supabase } = await requireCreative();
+  const id = s(formData, "id")!;
+  const { error } = await supabase.from("posts")
+    .update({ final_files: parseFiles(formData, "final_files"), status: "entregado", delivered_at: new Date().toISOString() }).eq("id", id);
+  if (error) fail(`/panel/parrilla/${id}`, error.message);
+  revalidatePath("/panel", "layout");
+  redirect(`/panel/parrilla/${id}?ok=1`);
 }
 
 export async function deletePost(formData: FormData) {

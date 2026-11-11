@@ -8,7 +8,7 @@ import { withDefaults } from "@/lib/rubros";
 import { ErrorNote } from "../_forms";
 import { sendForReview } from "../actions";
 
-export const metadata = { title: "Enviar a aprobación" };
+export const metadata = { title: "Enviar a revisión" };
 
 type SP = { cliente?: string; brief?: string; ids?: string; error?: string };
 
@@ -32,7 +32,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
   if (!clientId) {
     return (
       <>
-        <PageHeader back={{ href: "/panel/envios", label: "Aprobaciones" }} title="Enviar a aprobación" subtitle="¿A qué cliente le envías piezas?" />
+        <PageHeader back={{ href: "/panel/envios", label: "Revisiones" }} title="Enviar a revisión" subtitle="¿A qué cliente le envías piezas?" />
         <RowList empty={<EmptyState title="No hay piezas por enviar" text="Crea piezas en la parrilla; cuando estén listas, las envías juntas desde aquí."
           action={<Link href="/panel/parrilla/nueva" className="btn btn-primary">+ Nueva pieza</Link>} />}>
           {clientIds.map((cid) => {
@@ -71,8 +71,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
 
   return (
     <>
-      <PageHeader back={{ href: sp.brief ? `/panel/briefs/${sp.brief}` : "/panel/envios", label: sp.brief ? "Pedido" : "Aprobaciones" }}
-        title="Enviar a aprobación"
+      <PageHeader back={{ href: sp.brief ? `/panel/briefs/${sp.brief}` : "/panel/envios", label: sp.brief ? "Solicitud" : "Revisiones" }}
+        title="Enviar a revisión"
         subtitle={<span className="flex flex-wrap items-center gap-2 mt-1">
           <ClientChip name={clientLabel(c)} color={c?.color} />
           {clientIds.length > 1 && <Link href="/panel/enviar" className="text-[13px] font-semibold text-brand-dark hover:underline">Cambiar cliente</Link>}

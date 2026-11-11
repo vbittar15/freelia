@@ -4,8 +4,10 @@ import { requireClient } from "@/lib/auth";
 import { PageHeader, StatusBadge } from "@/components/ui";
 import { SubmitButton } from "@/components/client-ui";
 import { CommentThread } from "@/components/shared";
-import { PinBoard } from "@/components/pin-board";
-import type { Post, PostComment } from "@/lib/types";
+import { AssetViewer } from "@/components/asset-viewer";
+import { DownloadAll } from "@/components/download-all";
+import { FileGrid } from "@/components/files";
+import type { Post, PostComment, PostVersion } from "@/lib/types";
 import { FORMATS, NETWORKS, fmtDateTime } from "@/lib/utils";
 import { reviewPost } from "../../actions";
 
@@ -13,13 +15,15 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const { id } = await params;
   const { error, ok, r, prev } = await searchParams;
   const { supabase, user } = await requireClient();
-  const [{ data }, { data: comments }] = await Promise.all([
+  const [{ data }, { data: comments }, { data: vers }] = await Promise.all([
     supabase.from("posts").select("*").eq("id", id).single(),
     supabase.from("post_comments").select("*, profiles(full_name)").eq("post_id", id).order("created_at"),
+    supabase.from("post_versions").select("*").eq("post_id", id).order("round"),
   ]);
   if (!data) notFound();
   const p = data as Post;
-  const isVideo = p.asset_url && /\.(mp4|mov|webm)$/i.test(p.asset_url);
+  const assets = p.assets?.length ? p.assets : p.asset_url ? [{ url: p.asset_url, name: "arte", type: /\.(mp4|mov|webm)$/i.test(p.asset_url) ? "video/mp4" : "image/*" }] : [];
+  const hasImages = assets.some((a) => /^image|\.(png|jpe?g|gif|webp)$/i.test(a.type || a.url));
   const all = (comments ?? []) as PostComment[];
 
   // Revisión en secuencia dentro de un envío
@@ -62,7 +66,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {round > 1 && p.status === "en_revision" && (lastAsk?.body || fixedPins.length > 0) && (
         <div className="mb-5 rounded-[20px] bg-amarillo-t px-4 py-3.5">
           <div className="font-semibold text-[14px]">Corrección · ronda {round}</div>
-          <div className="text-[13px] text-muted">Esto fue lo que pediste. Compruébalo en el arte:</div>
+          <div className="text-[13px] text-muted">Esto fue lo que pediste. Compara con la versión anterior:</div>
           {lastAsk?.body && <p className="mt-1.5 text-[14px]">“{lastAsk.body}”</p>}
           {fixedPins.length > 0 && <ul className="mt-1.5 space-y-0.5 text-[14px]">{fixedPins.map((k) => <li key={k.id}>✓ {k.body}</li>)}</ul>}
         </div>
@@ -72,10 +76,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-5">
         <div className="card overflow-hidden">
-          {p.asset_url ? (
-            isVideo ? <video src={p.asset_url} controls className="w-full max-h-[70vh] bg-surface" />
-              : <div className="p-3 sm:p-4"><PinBoard postId={p.id} imageUrl={p.asset_url} comments={all} userId={user.id} canResolve={false} /></div>
-          ) : <div className="aspect-video bg-lila-t flex items-center justify-center text-muted">Sin arte adjunto</div>}
+          <div className="p-3 sm:p-4">
+            <AssetViewer postId={p.id} userId={user.id} assets={assets} link={p.link_url} comments={all}
+              versions={(vers ?? []) as PostVersion[]} currentRound={Math.max(1, p.round ?? 1)} canPin={p.status === "en_revision"} canResolve={false} />
+          </div>
           {p.copy && (
             <div className="p-6 border-t border-line">
               <div className="text-[11px] uppercase tracking-wide text-muted mb-2">Copy</div>
@@ -85,6 +89,16 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         </div>
 
         <div className="space-y-4">
+          {p.status === "entregado" && (() => {
+            const files = (p.final_files?.length ? p.final_files : assets);
+            return (
+              <div className="rounded-[22px] bg-verde-t p-5 space-y-3">
+                <div className="font-semibold">📦 Archivos finales</div>
+                <FileGrid files={files} />
+                <DownloadAll files={files} zipName={p.title} className="btn btn-primary w-full" />
+              </div>
+            );
+          })()}
           {p.status === "en_revision" && (
             <div className="card p-5 space-y-3">
               <h3 className="h2">¿Qué te parece?</h3>
@@ -95,7 +109,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
               <div className="text-center text-[11px] text-muted">o</div>
               <form action={reviewPost} className="space-y-2">
                 <input type="hidden" name="id" value={p.id} /><input type="hidden" name="action" value="cambios" />{r && <input type="hidden" name="r" value={r} />}
-                <textarea name="comment" rows={4} className="input" placeholder={isVideo || !p.asset_url ? "Describe los cambios que necesitas…" : "Describe los cambios (o márcalos sobre el arte)…"} />
+                <textarea name="comment" rows={4} className="input" placeholder={hasImages ? "Describe los cambios (o márcalos sobre la imagen)…" : "Describe los cambios que necesitas…"} />
                 <SubmitButton className="btn btn-changes btn-lg w-full" pendingText="Enviando…">{seq && seq.pending > 1 ? "Pedir cambios y seguir" : "Pedir cambios"}</SubmitButton>
               </form>
             </div>

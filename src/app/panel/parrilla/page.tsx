@@ -46,7 +46,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
     <>
       <PageHeader title={workTitle(rub)} subtitle={usesSocial(rub) ? "Planea, envía a aprobación y publica." : "Organiza tus entregas, envíalas a aprobación y entrégalas."}
         actions={<>
-          <Link href={`/panel/enviar${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-soft">Enviar a aprobación</Link>
+          <Link href={`/panel/enviar${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-soft">Enviar a revisión</Link>
           <Link href={`/panel/parrilla/nueva${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-primary">+ Nueva {pieceWord(rub)}</Link>
         </>} />
 

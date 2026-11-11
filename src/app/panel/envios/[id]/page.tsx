@@ -27,11 +27,11 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
   return (
     <>
-      <PageHeader back={{ href: "/panel/envios", label: "Aprobaciones" }} title={`Envío a ${name}`}
+      <PageHeader back={{ href: "/panel/envios", label: "Revisiones" }} title={`Envío a ${name}`}
         subtitle={<span className="flex flex-wrap items-center gap-3 mt-1">
           <Link href={`/panel/clientes/${r.client_id}`}><ClientChip name={name} color={r.clients?.color} /></Link>
           <span className="text-[13px] text-muted">{fmtDateTime(r.created_at)}</span>
-          {r.brief_id && <Link href={`/panel/briefs/${r.brief_id}`} className="text-[13px] font-semibold text-brand-dark hover:underline">Ver pedido →</Link>}
+          {r.brief_id && <Link href={`/panel/briefs/${r.brief_id}`} className="text-[13px] font-semibold text-brand-dark hover:underline">Ver solicitud →</Link>}
         </span>} />
 
       {nuevo && <div className="mb-5"><Notice tone="ok">

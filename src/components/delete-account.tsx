@@ -10,7 +10,7 @@ export function DeleteAccount({ action, back, role, error }: { action: (f: FormD
   const [text, setText] = useState("");
   const ok = text.trim().toUpperCase() === "ELIMINAR";
   const lost = role === "creative"
-    ? ["Tus clientes y sus fichas", "Parrilla, piezas y comentarios", "Briefs, cotizaciones y cuentas de cobro", "Chats y archivos que subiste"]
+    ? ["Tus clientes y sus fichas", "Parrilla, piezas y comentarios", "Solicitudes, cotizaciones y cuentas de cobro", "Chats y archivos que subiste"]
     : ["Tu acceso al portal y tus notificaciones", "Los archivos que subiste", "Tu equipo creativo conserva el historial de piezas, pedidos y mensajes"];
 
   return (

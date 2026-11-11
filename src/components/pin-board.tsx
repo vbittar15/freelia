@@ -8,8 +8,8 @@ import { cn, timeAgo } from "@/lib/utils";
 import { Lia } from "./brand";
 
 /** Comentarios sobre el arte: toca un punto de la imagen y deja tu comentario ahí */
-export function PinBoard({ postId, imageUrl, comments, userId, canResolve }:
-  { postId: string; imageUrl: string; comments: PostComment[]; userId: string; canResolve: boolean }) {
+export function PinBoard({ postId, imageUrl, comments, userId, canResolve, assetIdx = 0, readOnly, hideList }:
+  { postId: string; imageUrl: string; comments: PostComment[]; userId: string; canResolve: boolean; assetIdx?: number; readOnly?: boolean; hideList?: boolean }) {
   const router = useRouter();
   const box = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState<{ x: number; y: number } | null>(null);
@@ -19,10 +19,11 @@ export function PinBoard({ postId, imageUrl, comments, userId, canResolve }:
   const [local, setLocal] = useState<PostComment[]>([]);
 
   const pins = [...comments, ...local.filter((l) => !comments.some((c) => c.id === l.id))]
-    .filter((c) => c.x != null && c.y != null)
+    .filter((c) => c.x != null && c.y != null && (c.asset_idx ?? 0) === assetIdx)
     .sort((a, b) => a.created_at.localeCompare(b.created_at));
 
   function place(e: React.MouseEvent<HTMLDivElement>) {
+    if (readOnly) return;
     const r = box.current!.getBoundingClientRect();
     const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
     const y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
@@ -34,7 +35,7 @@ export function PinBoard({ postId, imageUrl, comments, userId, canResolve }:
     if (!draft || !text.trim()) return;
     setSaving(true);
     const { data } = await createClient().from("post_comments")
-      .insert({ post_id: postId, body: text.trim(), x: draft.x, y: draft.y })
+      .insert({ post_id: postId, body: text.trim(), x: draft.x, y: draft.y, asset_idx: assetIdx })
       .select("*, profiles(full_name)").single();
     if (data) setLocal((l) => [...l, data as PostComment]);
     setDraft(null); setText(""); setSaving(false);
@@ -52,12 +53,14 @@ export function PinBoard({ postId, imageUrl, comments, userId, canResolve }:
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-[13px] text-muted px-1">
-        <span className="relative flex size-2.5"><span className="absolute inset-0 rounded-full bg-rosa anim-ping" /><span className="relative size-2.5 rounded-full bg-rosa" /></span>
-        Toca cualquier punto del arte para dejar un comentario ahí.
-      </div>
+      {!readOnly && (
+        <div className="flex items-center gap-2 text-[13px] text-muted px-1">
+          <span className="relative flex size-2.5"><span className="absolute inset-0 rounded-full bg-rosa anim-ping" /><span className="relative size-2.5 rounded-full bg-rosa" /></span>
+          Toca cualquier punto para dejar un comentario ahí.
+        </div>
+      )}
 
-      <div ref={box} onClick={place} className="relative rounded-[20px] overflow-hidden bg-surface-2 cursor-crosshair select-none">
+      <div ref={box} onClick={place} className={cn("relative rounded-[20px] overflow-hidden bg-surface-2 select-none", !readOnly && "cursor-crosshair")}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imageUrl} alt="Arte de la pieza" className="w-full max-h-[75vh] object-contain pointer-events-none" draggable={false} />
         {pins.map((c, i) => {
@@ -86,10 +89,10 @@ export function PinBoard({ postId, imageUrl, comments, userId, canResolve }:
         </form>
       )}
 
-      {pins.length > 0 && (
+      {pins.length > 0 && !hideList && (
         <div>
           <div className="flex items-center gap-2 mb-2 px-1">
-            <h3 className="h2">Comentarios sobre el arte</h3>
+            <h3 className="h2">Comentarios sobre esta imagen</h3>
             {open > 0 && <span className="min-w-[22px] h-[22px] px-[7px] rounded-full bg-rosa-t text-[12px] font-bold inline-flex items-center justify-center">{open}</span>}
           </div>
           <div className="flex flex-col gap-2">
@@ -103,7 +106,7 @@ export function PinBoard({ postId, imageUrl, comments, userId, canResolve }:
                     <div className="text-[12px] text-muted"><b className="text-ink font-semibold">{c.author_id === userId ? "Tú" : c.profiles?.full_name ?? "Cliente"}</b> · {timeAgo(c.created_at)}</div>
                     <p className={cn("text-[14px] leading-snug mt-0.5", s.resolved && "line-through")}>{c.body}</p>
                   </div>
-                  {canResolve && (
+                  {canResolve && !readOnly && (
                     <button type="button" onClick={() => toggle(s)} className="btn btn-sm shrink-0 bg-surface text-ink hover:bg-surface-2">
                       {s.resolved ? "Reabrir" : "Resolver"}
                     </button>
@@ -114,7 +117,7 @@ export function PinBoard({ postId, imageUrl, comments, userId, canResolve }:
           </div>
         </div>
       )}
-      {pins.length === 0 && !draft && (
+      {pins.length === 0 && !draft && !readOnly && (
         <div className="flex items-center gap-3 px-1 text-[13px] text-muted"><Lia size={22} mood="idea" color="#FFC93C" /> Aún no hay comentarios sobre el arte.</div>
       )}
     </div>

@@ -72,11 +72,17 @@ export type Brief = {
   budget: number | null;
   status: BriefStatus;
   attachments?: FileRef[] | null;
+  kind?: "proyecto" | "pieza" | "parrilla" | "campana" | "reunion";
+  details?: Record<string, unknown> | null;
+  meeting_at?: string | null;
+  meeting_link?: string | null;
+  delivered_at?: string | null;
   created_at: string;
   clients?: Pick<Client, "name" | "company" | "color"> | null;
 };
 
-export type PostStatus = "borrador" | "en_revision" | "cambios" | "aprobado" | "publicado";
+export type PostStatus = "borrador" | "en_revision" | "cambios" | "aprobado" | "publicado" | "entregado";
+export type PostVersion = { id: string; post_id: string; round: number; assets: FileRef[]; copy: string | null; link_url: string | null; created_at: string };
 export type Post = {
   id: string;
   owner_id: string;
@@ -90,6 +96,11 @@ export type Post = {
   brief_id?: string | null;
   round?: number;
   review_request_id?: string | null;
+  assets?: FileRef[];
+  link_url?: string | null;
+  social?: boolean;
+  final_files?: FileRef[];
+  delivered_at?: string | null;
   status: PostStatus;
   created_at: string;
   updated_at: string;
@@ -105,6 +116,8 @@ export type PostComment = {
   x?: number | null;
   y?: number | null;
   resolved?: boolean;
+  asset_idx?: number;
+  round?: number | null;
   created_at: string;
   profiles?: Pick<Profile, "full_name"> | null;
 };

@@ -58,7 +58,7 @@ export default async function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="Clientes activos" value={clientsCount ?? 0} tone="cielo" href="/panel/clientes" />
         <Stat label="Esperando al cliente" value={(review ?? []).length} tone="lavanda" href="/panel/parrilla?estado=en_revision" />
-        <Stat label="Briefs nuevos" value={briefsL.length} tone="mantequilla" href="/panel/briefs?estado=nuevo" />
+        <Stat label="Solicitudes nuevas" value={briefsL.length} tone="mantequilla" href="/panel/briefs?ver=nuevas" />
         <Stat label="Por cobrar" value={money(owed)} tone="menta" href="/panel/cobros" />
       </div>
 

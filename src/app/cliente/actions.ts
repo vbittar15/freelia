@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireClient } from "@/lib/auth";
+import { parseRequest } from "@/lib/requests";
 
 const s = (f: FormData, k: string) => {
   const v = f.get(k);
@@ -57,27 +58,21 @@ export async function respondQuote(formData: FormData) {
 
 export async function createRequest(formData: FormData) {
   const { supabase, user } = await requireClient();
-  const row = {
-    client_id: s(formData, "client_id"),
-    created_by: user.id,
-    title: s(formData, "title"),
-    objective: s(formData, "objective"),
-    audience: s(formData, "audience"),
-    key_message: s(formData, "key_message"),
-    deliverables: s(formData, "deliverables"),
-    refs: s(formData, "refs"),
-    deadline: s(formData, "deadline"),
-    attachments: (() => {
-      try {
-        const arr = JSON.parse(String(formData.get("attachments") || "[]")) as { url: string; name: string; type: string }[];
-        return arr.filter((x) => typeof x.url === "string" && x.url.startsWith("http")).map(({ url, name, type }) => ({ url, name, type }));
-      } catch { return []; }
-    })(),
-  };
-  if (!row.client_id || !row.title) redirect(`/cliente/solicitudes/nueva?error=${encodeURIComponent("Escribe un título para tu solicitud")}`);
-  const { data, error } = await supabase.from("briefs").insert(row).select("id").single();
-  if (error || !data) redirect(`/cliente/solicitudes/nueva?error=${encodeURIComponent(error?.message ?? "No se pudo enviar")}`);
-  revalidatePath("/cliente/solicitudes");
+  const tipo = s(formData, "kind") ?? "proyecto";
+  const { row, missing } = parseRequest(formData, tipo);
+  const back = `/cliente/solicitudes/nueva?tipo=${tipo}`;
+  if (!row.title) redirect(`${back}&error=${encodeURIComponent("Escribe un título para tu solicitud")}`);
+  if (missing.length) redirect(`${back}&error=${encodeURIComponent("Falta: " + missing.join(", "))}`);
+  const attachments = (() => {
+    try {
+      const arr = JSON.parse(String(formData.get("attachments") || "[]")) as { url: string; name: string; type: string }[];
+      return arr.filter((x) => typeof x.url === "string" && x.url.startsWith("http")).map(({ url, name, type }) => ({ url, name, type }));
+    } catch { return []; }
+  })();
+  const { data, error } = await supabase.from("briefs")
+    .insert({ ...row, client_id: s(formData, "client_id"), created_by: user.id, attachments }).select("id").single();
+  if (error || !data) redirect(`${back}&error=${encodeURIComponent(error?.message ?? "No se pudo enviar")}`);
+  revalidatePath("/cliente", "layout");
   redirect(`/cliente/solicitudes/${data.id}?ok=1`);
 }
 

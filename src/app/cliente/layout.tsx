@@ -3,10 +3,10 @@ import { requireClient } from "@/lib/auth";
 
 const NAV: NavItem[] = [
   { href: "/cliente", label: "Inicio", icon: "home", exact: true, tab: true },
-  { href: "/cliente/aprobaciones", label: "Por aprobar", short: "Aprobar", icon: "check", tab: true },
-  { href: "/cliente/cobros", label: "Cobros", icon: "money", tab: true },
+  { href: "/cliente/aprobaciones", label: "Por revisar", short: "Revisar", icon: "check", tab: true },
+  { href: "/cliente/solicitudes", label: "Solicitudes", short: "Pedir", icon: "brief", tab: true },
   { href: "/cliente/mensajes", label: "Mensajes", short: "Chat", icon: "chat", tab: true },
-  { href: "/cliente/solicitudes", label: "Pedidos", icon: "brief" },
+  { href: "/cliente/cobros", label: "Cuentas de cobro", icon: "money" },
   { href: "/cliente/cotizaciones", label: "Cotizaciones", icon: "quote" },
 ];
 

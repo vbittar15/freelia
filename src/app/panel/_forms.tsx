@@ -1,8 +1,9 @@
 import { SubmitButton } from "@/components/client-ui";
 import { Field } from "@/components/ui";
 import { ItemsEditor } from "@/components/items-editor";
+import { RequestFields } from "@/components/request-fields";
+import type { RequestKind } from "@/lib/requests";
 import type { CatalogItem } from "@/lib/catalog";
-import { ImageUpload } from "@/components/image-upload";
 import { FilePicker } from "@/components/file-picker";
 import type { Brief, Client, Invoice, Post, Quote } from "@/lib/types";
 import { FORMATS, NETWORKS, isoToBogotaLocal } from "@/lib/utils";
@@ -62,22 +63,15 @@ export function ClientForm({ client }: { client?: Client }) {
   );
 }
 
-export function BriefForm({ brief, clients, clientId, userId }: { brief?: Brief; clients: ClientOpt[]; clientId?: string; userId: string }) {
+export function BriefForm({ brief, clients, clientId, userId, kind }: { brief?: Brief; clients: ClientOpt[]; clientId?: string; userId: string; kind: RequestKind }) {
   return (
-    <form action={saveBrief} className="card p-6 grid sm:grid-cols-2 gap-4 max-w-3xl">
+    <form action={saveBrief} className="card p-5 sm:p-6 grid sm:grid-cols-2 gap-4 max-w-3xl">
       {brief && <input type="hidden" name="id" value={brief.id} />}
-      <ClientSelect clients={clients} value={brief?.client_id ?? clientId} disabled={!!brief} />
-      <Field label="Título del proyecto *"><input name="title" className="input" required defaultValue={brief?.title} placeholder="Ej. Campaña de Navidad" /></Field>
-      <Field label="Objetivo" className="sm:col-span-2"><textarea name="objective" rows={3} className="input" defaultValue={brief?.objective ?? ""} placeholder="¿Qué queremos lograr?" /></Field>
-      <Field label="Público objetivo"><textarea name="audience" rows={3} className="input" defaultValue={brief?.audience ?? ""} /></Field>
-      <Field label="Mensaje clave"><textarea name="key_message" rows={3} className="input" defaultValue={brief?.key_message ?? ""} /></Field>
-      <Field label="Entregables" className="sm:col-span-2"><textarea name="deliverables" rows={3} className="input" defaultValue={brief?.deliverables ?? ""} placeholder="Ej. 8 posts, 4 reels, 1 landing" /></Field>
-      <Field label="Referencias / links" className="sm:col-span-2"><textarea name="refs" rows={2} className="input" defaultValue={brief?.refs ?? ""} /></Field>
-      <div className="sm:col-span-2"><span className="label">Archivos</span><FilePicker userId={userId} initial={brief?.attachments ?? []} /></div>
-      <Field label="Fecha de entrega"><input name="deadline" type="date" className="input" defaultValue={brief?.deadline ?? ""} /></Field>
-      <Field label="Presupuesto (COP)"><input name="budget" type="number" min="0" step="1000" className="input" defaultValue={brief?.budget ?? ""} /></Field>
+      <div className="sm:col-span-2"><ClientSelect clients={clients} value={brief?.client_id ?? clientId} disabled={!!brief} /></div>
+      <RequestFields kind={kind} brief={brief} />
+      {kind.files && <div className="sm:col-span-2"><span className="label">Archivos</span><FilePicker userId={userId} initial={brief?.attachments ?? []} /></div>}
       <div className="sm:col-span-2 flex justify-end">
-        <SubmitButton>{brief ? "Guardar cambios" : "Crear brief"}</SubmitButton>
+        <SubmitButton>{brief ? "Guardar cambios" : `Crear ${kind.label.toLowerCase()}`}</SubmitButton>
       </div>
     </form>
   );
@@ -98,24 +92,38 @@ export function PostForm({ post, clients, userId, clientId, date, briefs = [], b
         <Field label={`Título de la ${word} *`}><input name="title" className="input" required defaultValue={post?.title} placeholder="Ej. Lanzamiento sabor maracuyá" /></Field>
         <Field label="Copy"><textarea name="copy" rows={8} className="input" defaultValue={post?.copy ?? ""} placeholder="Texto de la publicación, hashtags, CTA…" /></Field>
         <div>
-          <span className="label">Arte</span>
-          <ImageUpload userId={userId} initial={post?.asset_url} />
+          <span className="label">Material · imágenes, video, PDF o cualquier archivo</span>
+          <FilePicker userId={userId} name="assets"
+            initial={post?.assets?.length ? post.assets : post?.asset_url ? [{ url: post.asset_url, name: "arte", type: /\.(mp4|mov|webm)$/i.test(post.asset_url) ? "video/mp4" : "image/*" }] : []} />
+          <p className="text-[12px] text-muted mt-1.5 px-1">Para un carrusel sube todas las láminas en orden. Tu cliente podrá marcar cambios sobre cada imagen.</p>
         </div>
+        <Field label="Enlace (opcional)" hint="Figma, sitio web, video en Drive o YouTube…">
+          <input name="link_url" type="url" className="input" defaultValue={post?.link_url ?? ""} placeholder="https://" />
+        </Field>
       </div>
       <div className="space-y-4">
         <div className="card p-6 space-y-4">
           <ClientSelect clients={clients} value={post?.client_id ?? clientId} disabled={!!post} />
-          <Field label="Red o canal">
-            <select name="network" className="input" defaultValue={post?.network ?? netKeys[0]}>
-              {netKeys.map((k) => <option key={k} value={k}>{NETWORKS[k]}</option>)}
-            </select>
-          </Field>
-          <Field label="Formato">
+          <div className="group/soc space-y-4">
+            <label className="flex items-center justify-between gap-3 rounded-[16px] bg-white px-4 py-3 cursor-pointer">
+              <span><span className="block font-semibold text-[14px]">Es para redes sociales</span><span className="block text-[12px] text-muted">Pide red y fecha de publicación</span></span>
+              <input type="checkbox" name="social" defaultChecked={post ? post.social !== false : networks?.[0] !== "entrega"} className="peer sr-only" />
+              <span className="relative h-7 w-12 shrink-0 rounded-full bg-surface-2 transition-colors peer-checked:bg-brand after:absolute after:top-1 after:left-1 after:size-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5" />
+            </label>
+            <div className="hidden group-has-[input[name=social]:checked]/soc:block">
+              <Field label="Red o canal">
+                <select name="network" className="input" defaultValue={post?.network ?? netKeys[0]}>
+                  {netKeys.map((k) => <option key={k} value={k}>{NETWORKS[k]}</option>)}
+                </select>
+              </Field>
+            </div>
+          </div>
+          <Field label="Tipo de material">
             <select name="format" className="input" defaultValue={post?.format ?? fmtKeys[0]}>
               {fmtKeys.map((k) => <option key={k} value={k}>{FORMATS[k]}</option>)}
             </select>
           </Field>
-          <Field label="Fecha y hora de publicación">
+          <Field label="Fecha (publicación o entrega)">
             <input name="scheduled_at" type="datetime-local" className="input"
               defaultValue={post ? isoToBogotaLocal(post.scheduled_at) : date ? `${date}T10:00` : ""} />
           </Field>
@@ -132,7 +140,7 @@ export function PostForm({ post, clients, userId, clientId, date, briefs = [], b
           <SubmitButton name="intent" value="save">{post?.status === "cambios" ? "Guardar corrección" : post ? "Guardar cambios" : `Guardar ${word}`}</SubmitButton>
           {canSend && (
             <SubmitButton className="btn btn-soft" name="intent" value="review" pendingText="Guardando…">
-              {post?.status === "cambios" ? "Guardar y reenviar →" : "Guardar y enviar a aprobación →"}
+              {post?.status === "cambios" ? "Guardar y reenviar →" : "Guardar y enviar a revisión →"}
             </SubmitButton>
           )}
           {canSend && <p className="text-[12px] text-muted text-center px-2">Tip: guarda varias piezas y envíalas juntas. Tu cliente recibe un solo aviso.</p>}

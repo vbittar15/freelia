@@ -4,7 +4,7 @@ import { EmptyState, PageHeader, Row, RowList, Section } from "@/components/ui";
 import type { Post, ReviewRequest } from "@/lib/types";
 import { clientLabel, timeAgo } from "@/lib/utils";
 
-export const metadata = { title: "Aprobaciones" };
+export const metadata = { title: "Revisiones" };
 
 export default async function Page() {
   const { supabase } = await requireCreative();
@@ -40,8 +40,8 @@ export default async function Page() {
 
   return (
     <>
-      <PageHeader title="Aprobaciones" subtitle="Envía piezas a tus clientes y sigue sus respuestas."
-        actions={<Link href="/panel/enviar" className="btn btn-primary">Enviar a aprobación</Link>} />
+      <PageHeader title="Revisiones" subtitle="Lo que está por enviar, lo que el cliente está revisando y lo que ya respondió."
+        actions={<Link href="/panel/enviar" className="btn btn-primary">Enviar a revisión</Link>} />
       {(drafts > 0 || fixes > 0) && (
         <Link href="/panel/enviar" className="mb-7 flex items-center gap-4 rounded-[22px] bg-azul-t p-4 sm:p-5 hover:ring-2 hover:ring-brand/30 transition">
           <div className="min-w-0 flex-1">

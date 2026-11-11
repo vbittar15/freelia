@@ -1,41 +1,51 @@
 import { requireClient } from "@/lib/auth";
-import { EmptyState, Field, PageHeader } from "@/components/ui";
+import { EmptyState, PageHeader } from "@/components/ui";
 import { SubmitButton } from "@/components/client-ui";
 import { FilePicker } from "@/components/file-picker";
+import { KindPicker, RequestFields } from "@/components/request-fields";
+import { Lia } from "@/components/brand";
+import { kindMap } from "@/lib/requests";
 import { createRequest } from "../../actions";
 import { creativeName, getWorkspaces } from "../../data";
 
 export const metadata = { title: "Nueva solicitud" };
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await searchParams;
+export default async function Page({ searchParams }: { searchParams: Promise<{ error?: string; tipo?: string }> }) {
+  const { error, tipo } = await searchParams;
   const { supabase, user } = await requireClient();
   const ws = await getWorkspaces(supabase, user.id);
   if (!ws.length) return <EmptyState title="Aún no estás conectado a un equipo creativo" />;
+  const kind = tipo ? kindMap[tipo] : undefined;
   return (
     <>
-      <PageHeader title="Nueva solicitud" subtitle="Cuéntale a tu equipo qué necesitas." back={{ href: "/cliente/solicitudes", label: "Solicitudes" }} />
+      <PageHeader title="Nueva solicitud" subtitle={kind ? undefined : "¿Qué necesitas de tu equipo creativo?"} back={{ href: "/cliente/solicitudes", label: "Solicitudes" }} />
       {error && <p className="mb-5 rounded-[18px] bg-rosa-t text-ink px-4 py-3 text-[14px]">{error}</p>}
-      <form action={createRequest} className="card p-6 grid sm:grid-cols-2 gap-4 max-w-3xl">
-        {ws.length > 1 ? (
-          <Field label="Enviar a">
-            <select name="client_id" className="input" required>
-              {ws.map((w) => <option key={w.id} value={w.id}>{creativeName(w)}</option>)}
-            </select>
-          </Field>
-        ) : <input type="hidden" name="client_id" value={ws[0].id} />}
-        <Field label="¿Qué necesitas? *" className={ws.length > 1 ? "" : "sm:col-span-2"}>
-          <input name="title" className="input" required placeholder="Ej. Piezas para el lanzamiento de diciembre" />
-        </Field>
-        <Field label="Objetivo" className="sm:col-span-2"><textarea name="objective" rows={3} className="input" placeholder="¿Qué quieres lograr?" /></Field>
-        <Field label="¿A quién va dirigido?"><textarea name="audience" rows={3} className="input" /></Field>
-        <Field label="Mensaje principal"><textarea name="key_message" rows={3} className="input" /></Field>
-        <Field label="¿Qué piezas necesitas?" className="sm:col-span-2"><textarea name="deliverables" rows={3} className="input" placeholder="Ej. 4 posts, 2 historias, 1 video corto" /></Field>
-        <Field label="Referencias o links" className="sm:col-span-2"><textarea name="refs" rows={2} className="input" /></Field>
-        <div className="sm:col-span-2"><span className="label">Archivos (logos, referencias, audios…)</span><FilePicker userId={user.id} /></div>
-        <Field label="¿Para cuándo?"><input name="deadline" type="date" className="input" /></Field>
-        <div className="sm:col-span-2 flex justify-end"><SubmitButton pendingText="Enviando…">Enviar solicitud</SubmitButton></div>
-      </form>
+      <KindPicker current={kind?.key} href={(k) => `/cliente/solicitudes/nueva?tipo=${k}`} />
+      {kind ? (
+        <form action={createRequest} className="card p-5 sm:p-6 grid sm:grid-cols-2 gap-4 max-w-3xl mt-6 anim-page">
+          <div className="sm:col-span-2 flex items-center gap-3">
+            <span className="text-[28px]" aria-hidden>{kind.emoji}</span>
+            <div><div className="font-semibold text-[17px]">{kind.label}</div><div className="text-[13px] text-muted">{kind.desc}</div></div>
+          </div>
+          {ws.length > 1 ? (
+            <label className="block sm:col-span-2"><span className="label">Enviar a</span>
+              <select name="client_id" className="input" required>
+                {ws.map((w) => <option key={w.id} value={w.id}>{creativeName(w)}</option>)}
+              </select></label>
+          ) : <input type="hidden" name="client_id" value={ws[0].id} />}
+          <RequestFields kind={kind} />
+          {kind.files && <div className="sm:col-span-2"><span className="label">Archivos (logos, referencias, fotos…)</span><FilePicker userId={user.id} /></div>}
+          <div className="sm:col-span-2 flex flex-col-reverse sm:flex-row sm:items-center gap-3 justify-between">
+            <span className="text-[13px] text-muted">{kind.key === "reunion" ? `${creativeName(ws[0])} te confirmará la fecha y el enlace.` : `${creativeName(ws[0])} recibe un aviso al instante.`}</span>
+            <SubmitButton pendingText="Enviando…">{kind.key === "reunion" ? "Pedir reunión" : "Enviar solicitud"}</SubmitButton>
+          </div>
+        </form>
+      ) : (
+        <div className="mt-6 flex items-center gap-3 rounded-[20px] bg-azul-t p-4 max-w-xl">
+          <Lia size={40} mood="smile" />
+          <p className="text-[14px]">Elige qué necesitas y te pido solo los datos justos para ese tipo de solicitud.</p>
+        </div>
+      )}
     </>
   );
 }

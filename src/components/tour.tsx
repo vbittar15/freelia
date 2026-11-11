@@ -20,10 +20,10 @@ function buildSteps(keys: string[], name: string): Step[] {
       text: social
         ? "Planea las piezas por fecha y red social. Tu cliente marca sobre el arte lo que quiere cambiar 📍."
         : "Organiza pantallas, sitios, archivos y entregas por fecha. Tu cliente los revisa y marca sobre ellos lo que quiere ajustar." },
-    { target: ["/panel/envios", "more"], title: "Aprobaciones", mood: "smile",
+    { target: ["/panel/envios", "more"], title: "Revisiones", mood: "smile",
       text: "Cuando tengas varias listas, las envías juntas con un mensaje. Tu cliente las revisa una por una y aquí ves cómo va." },
-    { target: ["/panel/briefs", "more"], title: "Pedidos y briefs", mood: "right",
-      text: "Lo que te piden tus clientes llega aquí con archivos y fechas. Puedes enlazar las piezas a cada pedido." },
+    { target: ["/panel/briefs", "more"], title: "Solicitudes", mood: "right",
+      text: "Tus clientes piden proyectos, piezas, parrillas, campañas o reuniones. Cada solicitud muestra su avance y el material que subes para ella." },
     { target: ["/panel/cotizaciones", "more"], title: "Cotizaciones", mood: "idea",
       text: "Cotiza en segundos con tus servicios y paquetes guardados. Tu cliente la acepta desde su portal." },
     { target: ["/panel/cobros"], title: "Cuentas de cobro", mood: "happy", color: "#2FBF7A",
