@@ -25,7 +25,7 @@ export function PageHeader({
 }
 
 /** Encabezado en tono suave con Lia asomándose (Inicio y Cobros) */
-export function Hero({ children, tint = "#DCE3FF", lia = "#3D5BF5", mood = "peek" }:
+export function Hero({ children, tint = "var(--color-azul-t)", lia = "#3D5BF5", mood = "peek" }:
   { children: React.ReactNode; tint?: string; lia?: string; mood?: LiaMood }) {
   return (
     <div className="relative overflow-hidden rounded-[32px] px-6 md:px-9 pt-7 pb-8 md:pt-9 md:pb-10 mb-8" style={{ background: tint }}>

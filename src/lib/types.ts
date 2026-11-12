@@ -11,6 +11,8 @@ export type Profile = {
   phone: string | null;
   bank_info: string | null;
   specialties?: string[];
+  logo_url?: string | null;
+  brand_color?: string | null;
   settings?: import("./rubros").Settings | null;
   onboarded_at?: string | null;
 };
@@ -53,8 +55,15 @@ export type Client = {
   notes: string | null;
   archived: boolean;
   invite_token: string;
+  logo_url?: string | null;
+  brandbook_url?: string | null;
+  brand?: ClientBrand | null;
+  modules?: Partial<Record<ModuleKey, boolean>> | null;
   created_at: string;
 };
+
+export type ModuleKey = "parrilla" | "solicitudes" | "cotizaciones" | "cobros" | "contratos" | "chat";
+export type ClientBrand = { primary?: string; secondary?: string; accent?: string; font?: string; tone?: string };
 
 export type BriefStatus = "nuevo" | "en_proceso" | "completado";
 export type Brief = {
@@ -101,6 +110,11 @@ export type Post = {
   social?: boolean;
   final_files?: FileRef[];
   delivered_at?: string | null;
+  networks?: string[];
+  topic?: string | null;
+  idea?: string | null;
+  art_text?: string | null;
+  notes?: string | null;
   status: PostStatus;
   created_at: string;
   updated_at: string;
@@ -157,9 +171,20 @@ export type Invoice = {
   status: InvoiceStatus;
   notes: string | null;
   paid_at: string | null;
+  tax_rate?: number;
+  withholding_rate?: number;
+  discount?: number;
+  period?: string | null;
+  reminded_at?: string | null;
   created_at: string;
-  clients?: Pick<Client, "name" | "company" | "color" | "email" | "document_id"> | null;
+  clients?: Pick<Client, "name" | "company" | "color" | "email" | "document_id" | "phone" | "logo_url"> | null;
   invoice_items?: LineItem[];
+  invoice_payments?: InvoicePayment[];
+};
+
+export type InvoicePayment = {
+  id: string; invoice_id: string; amount: number; paid_on: string; method: string; reference: string | null;
+  proof_url: string | null; note: string | null; confirmed: boolean; created_by: string | null; created_at: string;
 };
 
 export type Message = {

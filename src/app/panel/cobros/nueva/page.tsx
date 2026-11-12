@@ -26,7 +26,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
           Completa tu cédula/NIT y datos bancarios en <Link href="/panel/perfil" className="text-brand font-medium">tu perfil</Link> para que aparezcan en la cuenta de cobro.
         </p>
       )}
-      {clients?.length ? <InvoiceForm clients={clients} clientId={cliente} catalog={catalog} defaults={{ due_date: plusDays(st.invoice_due_days), notes: st.invoice_notes }} />
+      {clients?.length ? <InvoiceForm clients={clients} clientId={cliente} catalog={catalog} defaults={{ due_date: plusDays(st.invoice_due_days), notes: st.invoice_notes, tax_rate: st.tax_rate, withholding_rate: st.withholding_rate }} />
         : <EmptyState title="Primero crea un cliente" action={<Link href="/panel/clientes/nuevo" className="btn btn-primary">Crear cliente</Link>} />}
     </>
   );

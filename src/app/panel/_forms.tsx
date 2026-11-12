@@ -2,11 +2,13 @@ import { SubmitButton } from "@/components/client-ui";
 import { Field } from "@/components/ui";
 import { ItemsEditor } from "@/components/items-editor";
 import { ClientServicesEditor } from "@/components/client-services-editor";
+import { BrandEditor } from "@/components/brand-editor";
+import { MODULES } from "@/lib/modules";
 import { RequestFields } from "@/components/request-fields";
 import type { RequestKind } from "@/lib/requests";
 import type { CatalogItem } from "@/lib/catalog";
 import { FilePicker } from "@/components/file-picker";
-import type { Brief, Client, ClientService, Invoice, Package, Post, Quote, Service } from "@/lib/types";
+import type { Brief, Client, ClientService, Invoice, ModuleKey, Package, Post, Quote, Service } from "@/lib/types";
 import { FORMATS, NETWORKS, isoToBogotaLocal } from "@/lib/utils";
 import { saveBrief, saveClient, saveInvoice, savePost, saveQuote } from "./actions";
 
@@ -31,7 +33,8 @@ function ClientSelect({ clients, value, disabled }: { clients: ClientOpt[]; valu
 
 const SWATCHES = ["#C9D6FF", "#E2D9FF", "#CFEFDF", "#FFE9B8", "#FFD3E4", "#D4ECFF", "#E9E3D6"];
 
-export function ClientForm({ client, services = [], packages = [], lines = [], hasDraft }: { client?: Client; services?: Service[]; packages?: Package[]; lines?: ClientService[]; hasDraft?: boolean }) {
+export function ClientForm({ client, services = [], packages = [], lines = [], hasDraft, userId, defaultModules }: { client?: Client; services?: Service[]; packages?: Package[]; lines?: ClientService[]; hasDraft?: boolean; userId: string; defaultModules: Record<ModuleKey, boolean> }) {
+  const mods = { ...defaultModules, ...(client?.modules ?? {}) };
   return (
     <form action={saveClient} className="grid gap-5 max-w-3xl">
     <div className="card p-6 grid sm:grid-cols-2 gap-4">
@@ -58,6 +61,23 @@ export function ClientForm({ client, services = [], packages = [], lines = [], h
       <Field label="Notas internas" className="sm:col-span-2">
         <textarea name="notes" rows={3} className="input" defaultValue={client?.notes ?? ""} placeholder="Tono de marca, horarios, personas clave…" />
       </Field>
+    </div>
+    <div className="card p-6">
+      <h2 className="h2">Marca del cliente</h2>
+      <p className="text-[13px] text-muted mt-1 mb-4">Con su logo y colores, su portal en Freelia se ve con su marca. El brand book queda a mano para todo el equipo.</p>
+      <BrandEditor userId={userId} initial={client?.brand} logo={client?.logo_url} brandbook={client?.brandbook_url} clientName={client?.company || client?.name} />
+    </div>
+    <div className="card p-6">
+      <h2 className="h2">Qué trabajas con este cliente</h2>
+      <p className="text-[13px] text-muted mt-1 mb-4">Activa solo lo que usas. Lo desactivado no aparece ni en tu panel ni en su portal.</p>
+      <div className="grid sm:grid-cols-2 gap-2">
+        {MODULES.map((m) => (
+          <label key={m.key} className="flex items-start gap-3 rounded-[16px] bg-white px-4 py-3 cursor-pointer has-[:checked]:ring-2 has-[:checked]:ring-brand transition">
+            <input type="checkbox" name={`mod_${m.key}`} defaultChecked={mods[m.key] !== false} className="size-4 mt-1 accent-[#3d5bf5]" />
+            <span><span className="block font-semibold text-[14px]">{m.label}</span><span className="block text-[12px] text-muted">{m.hint}</span></span>
+          </label>
+        ))}
+      </div>
     </div>
     <div className="card p-6">
       <h2 className="h2">Servicios que le prestas</h2>
@@ -101,9 +121,15 @@ export function PostForm({ post, clients, userId, clientId, date, briefs = [], b
   return (
     <form action={savePost} className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-5">
       {post && <input type="hidden" name="id" value={post.id} />}
+      {post?.networks?.map((k) => <input key={k} type="hidden" name="networks" value={k} />)}
       <div className="card p-6 space-y-4">
         <Field label={`Título de la ${word} *`}><input name="title" className="input" required defaultValue={post?.title} placeholder="Ej. Lanzamiento sabor maracuyá" /></Field>
-        <Field label="Copy"><textarea name="copy" rows={8} className="input" defaultValue={post?.copy ?? ""} placeholder="Texto de la publicación, hashtags, CTA…" /></Field>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field label="Tema"><input name="topic" className="input" defaultValue={post?.topic ?? ""} placeholder="Ej. Día del padre" /></Field>
+          <Field label="Idea o concepto"><input name="idea" className="input" defaultValue={post?.idea ?? ""} placeholder="Qué se va a mostrar" /></Field>
+        </div>
+        <Field label="Texto en la pieza"><textarea name="art_text" rows={2} className="input" defaultValue={post?.art_text ?? ""} placeholder="Lo que va escrito sobre el diseño" /></Field>
+        <Field label="Copy"><textarea name="copy" rows={6} className="input" defaultValue={post?.copy ?? ""} placeholder="Texto de la publicación, hashtags, CTA…" /></Field>
         <div>
           <span className="label">Material · imágenes, video, PDF o cualquier archivo</span>
           <FilePicker userId={userId} name="assets"
@@ -189,7 +215,7 @@ export function QuoteForm({ quote, clients, clientId, catalog, defaults }: { quo
   );
 }
 
-export function InvoiceForm({ invoice, clients, clientId, catalog, defaults }: { invoice?: Invoice; clients: ClientOpt[]; clientId?: string; catalog?: CatalogItem[]; defaults?: { due_date?: string; notes?: string } }) {
+export function InvoiceForm({ invoice, clients, clientId, catalog, defaults }: { invoice?: Invoice; clients: ClientOpt[]; clientId?: string; catalog?: CatalogItem[]; defaults?: { due_date?: string; notes?: string; tax_rate?: number; withholding_rate?: number } }) {
   const today = new Date().toISOString().slice(0, 10);
   return (
     <form action={saveInvoice} className="space-y-5 max-w-4xl">
@@ -203,6 +229,11 @@ export function InvoiceForm({ invoice, clients, clientId, catalog, defaults }: {
       <div className="card p-6">
         <h3 className="font-medium mb-4">Ítems</h3>
         <ItemsEditor initial={invoice?.invoice_items} catalog={catalog} />
+      </div>
+      <div className="card p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Field label="Descuento ($)"><input name="discount" type="number" min={0} step={1000} className="input" defaultValue={invoice?.discount ?? 0} /></Field>
+        <Field label="IVA (%)" hint="0 si no eres responsable de IVA"><input name="tax_rate" type="number" min={0} max={30} step="0.01" className="input" defaultValue={invoice?.tax_rate ?? defaults?.tax_rate ?? 0} /></Field>
+        <Field label="Retención en la fuente (%)" hint="La que te descuenta tu cliente"><input name="withholding_rate" type="number" min={0} max={20} step="0.01" className="input" defaultValue={invoice?.withholding_rate ?? defaults?.withholding_rate ?? 0} /></Field>
       </div>
       <div className="card p-6">
         <Field label="Notas" hint="Tus datos bancarios se toman de tu perfil.">

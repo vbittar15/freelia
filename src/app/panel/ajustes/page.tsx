@@ -4,11 +4,12 @@ import { Notice, PageHeader } from "@/components/ui";
 import { ConfirmSubmit, SubmitButton } from "@/components/client-ui";
 import { RubroPicker } from "@/components/rubro-picker";
 import { PackageForm } from "@/components/package-form";
+import { MyBrandFields } from "@/components/brand-editor";
 import { Lia } from "@/components/brand";
 import type { Package, Service } from "@/lib/types";
 import { RUBROS, UNITS, rubroMap, suggestedServices, usesSocial, withDefaults } from "@/lib/rubros";
 import { NETWORKS, cn, money } from "@/lib/utils";
-import { addSuggested, deletePackage, deleteService, savePackage, saveService, saveSettings, saveSpecialties } from "./actions";
+import { saveMyBrand, addSuggested, deletePackage, deleteService, savePackage, saveService, saveSettings, saveSpecialties } from "./actions";
 import { Icon, IconTile } from "@/components/icons";
 
 export const metadata = { title: "Ajustes" };
@@ -53,7 +54,7 @@ function ServiceFields({ sv, rubros }: { sv?: Service; rubros: string[] }) {
 export default async function Page({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
   const tab = TABS.some((t) => t.key === sp.tab) ? sp.tab! : "negocio";
-  const { supabase, profile } = await requireCreative();
+  const { supabase, profile, user } = await requireCreative();
   const rubros = profile.specialties ?? [];
   const settings = withDefaults(profile.settings);
   const [{ data: sd }, { data: pd }] = await Promise.all([
@@ -92,6 +93,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
             <div className="mt-4 flex justify-end"><SubmitButton>Guardar rubros</SubmitButton></div>
           </form>
           <aside className="space-y-4">
+            <form action={saveMyBrand} className="card p-5">
+              <div className="font-semibold">Tu marca en documentos</div>
+              <p className="text-[13px] text-muted mt-1 mb-3">Tu logo y color salen en cotizaciones, cuentas de cobro y contratos.</p>
+              <MyBrandFields userId={user.id} logo={profile.logo_url} color={profile.brand_color} />
+              <SubmitButton className="btn btn-soft btn-sm mt-3">Guardar mi marca</SubmitButton>
+            </form>
             <div className="rounded-[22px] bg-azul-t p-5">
               <div className="flex gap-3 items-center"><Lia size={40} mood="smile" /><div className="font-semibold">Recorrido por Freelia</div></div>
               <p className="text-[13px] text-muted mt-2">Vuelve a ver cómo funciona cada sección, explicada por Lia.</p>
@@ -226,6 +233,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
           </div>
           <label className="block max-w-[220px]"><span className="label">Plazo de pago (días)</span>
             <input name="invoice_due_days" type="number" min={0} max={365} defaultValue={settings.invoice_due_days} className="input" /></label>
+          <div className="grid grid-cols-2 gap-3 max-w-md">
+            <label className="block"><span className="label">IVA por defecto (%)</span>
+              <input name="tax_rate" type="number" min={0} max={30} defaultValue={settings.tax_rate} className="input" /></label>
+            <label className="block"><span className="label">Retención por defecto (%)</span>
+              <input name="withholding_rate" type="number" min={0} max={20} defaultValue={settings.withholding_rate} className="input" /></label>
+          </div>
           <label className="block"><span className="label">Nota por defecto</span>
             <textarea name="invoice_notes" rows={3} defaultValue={settings.invoice_notes} className="input" /></label>
           <div className="flex justify-end"><SubmitButton>Guardar preferencias</SubmitButton></div>

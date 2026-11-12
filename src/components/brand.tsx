@@ -44,46 +44,64 @@ export function Lia({ size = 40, mood = "base", color = "#3D5BF5", className, st
   const star = "M0 -1C.14 -.14 .14 -.14 1 0C.14 .14 .14 .14 0 1C-.14 .14 -.14 .14 -1 0C-.14 -.14 -.14 -.14 0 -1Z";
 
   let body = { rx: 50, ry: 50, dy: 0 };
-  let face: React.ReactNode;
+  let eyes: React.ReactNode;           // solo los ojos parpadean
+  let rest: React.ReactNode = null;    // boca, mejillas y cejas quedan quietas
   let extra: React.ReactNode = null;
+  let blink = true;
 
   switch (mood) {
     case "right":
-      face = <>{eye(-6, -6)}{eye(24, -6)}{big && line("M3 14h12", 4.5)}</>;
+      eyes = <>{eye(-6, -6)}{eye(24, -6)}</>;
+      rest = big && line("M3 14h12", 4.5);
       break;
     case "idea":
       body = { rx: 48.5, ry: 51.5, dy: -1.5 };
-      face = <>{eye(-15, -18)}{eye(15, -18)}{big && <circle cx={0} cy={12} r={4.5} fill={INK} />}</>;
+      eyes = <>{eye(-15, -18)}{eye(15, -18)}</>;
+      rest = big && <circle cx={0} cy={12} r={4.5} fill={INK} />;
       extra = big && <path transform="translate(44 -66) scale(13)" d={star} fill={INK} />;
       break;
     case "happy":
       body = { rx: 51.5, ry: 48.5, dy: 1.5 };
-      face = <>{line("M-23 -3q8 -13 16 0", 5.5)}{line("M7 -3q8 -13 16 0", 5.5)}{cheeks}{big && <path d="M-10 8h20a10 10 0 0 1-20 0z" fill={INK} />}</>;
+      blink = false;
+      eyes = <>{line("M-23 -6q8 -12 16 0", 5.5)}{line("M7 -6q8 -12 16 0", 5.5)}</>;
+      rest = <>{cheeks}{big && <path d="M-10 9h20a10 10 0 0 1-20 0z" fill={INK} />}</>;
       extra = big && <>{line("M54 -48l10 -12")}{line("M66 -30l15 -5")}{line("M-54 -48l-10 -12")}{line("M-66 -30l-15 -5")}</>;
       break;
     case "worry":
       if (big) body = { rx: 52.5, ry: 46.5, dy: 3.5 };
-      face = <>{eye(-15, -2)}{eye(15, -2)}{line("M-28 -19l15 -7")}{line("M28 -19l-15 -7")}{big && line("M-9 16q4.5 -5 9 0t9 0", 4.5)}</>;
+      eyes = <>{eye(-15, -4)}{eye(15, -4)}</>;
+      rest = <>{line("M-28 -21l15 -7")}{line("M28 -21l-15 -7")}{big && line("M-9 17q4.5 -5 9 0t9 0", 4.5)}</>;
       extra = big && <path d="M60 -52c5 8 9 13 9 18a9 9 0 0 1-18 0c0-5 4-10 9-18z" fill="#3D5BF5" />;
       break;
     case "sleep":
-      face = <>{line("M-23 -4h16")}{line("M7 -4h16")}{cheeks}</>;
+      blink = false;
+      eyes = <>{line("M-23 -4h16")}{line("M7 -4h16")}</>;
+      rest = cheeks;
       extra = big && <><text x={44} y={-40} fontFamily="Poppins" fontWeight={800} fontSize={26} fill={INK}>z</text><text x={64} y={-62} fontFamily="Poppins" fontWeight={800} fontSize={18} fill={INK}>z</text></>;
       break;
     case "smile":
-      face = <>{eye(-15, -6)}{eye(15, -6)}{cheeks}{big && line("M-7 10q7 7 14 0", 4.5)}</>;
+      eyes = <>{eye(-15, -9)}{eye(15, -9)}</>;
+      rest = <>{cheeks}{big && line("M-8 13q8 8 16 0", 4.5)}</>;
       break;
     case "peek":
-      face = <>{eye(-22, 4)}{eye(8, 4)}{cheeks}{big && line("M-7 10q7 7 14 0", 4.5)}</>;
+      // Mira hacia la izquierda: ojos y sonrisa se corren juntos
+      eyes = <>{eye(-24, -9)}{eye(4, -9)}</>;
+      rest = big && <>
+        <ellipse cx={-39} cy={10} rx={6.5} ry={4.2} fill={CHEEK} /><ellipse cx={19} cy={10} rx={6.5} ry={4.2} fill={CHEEK} />
+        {line("M-18 13q8 8 16 0", 4.5)}
+      </>;
       break;
     default:
-      face = <>{eye(-15, -6)}{eye(15, -6)}</>;
+      eyes = <>{eye(-15, -6)}{eye(15, -6)}</>;
   }
 
   return (
     <svg viewBox="-50 -50 100 100" width={size} height={size} className={cn("block shrink-0 overflow-visible", className)} aria-hidden>
       <ellipse cx={0} cy={body.dy} rx={body.rx} ry={body.ry} fill={color} />
-      <g transform={`translate(0 ${body.dy})`}><g className={still || mood === "happy" || mood === "sleep" ? undefined : "lia-eyes"} style={{ animationDelay: `${(size * 37) % 4000}ms` }}>{face}</g></g>
+      <g transform={`translate(0 ${body.dy})`}>
+        <g className={still || !blink ? undefined : "lia-eyes"} style={{ animationDelay: `${(size * 37) % 4000}ms` }}>{eyes}</g>
+        {rest}
+      </g>
       {extra}
     </svg>
   );

@@ -6,30 +6,37 @@ import { Avatar, EmptyState, Notice, Row, RowList, Section, Stat, StatusBadge } 
 import { ConfirmSubmit, SubmitButton } from "@/components/client-ui";
 import { InvitePanel } from "@/components/invite-panel";
 import { newContract } from "../../contratos/actions";
+import { generateMonthly } from "../../cobros/pay-actions";
+import { hasModule } from "@/lib/modules";
+import { ParrillaSheet, type SheetRow } from "@/components/parrilla-sheet";
+import { Icon } from "@/components/icons";
+import { withDefaults } from "@/lib/rubros";
 import { ContentCalendar, monthRange } from "@/components/content-calendar";
 import { Lia, Sparkle, StatusPill } from "@/components/brand";
-import type { Brief, Client, ClientService, Contract, Invoice, Post, Quote } from "@/lib/types";
+import type { Brief, Client, ClientService, Contract, Invoice, ModuleKey, Post, Quote } from "@/lib/types";
 import { FORMATS, NETWORKS, cn, fmtDate, fmtDateTime, isoToBogotaLocal, money, total } from "@/lib/utils";
 import { archiveClient, deleteClient, resetInvite } from "../../actions";
 
-const TABS = [
+const ALL_TABS: { k: string; l: string; mod?: ModuleKey }[] = [
   { k: "resumen", l: "Resumen" },
-  { k: "parrilla", l: "Parrilla" },
-  { k: "briefs", l: "Solicitudes" },
-  { k: "cotizaciones", l: "Cotizaciones" },
-  { k: "cobros", l: "Cobros" },
+  { k: "parrilla", l: "Parrilla", mod: "parrilla" },
+  { k: "material", l: "Material" },
+  { k: "briefs", l: "Solicitudes", mod: "solicitudes" },
+  { k: "cotizaciones", l: "Cotizaciones", mod: "cotizaciones" },
+  { k: "cobros", l: "Cobros", mod: "cobros" },
 ] as const;
 
-type SP = { tab?: string; mes?: string; vista?: string; nuevo?: string; enlace?: string };
+type SP = { error?: string; tab?: string; mes?: string; vista?: string; nuevo?: string; enlace?: string };
 
 export default async function Page({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<SP> }) {
   const { id } = await params;
   const sp = await searchParams;
-  const tab = TABS.some((t) => t.k === sp.tab) ? sp.tab! : "resumen";
   const { supabase, profile } = await requireCreative();
   const { data } = await supabase.from("clients").select("*").eq("id", id).single();
   if (!data) notFound();
   const c = data as Client;
+  const TABS = ALL_TABS.filter((t) => !t.mod || hasModule(c, t.mod));
+  const tab = TABS.some((t) => t.k === sp.tab) ? sp.tab! : "resumen";
 
   const [{ data: postsD }, { data: briefsD }, { data: quotesD }, { data: invoicesD }, { data: svcD }, { data: kD }] = await Promise.all([
     supabase.from("posts").select("*").eq("client_id", id).order("scheduled_at", { ascending: true, nullsFirst: false }),
@@ -39,6 +46,12 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     supabase.from("client_services").select("*").eq("client_id", id).order("position"),
     supabase.from("contracts").select("id, number, status, sent_at, signed_at, created_at").eq("client_id", id).order("created_at", { ascending: false }),
   ]);
+  const postIds = ((postsD ?? []) as Post[]).map((p) => p.id);
+  const { data: cmD } = postIds.length && sp.tab === "parrilla"
+    ? await supabase.from("post_comments").select("post_id, profiles(id)").in("post_id", postIds).eq("action", "comentario").neq("author_id", profile.id)
+    : { data: [] };
+  const commentCounts: Record<string, number> = {};
+  for (const r of (cmD ?? []) as { post_id: string }[]) commentCounts[r.post_id] = (commentCounts[r.post_id] ?? 0) + 1;
   const svcs = (svcD ?? []) as ClientService[];
   const contracts = (kD ?? []) as Pick<Contract, "id" | "number" | "status" | "sent_at" | "signed_at" | "created_at">[];
   const monthly = svcs.filter((x) => x.period === "mensual").reduce((a, x) => a + Number(x.price) * Number(x.qty), 0);
@@ -85,7 +98,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <Sparkle size={9} color="#A98BFF" className="absolute right-[142px] top-12 hidden sm:block" />
         <div className="flex flex-col xl:flex-row xl:items-center gap-4">
           <div className="flex items-center gap-4 min-w-0 flex-1">
-          <div className="anim-pop shrink-0"><Avatar name={c.company || c.name} size={60} color="#FFFFFF" /></div>
+          <div className="anim-pop shrink-0">{c.logo_url
+            // eslint-disable-next-line @next/next/no-img-element
+            ? <img src={c.logo_url} alt="" className="size-[60px] rounded-[18px] bg-white object-contain p-1.5" />
+            : <Avatar name={c.company || c.name} size={60} color="#FFFFFF" />}</div>
           <div className="min-w-0 flex-1">
             <h1 className="h1 truncate">{c.company || c.name}</h1>
             <div className="text-[14px] text-ink/70 flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
@@ -97,8 +113,8 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link href={`/panel/parrilla/nueva?cliente=${c.id}`} className="btn btn-primary btn-sm">+ Pieza</Link>
-            <Link href={`/panel/mensajes/${c.id}`} className="btn btn-sm bg-white text-ink hover:bg-surface">Mensajes</Link>
+            <Link href={`/panel/parrilla/nueva?cliente=${c.id}`} className="btn btn-primary btn-sm">+ Material</Link>
+            {hasModule(c, "chat") && <Link href={`/panel/mensajes/${c.id}`} className="btn btn-sm bg-white text-ink hover:bg-surface">Mensajes</Link>}
             <Link href={`${base}/editar`} className="btn btn-sm bg-white/60 text-ink hover:bg-white">Editar</Link>
           </div>
         </div>
@@ -162,7 +178,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
                 <div className="card p-5 text-[14px] text-muted">Aún no defines qué servicios le prestas. <Link href={`/panel/clientes/${c.id}/editar`} className="font-semibold text-brand-dark">Agregarlos</Link></div>
               )}
             </Section>
-            <Section title="Contrato" action={<form action={newContract}><input type="hidden" name="client_id" value={c.id} /><SubmitButton className="text-[13px] font-semibold text-brand-dark cursor-pointer" pendingText="Creando…">+ Nuevo</SubmitButton></form>}>
+            {hasModule(c, "contratos") && <Section title="Contrato" action={<form action={newContract}><input type="hidden" name="client_id" value={c.id} /><SubmitButton className="text-[13px] font-semibold text-brand-dark cursor-pointer" pendingText="Creando…">+ Nuevo</SubmitButton></form>}>
               <RowList empty={<div className="card p-5 text-[14px] text-muted">Sin contrato. Crea uno con los servicios de este cliente y envíaselo para firmar desde la app.</div>}>
                 {contracts.map((k) => (
                   <Row key={k.id} href={`/panel/contratos/${k.id}`} status={K_STATE[k.status]} title={`Contrato N.º ${k.number}`}
@@ -170,7 +186,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
                     pill={<StatusBadge status={K_STATE[k.status]} label={K_LABEL[k.status]} />} />
                 ))}
               </RowList>
-            </Section>
+            </Section>}
           </div>
 
           <div className="grid lg:grid-cols-2 gap-9 lg:gap-8 [&>*]:min-w-0">
@@ -202,6 +218,16 @@ export default async function Page({ params, searchParams }: { params: Promise<{
                 {c.phone && <div><div className="text-[12px] text-muted">WhatsApp</div>{c.phone}</div>}
                 {c.document_id && <div><div className="text-[12px] text-muted">NIT / C.C.</div>{c.document_id}</div>}
                 {c.notes && <div><div className="text-[12px] text-muted">Notas</div><p className="whitespace-pre-wrap">{c.notes}</p></div>}
+                {(c.brand?.primary || c.brandbook_url) && (
+                  <div><div className="text-[12px] text-muted mb-1">Marca</div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {[c.brand?.primary, c.brand?.secondary, c.brand?.accent].filter(Boolean).map((col) => <span key={col} className="size-6 rounded-[8px] ring-1 ring-line" style={{ background: col }} title={col} />)}
+                      {c.brand?.font && <span className="text-[13px]">{c.brand.font}</span>}
+                      {c.brandbook_url && <a href={c.brandbook_url} target="_blank" rel="noopener noreferrer" className="text-[13px] font-semibold text-brand-dark inline-flex items-center gap-1"><Icon name="clip" className="size-4" /> Brand book</a>}
+                    </div>
+                    {c.brand?.tone && <p className="text-[13px] text-muted mt-1">Tono: {c.brand.tone}</p>}
+                  </div>
+                )}
                 <div className="text-[12px] text-muted pt-1">Cliente desde {fmtDate(c.created_at)}</div>
               </div>
               <div className="flex gap-2 mt-3">
@@ -221,6 +247,37 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       )}
 
       {tab === "parrilla" && (() => {
+        const mes = /^\d{4}-\d{2}$/.test(sp.mes ?? "") ? sp.mes! : isoToBogotaLocal(new Date().toISOString()).slice(0, 7);
+        const [yy, mm] = mes.split("-").map(Number);
+        const prev = new Date(yy, mm - 2, 1), next = new Date(yy, mm, 1);
+        const fmtM = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const rows: SheetRow[] = posts.filter((p) => p.social !== false && p.scheduled_at && isoToBogotaLocal(p.scheduled_at).startsWith(mes))
+          .sort((a, b) => (a.scheduled_at ?? "").localeCompare(b.scheduled_at ?? ""))
+          .map((p) => {
+            const loc = isoToBogotaLocal(p.scheduled_at!);
+            return {
+              id: p.id, date: loc.slice(0, 10), time: loc.slice(11, 16), topic: p.topic ?? (p.title.startsWith("Publicación ") ? "" : p.title),
+              idea: p.idea ?? "", art_text: p.art_text ?? "", copy: p.copy ?? "", format: p.format, networks: p.networks?.length ? p.networks : p.network && p.network !== "entrega" ? [p.network] : [],
+              status: p.status, thumb: p.asset_url && !/\.(mp4|mov|webm)$/i.test(p.asset_url) ? p.asset_url : null,
+              comments: commentCounts[p.id] ?? 0, notes: p.notes ?? "",
+            };
+          });
+        const ml = new Date(yy, mm - 1, 1).toLocaleDateString("es-CO", { month: "long" });
+        const label = `${ml[0].toUpperCase()}${ml.slice(1)} ${yy}`;
+        return (
+          <>
+            <div className="flex items-center gap-2 mb-4">
+              <Link href={href({ mes: fmtM(prev) })} className="btn btn-ghost btn-sm !px-2.5" aria-label="Mes anterior"><Icon name="chevronLeft" className="size-4" /></Link>
+              <h2 className="h2 min-w-[170px] text-center">{label}</h2>
+              <Link href={href({ mes: fmtM(next) })} className="btn btn-ghost btn-sm !px-2.5" aria-label="Mes siguiente"><Icon name="chevronRight" className="size-4" /></Link>
+              <span className="ml-auto text-[13px] text-muted">{rows.length} {rows.length === 1 ? "publicación" : "publicaciones"}</span>
+            </div>
+            <ParrillaSheet key={mes} clientId={c.id} month={mes} rows={rows} defaultNetworks={withDefaults(profile.settings).networks} />
+          </>
+        );
+      })()}
+
+      {tab === "material" && (() => {
         const list = sp.vista === "lista";
         const { start, end } = monthRange(sp.mes);
         const monthPosts = posts.filter((p) => p.scheduled_at && p.scheduled_at >= start && p.scheduled_at < end);
@@ -272,7 +329,19 @@ export default async function Page({ params, searchParams }: { params: Promise<{
 
       {tab === "cobros" && (
         <>
-          <div className="mb-5"><Link href={`/panel/cobros/nueva?cliente=${c.id}`} className="btn btn-primary btn-sm">+ Nueva cuenta de cobro</Link></div>
+          {sp.error && <div className="mb-4"><Notice tone="error">{sp.error}</Notice></div>}
+          <div className="mb-5 flex flex-wrap gap-2">
+            {monthly > 0 && (() => {
+              const period = isoToBogotaLocal(new Date().toISOString()).slice(0, 7);
+              const done = invoices.some((i) => i.period === period);
+              const mesL = new Date(Number(period.slice(0, 4)), Number(period.slice(5)) - 1, 1).toLocaleDateString("es-CO", { month: "long" });
+              return done ? <span className="btn btn-sm bg-verde-t text-ink pointer-events-none"><Icon name="check" className="size-4" /> Cobro de {mesL} creado</span> : (
+                <form action={generateMonthly}><input type="hidden" name="client_id" value={c.id} /><input type="hidden" name="period" value={period} />
+                  <SubmitButton className="btn btn-primary btn-sm" pendingText="Generando…">Generar cobro de {mesL} · {money(monthly)}</SubmitButton></form>
+              );
+            })()}
+            <Link href={`/panel/cobros/nueva?cliente=${c.id}`} className="btn btn-soft btn-sm">+ Cuenta de cobro libre</Link>
+          </div>
           <RowList empty={<EmptyState title="Sin cuentas de cobro" />}>
             {invoices.map((i) => <Row key={i.id} href={`/panel/cobros/${i.id}`} status={invStatus(i)} title={`N.º ${String(i.number).padStart(3, "0")} · ${i.concept}`} sub={`Vence ${fmtDate(i.due_date)}`} right={money(total(i.invoice_items))} pill={<StatusBadge status={invStatus(i)} />} />)}
           </RowList>

@@ -7,6 +7,8 @@ import { bogotaLocalToISO } from "@/lib/utils";
 import type { LineItem } from "@/lib/types";
 import { parseRequest } from "@/lib/requests";
 import { buildContract, defaultTerms } from "@/lib/contract";
+import { MODULES } from "@/lib/modules";
+const MODULE_KEYS = MODULES.map((m) => m.key);
 
 const s = (f: FormData, k: string) => {
   const v = f.get(k);
@@ -20,6 +22,8 @@ const n = (f: FormData, k: string) => {
 function fail(path: string, msg: string): never {
   redirect(`${path}${path.includes("?") ? "&" : "?"}error=${encodeURIComponent(msg)}`);
 }
+
+function post_networks(f: FormData) { return f.getAll("networks").map(String); }
 
 function parseFiles(f: FormData, name = "attachments") {
   try {
@@ -56,6 +60,13 @@ export async function saveClient(formData: FormData) {
     document_id: s(formData, "document_id"),
     color: s(formData, "color") ?? "#C9D6FF",
     notes: s(formData, "notes"),
+    ...(formData.has("brand") ? {
+      logo_url: s(formData, "logo_url"),
+      brandbook_url: s(formData, "brandbook_url"),
+      brand: (() => { try { const b = JSON.parse(String(formData.get("brand") || "{}")); const hex = (v: unknown) => (typeof v === "string" && /^#[\da-f]{6}$/i.test(v) ? v : undefined);
+        return { primary: hex(b.primary), secondary: hex(b.secondary), accent: hex(b.accent), font: typeof b.font === "string" ? b.font.slice(0, 60) : undefined, tone: typeof b.tone === "string" ? b.tone.slice(0, 400) : undefined }; } catch { return {}; } })(),
+      modules: Object.fromEntries(MODULE_KEYS.map((k) => [k, formData.get(`mod_${k}`) === "on"])),
+    } : {}),
   };
   const back = id ? `/panel/clientes/${id}/editar` : "/panel/clientes/nuevo";
   if (!row.name) fail(back, "El nombre es obligatorio");
@@ -199,6 +210,9 @@ export async function savePost(formData: FormData) {
     format: s(formData, "format") ?? "post",
     scheduled_at: bogotaLocalToISO(s(formData, "scheduled_at")),
     copy: s(formData, "copy"),
+    topic: s(formData, "topic"),
+    idea: s(formData, "idea"),
+    art_text: s(formData, "art_text"),
     brief_id: s(formData, "brief_id"),
     link_url: s(formData, "link_url"),
     social: formData.get("social") === "on",
@@ -209,7 +223,8 @@ export async function savePost(formData: FormData) {
     // Portada: la primera imagen o video (para calendario y listas)
     row.asset_url = assets.find((a) => /^(image|video)\//.test(a.type) || /\.(png|jpe?g|gif|webp|mp4|mov|webm)$/i.test(a.url))?.url ?? null;
   }
-  if (!row.social) row.network = "entrega";
+  if (!row.social) { row.network = "entrega"; row.networks = []; }
+  else if (row.network && typeof row.network === "string") row.networks = [row.network, ...((post_networks(formData)).filter((k) => k !== row.network))];
   const back = id ? `/panel/parrilla/${id}` : "/panel/parrilla/nueva";
   if (!row.client_id || !row.title) fail(back, "Elige un cliente y escribe un título");
 
@@ -336,6 +351,9 @@ export async function saveInvoice(formData: FormData) {
     issue_date: s(formData, "issue_date") ?? new Date().toISOString().slice(0, 10),
     due_date: s(formData, "due_date"),
     notes: s(formData, "notes"),
+    discount: Math.max(0, Number(s(formData, "discount") ?? 0) || 0),
+    tax_rate: Math.min(30, Math.max(0, Number(s(formData, "tax_rate") ?? 0) || 0)),
+    withholding_rate: Math.min(20, Math.max(0, Number(s(formData, "withholding_rate") ?? 0) || 0)),
   };
   const back = id ? `/panel/cobros/${id}/editar` : "/panel/cobros/nueva";
   if (!row.client_id || !row.concept) fail(back, "Elige un cliente y escribe el concepto");

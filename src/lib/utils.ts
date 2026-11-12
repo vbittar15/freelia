@@ -56,6 +56,8 @@ export const NETWORKS: Record<string, string> = {
   x: "X",
   youtube: "YouTube",
   pinterest: "Pinterest",
+  whatsapp: "Historias de WhatsApp",
+  threads: "Threads",
   web: "Web / Blog",
   entrega: "Entrega directa (sin red)",
 };
@@ -67,6 +69,8 @@ export const FORMATS: Record<string, string> = {
   historia: "Historia",
   video: "Video",
   articulo: "Artículo",
+  live: "En vivo",
+  short: "Short / video vertical",
   foto: "Fotografía",
   sesion: "Sesión de fotos",
   pantalla: "Pantalla / UI",
@@ -104,3 +108,48 @@ export function numberToWords(n: number): string {
   if (millions && !thousands && !rest) s += " de";
   return s;
 }
+
+/** Totales de una cuenta de cobro: subtotal, descuento, IVA, retención, total, pagado y saldo */
+export function invoiceTotals(inv: { discount?: number | null; tax_rate?: number | null; withholding_rate?: number | null; invoice_items?: { quantity: number; unit_price: number }[]; invoice_payments?: { amount: number; confirmed: boolean }[] }) {
+  const subtotal = (inv.invoice_items ?? []).reduce((s, i) => s + Number(i.quantity) * Number(i.unit_price), 0);
+  const discount = Math.min(subtotal, Number(inv.discount ?? 0));
+  const base = subtotal - discount;
+  const tax = Math.round(base * Number(inv.tax_rate ?? 0) / 100);
+  const withholding = Math.round(base * Number(inv.withholding_rate ?? 0) / 100);
+  const total = Math.round(base + tax - withholding);
+  const paid = (inv.invoice_payments ?? []).filter((p) => p.confirmed).reduce((s, p) => s + Number(p.amount), 0);
+  const reported = (inv.invoice_payments ?? []).filter((p) => !p.confirmed).reduce((s, p) => s + Number(p.amount), 0);
+  return { subtotal, discount, base, tax, withholding, total, paid, reported, balance: Math.max(0, total - paid) };
+}
+
+/** Variantes de un color de marca: oscuro (texto/hover) y tinte suave */
+export function brandShades(hex: string) {
+  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex.trim());
+  if (!m) return null;
+  const [r, g, b] = [m[1], m[2], m[3]].map((x) => parseInt(x, 16));
+  const mix = (c: number, t: number, k: number) => Math.round(c + (t - c) * k);
+  const toHex = (a: number[]) => "#" + a.map((v) => v.toString(16).padStart(2, "0")).join("");
+  const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  // Si el color es muy claro, se oscurece para que el texto blanco se lea
+  const base = lum > 0.62 ? [mix(r, 0, 0.45), mix(g, 0, 0.45), mix(b, 0, 0.45)] : [r, g, b];
+  return {
+    brand: toHex(base),
+    dark: toHex(base.map((c) => mix(c, 0, 0.28))),
+    soft: toHex([r, g, b].map((c) => mix(c, 255, 0.86))),
+    tint: toHex([r, g, b].map((c) => mix(c, 255, 0.8))),
+  };
+}
+
+/** Redes de la parrilla (las que se usan en marketing) con sigla y color */
+export const SOCIAL: { key: string; label: string; abbr: string; color: string }[] = [
+  { key: "instagram", label: "Instagram", abbr: "IG", color: "#E1306C" },
+  { key: "facebook", label: "Facebook", abbr: "FB", color: "#1877F2" },
+  { key: "tiktok", label: "TikTok", abbr: "TT", color: "#111111" },
+  { key: "linkedin", label: "LinkedIn", abbr: "IN", color: "#0A66C2" },
+  { key: "x", label: "X", abbr: "X", color: "#222222" },
+  { key: "youtube", label: "YouTube", abbr: "YT", color: "#FF0000" },
+  { key: "whatsapp", label: "Historias de WhatsApp", abbr: "WA", color: "#25D366" },
+  { key: "pinterest", label: "Pinterest", abbr: "PI", color: "#E60023" },
+  { key: "threads", label: "Threads", abbr: "TH", color: "#000000" },
+];
+export const DAYS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];

@@ -113,6 +113,8 @@ export async function saveSettings(formData: FormData) {
     next.quote_notes = s(formData, "quote_notes") ?? "";
     next.invoice_due_days = int("invoice_due_days", 0, 365, cur.invoice_due_days);
     next.invoice_notes = s(formData, "invoice_notes") ?? "";
+    next.tax_rate = int("tax_rate", 0, 30, cur.tax_rate);
+    next.withholding_rate = int("withholding_rate", 0, 20, cur.withholding_rate);
   } else if (tab === "parrilla") {
     next.networks = formData.getAll("networks").map(String).filter((k) => k in NETWORKS);
     next.rounds_included = int("rounds_included", 0, 10, cur.rounds_included);
@@ -145,4 +147,14 @@ export async function finishOnboarding(formData: FormData) {
   if (rows.length) await supabase.from("services").insert(rows);
   revalidatePath("/panel", "layout");
   redirect("/panel?tour=1");
+}
+
+export async function saveMyBrand(formData: FormData) {
+  const { supabase, user } = await requireCreative();
+  const color = s(formData, "brand_color");
+  await supabase.from("profiles").update({
+    logo_url: s(formData, "logo_url"),
+    brand_color: color && /^#[\da-f]{6}$/i.test(color) ? color : null,
+  }).eq("id", user.id);
+  done("negocio", "Tu marca quedó guardada");
 }

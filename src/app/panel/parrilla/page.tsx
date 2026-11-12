@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { requireCreative } from "@/lib/auth";
 import { EmptyState, PageHeader, Row, RowList, StatusBadge } from "@/components/ui";
-import type { Post } from "@/lib/types";
+import { Icon } from "@/components/icons";
+import { hasModule } from "@/lib/modules";
+import type { Client, Post } from "@/lib/types";
 import { NETWORKS, FORMATS, clientLabel, cn, fmtDateTime } from "@/lib/utils";
 import { ContentCalendar, monthRange } from "@/components/content-calendar";
 import { pieceWord, usesSocial, workTitle } from "@/lib/rubros";
@@ -13,6 +15,8 @@ type SP = { mes?: string; cliente?: string; estado?: string; vista?: string };
 export default async function Page({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = await searchParams;
   const { supabase, profile } = await requireCreative();
+  const { data: pcs } = await supabase.from("clients").select("id, name, company, color, logo_url, modules").eq("archived", false).order("company");
+  const parrillaClients = ((pcs ?? []) as Client[]).filter((c) => hasModule(c, "parrilla"));
   const rub = profile.specialties ?? [];
 
   const { start, end } = monthRange(sp.mes);
@@ -49,6 +53,22 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
           <Link href={`/panel/enviar${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-soft">Enviar a revisión</Link>
           <Link href={`/panel/parrilla/nueva${sp.cliente ? `?cliente=${sp.cliente}` : ""}`} className="btn btn-primary">+ Nueva {pieceWord(rub)}</Link>
         </>} />
+
+      {parrillaClients.length > 0 && (
+        <section className="mb-6">
+          <div className="text-[13px] font-semibold text-muted mb-2 px-1">Parrilla de cada cliente</div>
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+            {parrillaClients.map((c) => (
+              <Link key={c.id} href={`/panel/clientes/${c.id}?tab=parrilla`} className="shrink-0 flex items-center gap-2.5 rounded-[18px] bg-surface hover:bg-surface-2 px-3 py-2.5 transition-colors">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {c.logo_url ? <img src={c.logo_url} alt="" className="size-8 rounded-[10px] object-contain bg-white" /> : <span className="size-8 rounded-[10px] grid place-items-center text-[12px] font-bold" style={{ background: c.color ?? "#DCE3FF" }}>{(c.company || c.name).slice(0, 2).toUpperCase()}</span>}
+                <span className="font-semibold text-[14px] whitespace-nowrap">{c.company || c.name}</span>
+                <Icon name="chevronRight" className="size-4 text-faint" />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="flex flex-wrap items-center gap-2 mb-5">
         <form className="flex flex-wrap gap-2" action="/panel/parrilla">

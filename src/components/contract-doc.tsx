@@ -1,29 +1,26 @@
 import type { Contract } from "@/lib/types";
 import { parseBody } from "@/lib/contract";
-import { fmtDateTime, money } from "@/lib/utils";
+import { brandShades, fmtDateTime, money } from "@/lib/utils";
 import { Logo } from "./brand";
+import { DocHeader, type Issuer } from "./documents";
 
 /** Contrato listo para leer, imprimir o guardar como PDF */
-export function ContractDocument({ k }: { k: Contract }) {
+export function ContractDocument({ k, issuer }: { k: Contract; issuer?: Issuer | null }) {
   const blocks = parseBody(k.body);
+  const a = brandShades(issuer?.brand_color || "#3D5BF5")!;
   return (
-    <article className="sheet p-6 sm:p-10 text-[14.5px] leading-relaxed">
-      <header className="flex items-start justify-between gap-4 mb-6">
-        <div>
-          <div className="text-[12px] uppercase tracking-wide text-muted">Contrato N.º {k.number}</div>
-          <h1 className="text-[22px] sm:text-[26px] font-bold tracking-tight leading-tight mt-1">{k.title}</h1>
-        </div>
-        <Logo size={20} />
-      </header>
+    <article className="sheet doc p-6 sm:p-10 text-[14.5px] leading-relaxed">
+      <DocHeader issuer={issuer ?? { full_name: k.creative_name, business_name: null, document_id: k.creative_doc, city: null, phone: null, email: "", bank_info: null }} kind="Contrato" number={k.number} accent={a} />
+      <h1 className="text-[22px] sm:text-[26px] font-bold tracking-tight leading-tight mb-6">{k.title}</h1>
       <div className="space-y-3">
         {blocks.map((b, i) => b.kind === "h"
-          ? <h2 key={i} className="font-bold text-[15.5px] pt-3">{b.text}</h2>
+          ? <h2 key={i} className="font-bold text-[15.5px] pt-4 break-after-avoid" style={{ color: a.dark }}>{b.text}</h2>
           : b.kind === "li" ? <p key={i} className="pl-5 relative before:content-['•'] before:absolute before:left-1.5 before:text-brand">{b.text}</p>
           : <p key={i}>{b.text}</p>)}
       </div>
 
       {k.services.length > 0 && (
-        <div className="mt-6 rounded-[16px] bg-surface p-4 text-[13.5px] break-inside-avoid">
+        <div className="mt-6 rounded-[16px] p-4 text-[13.5px] break-inside-avoid" style={{ background: a.soft }}>
           <div className="font-semibold mb-2">Resumen de servicios</div>
           {k.services.map((s, i) => (
             <div key={i} className="flex justify-between gap-3 py-1 border-b border-line last:border-0">
@@ -37,7 +34,7 @@ export function ContractDocument({ k }: { k: Contract }) {
       <section className="mt-10 grid sm:grid-cols-2 gap-8 break-inside-avoid">
         <div>
           <div className="h-20 flex items-end">
-            {k.sent_at ? <span className="font-[cursive] text-[26px] text-brand-dark leading-none">{k.creative_name}</span> : <span className="text-muted text-[13px]">Pendiente</span>}
+            {k.sent_at ? <span className="font-[cursive] text-[26px] leading-none" style={{ color: a.dark }}>{k.creative_name}</span> : <span className="text-muted text-[13px]">Pendiente</span>}
           </div>
           <div className="border-t border-ink/60 pt-2">
             <div className="font-semibold">{k.creative_name || "EL CONTRATISTA"}</div>
@@ -58,6 +55,7 @@ export function ContractDocument({ k }: { k: Contract }) {
         </div>
       </section>
 
+      <div className="mt-8 flex items-center justify-between text-[11px] text-faint"><span>Documento generado con</span><Logo size={13} /></div>
       {k.signed_at && (
         <footer className="mt-8 rounded-[14px] border border-line p-3 text-[11px] text-muted leading-relaxed break-inside-avoid">
           <b className="text-ink">Evidencia de firma electrónica (Ley 527 de 1999).</b> Firmado por {k.signer_name} ({k.signer_doc}{k.signer_email ? `, ${k.signer_email}` : ""}) el {fmtDateTime(k.signed_at)}

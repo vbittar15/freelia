@@ -82,6 +82,8 @@
   .no-print { display: none !important; }
   body { background: white; }
   .sheet { border: none !important; padding: 0 !important; }
+  .doc, .doc * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .doc header { margin-left: 0 !important; margin-right: 0 !important; margin-top: 0 !important; border-radius: 16px !important; }
   @page { margin: 18mm; }
 }
 

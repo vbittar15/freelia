@@ -155,6 +155,8 @@ export type Settings = {
   invoice_notes?: string;
   networks?: string[];
   rounds_included?: number;
+  tax_rate?: number;
+  withholding_rate?: number;
 };
 
 export const DEFAULT_SETTINGS: Required<Settings> = {
@@ -164,6 +166,8 @@ export const DEFAULT_SETTINGS: Required<Settings> = {
   invoice_notes: "No soy responsable de IVA.",
   networks: [],
   rounds_included: 2,
+  tax_rate: 0,
+  withholding_rate: 0,
 };
 
 export const withDefaults = (s?: Settings | null): Required<Settings> => ({ ...DEFAULT_SETTINGS, ...(s ?? {}) });

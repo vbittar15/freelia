@@ -43,7 +43,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {sp.error && <div className="mb-5 no-print"><Notice tone="error">{sp.error}</Notice></div>}
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
-        <ContractDocument k={k} />
+        <ContractDocument k={k} issuer={profile} />
 
         <aside className="space-y-4 no-print lg:sticky lg:top-6">
           {k.status === "borrador" && (

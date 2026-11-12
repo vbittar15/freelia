@@ -14,10 +14,11 @@ import { Icon, type IconName } from "./icons";
 export type NavItem = { href: string; label: string; short?: string; icon: IconName; exact?: boolean; tab?: boolean };
 
 export function AppShell({
-  nav, userId, userName, unread, notificationsHref, profileHref, children,
+  nav, userId, userName, unread, notificationsHref, profileHref, children, brand,
 }: {
   nav: NavItem[]; userId: string; userName: string; unread: number;
   notificationsHref: string; profileHref: string; children: React.ReactNode;
+  brand?: { logo?: string | null; name?: string; vars?: Record<string, string>; font?: string | null };
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -50,10 +51,14 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex" style={{ ...(brand?.vars ?? {}), ...(brand?.font ? { fontFamily: `"${brand.font}", var(--font-sans)` } : {}) } as React.CSSProperties}>
+      {brand?.font && <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${encodeURIComponent(brand.font)}:wght@400;500;600;700;800&display=swap`} />}
       {/* Barra lateral (escritorio) */}
       <aside className="no-print hidden lg:flex w-[248px] shrink-0 flex-col px-4 py-7 sticky top-0 h-screen">
-        <Link href={nav[0].href} className="px-3 mb-9"><Logo size={28} /></Link>
+        <Link href={nav[0].href} className="px-3 mb-9 block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {brand?.logo ? <><img src={brand.logo} alt={brand.name ?? "Logo"} className="h-10 max-w-[180px] object-contain" /><span className="mt-2 flex items-center gap-1.5 text-[11px] text-faint">con <Logo size={12} /></span></> : <Logo size={28} />}
+        </Link>
         <nav className="flex flex-col gap-1 flex-1">
           {nav.map((i) => (
             <Link key={i.href} href={i.href} data-tour={i.href}
@@ -83,7 +88,8 @@ export function AppShell({
       <div className="flex-1 min-w-0 flex flex-col">
         {/* Barra superior (móvil) */}
         <header className="no-print lg:hidden flex items-center justify-between px-4 h-16 sticky top-0 bg-white/90 backdrop-blur z-20">
-          <Link href={nav[0].href} className="pl-1"><Logo size={24} /></Link>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <Link href={nav[0].href} className="pl-1">{brand?.logo ? <img src={brand.logo} alt={brand.name ?? "Logo"} className="h-8 max-w-[140px] object-contain" /> : <Logo size={24} />}</Link>
           <div className="flex items-center gap-2.5">
             <Link href={notificationsHref} data-tour="notificaciones" className="icon-btn relative" aria-label="Notificaciones">
               <Icon name="bell" />

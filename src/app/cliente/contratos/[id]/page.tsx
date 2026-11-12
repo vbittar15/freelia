@@ -16,6 +16,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const { data } = await supabase.from("contracts").select("*").eq("id", id).single();
   if (!data) notFound();
   const k = data as Contract;
+  const { data: iss } = await supabase.from("profiles").select("full_name, business_name, document_id, city, phone, email, bank_info, logo_url, brand_color").eq("id", k.owner_id).single();
   const hash = createHash("sha256").update(k.body, "utf8").digest("hex");
 
   return (
@@ -25,7 +26,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
       {error && <div className="mb-5 no-print"><Notice tone="error">{error}</Notice></div>}
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-6 items-start">
-        <ContractDocument k={k} />
+        <ContractDocument k={k} issuer={iss} />
         <aside className="no-print lg:sticky lg:top-6">
           {k.status === "enviado" ? (
             <div className="card p-5 sm:p-6">

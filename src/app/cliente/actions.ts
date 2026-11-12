@@ -98,3 +98,18 @@ export async function signContract(formData: FormData) {
   revalidatePath("/cliente", "layout");
   redirect(`/cliente/contratos/${id}?ok=1`);
 }
+
+export async function reportPayment(formData: FormData) {
+  const { supabase } = await requireClient();
+  const id = s(formData, "invoice_id")!;
+  const amount = Math.round(Number(s(formData, "amount") ?? 0));
+  let proof: string | null = null;
+  try { const a = JSON.parse(String(formData.get("proof") || "[]")); proof = Array.isArray(a) && a[0]?.url ? String(a[0].url) : null; } catch { /* sin comprobante */ }
+  if (!(amount > 0)) redirect(`/cliente/cobros/${id}?error=${encodeURIComponent("Escribe el valor que pagaste")}`);
+  const { error } = await supabase.from("invoice_payments").insert({
+    invoice_id: id, amount, paid_on: s(formData, "paid_on"), method: s(formData, "method") ?? "transferencia", reference: s(formData, "reference"), proof_url: proof, confirmed: false,
+  });
+  if (error) redirect(`/cliente/cobros/${id}?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/cliente", "layout");
+  redirect(`/cliente/cobros/${id}?ok=1`);
+}

@@ -81,6 +81,13 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             <AssetViewer postId={p.id} userId={user.id} assets={assets} link={p.link_url} comments={all}
               versions={(vers ?? []) as PostVersion[]} currentRound={Math.max(1, p.round ?? 1)} canPin={p.status === "en_revision"} canResolve={false} />
           </div>
+          {(p.topic || p.idea || p.art_text) && (
+            <div className="p-6 border-t border-line grid sm:grid-cols-3 gap-4 text-[14px]">
+              {p.topic && <div><div className="text-[11px] uppercase tracking-wide text-muted mb-1">Tema</div>{p.topic}</div>}
+              {p.idea && <div><div className="text-[11px] uppercase tracking-wide text-muted mb-1">Idea</div><p className="whitespace-pre-wrap">{p.idea}</p></div>}
+              {p.art_text && <div><div className="text-[11px] uppercase tracking-wide text-muted mb-1">Texto en la pieza</div><p className="whitespace-pre-wrap">{p.art_text}</p></div>}
+            </div>
+          )}
           {p.copy && (
             <div className="p-6 border-t border-line">
               <div className="text-[11px] uppercase tracking-wide text-muted mb-2">Copy</div>
